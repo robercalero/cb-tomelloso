@@ -20,7 +20,7 @@ services:
       - key: BASE_URL
         value: https://cb-tomelloso-api.onrender.com
       - key: DB_SYNC
-        value: "true"
+        value: "false"
       - key: DB_LOGGING
         value: "false"
       - key: DB_SSL
