@@ -2,7 +2,7 @@ services:
   - type: web
     name: cb-tomelloso-api
     runtime: node
-    repo: https://github.com/tu-usuario/cb-tomelloso
+    repo: https://github.com/robercalero/cb-tomelloso
     plan: free
     rootDir: backend
     buildCommand: npm install && npm run build
@@ -23,6 +23,8 @@ services:
         value: "true"
       - key: DB_LOGGING
         value: "false"
+      - key: DB_SSL
+        value: REQUIRED
       - key: THROTTLE_TTL
         value: "60000"
       - key: THROTTLE_LIMIT
@@ -36,6 +38,8 @@ services:
       - key: DB_PASSWORD
         sync: false
       - key: DB_NAME
+        sync: false
+      - key: DB_CA_CERT
         sync: false
       - key: JWT_SECRET
         sync: false
@@ -53,7 +57,7 @@ services:
   - type: static
     name: cb-tomelloso-web
     runtime: static
-    repo: https://github.com/tu-usuario/cb-tomelloso
+    repo: https://github.com/robercalero/cb-tomelloso
     plan: free
     rootDir: .
     buildCommand: npm install && npm run build -- --configuration production
