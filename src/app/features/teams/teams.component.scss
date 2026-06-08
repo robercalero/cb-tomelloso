@@ -1,0 +1,167 @@
+.teams-page {
+  .page-hero {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    padding: 120px 0 60px;
+    color: var(--color-white);
+    text-align: center;
+  }
+
+  .page-hero-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 3rem;
+    margin: 0 0 var(--spacing-sm);
+  }
+
+  .page-hero-subtitle {
+    font-size: 1.15rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .section {
+    padding: var(--spacing-2xl) 0;
+  }
+}
+
+.team-tabs {
+  margin-top: var(--spacing-lg);
+}
+
+.tab-content {
+  padding: var(--spacing-xl) 0;
+}
+
+.team-info-header {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.team-info {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+.team-badge {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.team-name {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.team-category {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin: 2px 0;
+}
+
+.team-coach {
+  font-size: 0.85rem;
+  color: var(--color-text);
+  margin: var(--spacing-xs) 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  .assistant {
+    color: var(--color-text-muted);
+  }
+}
+
+.subsection-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin: var(--spacing-xl) 0 var(--spacing-lg);
+}
+
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.recent-results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  color: var(--color-text-muted);
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.standings-table-wrapper {
+  overflow-x: auto;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.standings-table {
+  width: 100%;
+
+  .highlight-row {
+    background: rgba(212, 160, 23, 0.08);
+    font-weight: 600;
+  }
+
+  th {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-muted);
+  }
+
+  td {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .teams-page {
+    .page-hero-title {
+      font-size: 2rem;
+    }
+  }
+
+  .team-info {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .players-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

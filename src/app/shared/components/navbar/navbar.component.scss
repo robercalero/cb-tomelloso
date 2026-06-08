@@ -1,0 +1,232 @@
+:host {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar {
+  transition: box-shadow var(--transition-normal);
+
+  &.scrolled {
+    box-shadow: var(--shadow-nav);
+  }
+}
+
+.navbar-top {
+  background: var(--color-dark);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 4px 0;
+
+  .social-bar {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-md);
+  }
+
+  .social-icon {
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      color: var(--color-secondary-light);
+    }
+  }
+}
+
+.navbar-main {
+  background: var(--color-dark-secondary);
+  padding: 0;
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+  color: var(--color-white);
+
+  .logo-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-primary);
+  }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1.2rem;
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+  }
+
+  .logo-subtitle {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 0.7rem;
+    color: var(--color-secondary-light);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+
+  .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: color var(--transition-fast), background var(--transition-fast);
+
+    &:hover, &.active {
+      color: var(--color-secondary-light);
+      background: rgba(39, 174, 96, 0.1);
+    }
+
+    &.active {
+      font-weight: 600;
+    }
+  }
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 20px;
+  background: var(--color-accent);
+  color: var(--color-white);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+
+  &:hover {
+    background: var(--color-accent-hover);
+    transform: translateY(-1px);
+  }
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+
+  .hamburger-line {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-white);
+    border-radius: 2px;
+    transition: all var(--transition-fast);
+  }
+
+  .hamburger-line.open:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+
+  .hamburger-line.open:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger-line.open:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+}
+
+.mobile-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+@media (max-width: 1024px) {
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: var(--color-dark-secondary);
+    flex-direction: column;
+    padding: 80px var(--spacing-lg) var(--spacing-lg);
+    transition: right var(--transition-normal);
+    z-index: 1000;
+    gap: var(--spacing-xs);
+
+    &.open {
+      right: 0;
+    }
+
+    .nav-link {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1.1rem;
+    }
+
+    .cta-button {
+      width: 100%;
+      justify-content: center;
+      margin-top: var(--spacing-md);
+    }
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .mobile-overlay {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    height: 56px;
+  }
+
+  .logo-title {
+    font-size: 1rem;
+  }
+
+  .logo-subtitle {
+    font-size: 0.6rem;
+  }
+}

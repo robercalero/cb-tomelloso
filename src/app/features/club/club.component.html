@@ -1,0 +1,102 @@
+<div class="club-page">
+  <!-- Hero -->
+  <section class="page-hero">
+    <div class="container">
+      <h1 class="page-hero-title">El Club</h1>
+      <p class="page-hero-subtitle">Conoce nuestra historia, nuestra gente y nuestros valores</p>
+    </div>
+  </section>
+
+  <!-- Timeline Historia -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title text-center">Nuestra Historia</h2>
+      <div class="timeline">
+        @for (event of timeline; track event.year; let i = $index) {
+          <div class="timeline-item" [class.timeline-left]="i % 2 === 0" [class.timeline-right]="i % 2 !== 0">
+            <div class="timeline-marker">
+              <span class="timeline-year">{{ event.year }}</span>
+            </div>
+            <div class="timeline-content">
+              <h3 class="timeline-title">{{ event.title }}</h3>
+              <p class="timeline-desc">{{ event.description }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Junta Directiva -->
+  <section class="section section-dark">
+    <div class="container">
+      <h2 class="section-title text-center">Junta Directiva</h2>
+      <div class="board-grid">
+        @for (member of board; track member.name) {
+          <div class="board-card">
+            <div class="board-avatar">
+              <span>{{ member.name.split(' ').map(n => n[0]).join('').slice(0, 2) }}</span>
+            </div>
+            <h3 class="board-name">{{ member.name }}</h3>
+            <span class="board-role">{{ member.role }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Misión y Valores -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title text-center">Misión y Valores</h2>
+      <div class="values-grid">
+        @for (value of values; track value.title) {
+          <div class="value-card">
+            <mat-icon class="value-icon">{{ value.icon }}</mat-icon>
+            <h3 class="value-title">{{ value.title }}</h3>
+            <p class="value-desc">{{ value.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Pabellón -->
+  <section class="section section-dark">
+    <div class="container">
+      <h2 class="section-title text-center">Pabellón San José</h2>
+      <div class="venue-content">
+        <div class="venue-info">
+          <mat-icon>location_on</mat-icon>
+          <p>Pabellón San José, Tomelloso (Ciudad Real)</p>
+          <mat-icon>schedule</mat-icon>
+          <p>Entrenamientos: Lunes a Viernes, 17:00 - 21:00</p>
+          <mat-icon>calendar_month</mat-icon>
+          <p>Partidos: Fines de semana, horario según competición</p>
+        </div>
+        @defer (on viewport) {
+          <div class="venue-map">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3088.0!2d-3.0!3d39.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd0e0e0e0e0e0e0%3A0x0!2zUGFiZWxsw7NuIFNhbiBKb3PDqQ!5e0!3m2!1ses!2ses!4v1"
+              width="100%"
+              height="350"
+              style="border:0;"
+              allowfullscreen=""
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Ubicación del Pabellón San José"
+            ></iframe>
+          </div>
+        } @loading (minimum 300ms) {
+          <div class="venue-map-placeholder">
+            <p>Cargando mapa...</p>
+          </div>
+        } @placeholder {
+          <div class="venue-map-placeholder">
+            <p>Cargando mapa...</p>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>

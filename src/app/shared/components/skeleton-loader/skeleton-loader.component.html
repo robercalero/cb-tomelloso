@@ -1,0 +1,48 @@
+@switch (type()) {
+  @case ('card') {
+    @for (item of [].constructor(count()); track $index) {
+      <div class="skeleton-card">
+        <div class="skeleton-image skeleton-pulse"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line w-75 skeleton-pulse"></div>
+          <div class="skeleton-line w-50 skeleton-pulse"></div>
+          <div class="skeleton-line w-60 skeleton-pulse"></div>
+        </div>
+      </div>
+    }
+  }
+  @case ('hero') {
+    <div class="skeleton-hero">
+      <div class="skeleton-hero-content">
+        <div class="skeleton-line w-60 skeleton-pulse" style="height: 48px; margin-bottom: 16px;"></div>
+        <div class="skeleton-line w-40 skeleton-pulse" style="height: 24px;"></div>
+      </div>
+    </div>
+  }
+  @case ('gallery') {
+    <div class="skeleton-gallery-grid">
+      @for (item of [].constructor(count()); track $index) {
+        <div class="skeleton-gallery-item skeleton-pulse"></div>
+      }
+    </div>
+  }
+  @case ('list') {
+    <div class="skeleton-list">
+      @for (item of [].constructor(count()); track $index) {
+        <div class="skeleton-list-item">
+          <div class="skeleton-line w-40 skeleton-pulse"></div>
+          <div class="skeleton-line w-70 skeleton-pulse"></div>
+        </div>
+      }
+    </div>
+  }
+  @default {
+    @for (item of [].constructor(count()); track $index) {
+      <div class="skeleton-text">
+        <div class="skeleton-line w-100 skeleton-pulse"></div>
+        <div class="skeleton-line w-85 skeleton-pulse"></div>
+        <div class="skeleton-line w-70 skeleton-pulse"></div>
+      </div>
+    }
+  }
+}

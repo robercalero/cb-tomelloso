@@ -1,0 +1,166 @@
+<!-- ═══════════════════════════════════════════════════════
+     NEWS SLIDER HERO — noticias destacadas con imágenes
+     ═══════════════════════════════════════════════════════ -->
+<app-news-slider
+  [slides]="heroSlides()"
+  [autoplay]="true"
+  [interval]="6000"
+  [transition]="700"
+  [pauseOnHover]="true"
+  (slideChanged)="onSlideChanged($event)"
+/>
+
+<!-- Próximos Partidos -->
+<section class="section section-dark">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Próximos Partidos</h2>
+      <a routerLink="/agenda" class="section-link">Ver todos &rarr;</a>
+    </div>
+    @defer (on viewport) {
+      @if (upcomingMatches().length > 0) {
+        <div class="matches-grid">
+          @for (match of upcomingMatches(); track match.id) {
+            <app-match-card [match]="match" />
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>calendar_month</mat-icon>
+          <p>No hay partidos programados próximamente.</p>
+        </div>
+      }
+    } @loading (minimum 300ms) {
+      <div class="matches-grid">
+        <app-skeleton-loader type="card" [count]="3" />
+      </div>
+    } @placeholder {
+      <div class="matches-grid">
+        <app-skeleton-loader type="card" [count]="3" />
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Últimos Resultados -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Últimos Resultados</h2>
+      <a routerLink="/agenda" class="section-link">Ver todos &rarr;</a>
+    </div>
+    @if (recentResults().length > 0) {
+      <div class="matches-grid">
+        @for (match of recentResults().slice(0, 3); track match.id) {
+          <app-match-card [match]="match" />
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <mat-icon>sports_score</mat-icon>
+        <p>No hay resultados disponibles.</p>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Equipos Resumen -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Nuestros Equipos</h2>
+      <a routerLink="/equipos" class="section-link">Ver todos &rarr;</a>
+    </div>
+    <div class="teams-grid">
+      <div class="team-card">
+        <div class="team-card-icon team-senior">
+          <mat-icon>groups</mat-icon>
+        </div>
+        <h3 class="team-card-title">Sénior Autonómica</h3>
+        <p class="team-card-desc">Primera Nacional CLM</p>
+        <a mat-stroked-button routerLink="/equipos" class="team-card-btn">Ver plantilla</a>
+      </div>
+      <div class="team-card">
+        <div class="team-card-icon team-senior-zonal">
+          <mat-icon>groups</mat-icon>
+        </div>
+        <h3 class="team-card-title">Sénior Zonal</h3>
+        <p class="team-card-desc">Competición zonal</p>
+        <a mat-stroked-button routerLink="/equipos" class="team-card-btn">Ver plantilla</a>
+      </div>
+      <div class="team-card">
+        <div class="team-card-icon team-junior">
+          <mat-icon>people</mat-icon>
+        </div>
+        <h3 class="team-card-title">Júnior Autonómica</h3>
+        <p class="team-card-desc">Categoría autonómica</p>
+        <a mat-stroked-button routerLink="/equipos" class="team-card-btn">Ver plantilla</a>
+      </div>
+      <div class="team-card">
+        <div class="team-card-icon team-base">
+          <mat-icon>child_care</mat-icon>
+        </div>
+        <h3 class="team-card-title">Categorías Base</h3>
+        <p class="team-card-desc">Minibasket y formación</p>
+        <a mat-stroked-button routerLink="/equipos" class="team-card-btn">Ver plantilla</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Estadísticas animadas -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      @for (stat of stats; track stat.label) {
+        <div class="stat-item">
+          <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
+          <div class="stat-value">+{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Patrocinadores -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Patrocinadores</h2>
+      <a routerLink="/patrocinadores" class="section-link">Ver todos &rarr;</a>
+    </div>
+    @defer (on viewport) {
+      <app-sponsor-carousel [sponsors]="sponsors()" />
+    } @loading (minimum 300ms) {
+      <div class="sponsors-placeholder">
+        <app-skeleton-loader type="text" />
+      </div>
+    } @placeholder {
+      <div class="sponsors-placeholder">
+        <app-skeleton-loader type="text" />
+      </div>
+    }
+  </div>
+</section>
+
+<!-- CTA Hazte Socio -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2 class="cta-title">Hazte Socio del CB Tomelloso</h2>
+      <p class="cta-text">
+        Forma parte de nuestra familia. Apoya al baloncesto de Tomelloso y disfruta de ventajas exclusivas para socios.
+      </p>
+      <div class="cta-actions">
+        <a mat-raised-button color="accent" routerLink="/contacto" class="cta-btn">
+          <mat-icon>person_add</mat-icon>
+          Quiero ser socio
+        </a>
+        <a mat-stroked-button routerLink="/contacto" class="cta-btn-secondary">
+          Más información
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

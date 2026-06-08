@@ -1,0 +1,202 @@
+<div class="gallery-page">
+  <section class="page-hero">
+    <div class="container">
+      <h1 class="page-hero-title">Galería</h1>
+      <p class="page-hero-subtitle">Imágenes y vídeos del CB Tomelloso</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <mat-tab-group class="gallery-tabs">
+        <mat-tab label="Fotos">
+          <div class="gallery-toolbar">
+            <div class="filter-chips">
+              @for (cat of categories; track cat) {
+                <button
+                  mat-stroked-button
+                  [class.active]="selectedCategory() === cat"
+                  (click)="selectedCategory.set(cat)"
+                >
+                  {{ cat === 'todas' ? 'Todas' : (cat.charAt(0).toUpperCase() + cat.slice(1)) }}
+                </button>
+              }
+            </div>
+          </div>
+
+          @defer (on viewport) {
+            @if (filteredGallery().length > 0) {
+              <div class="gallery-masonry">
+                @for (image of filteredGallery(); track image.id; let i = $index) {
+                  <div
+                    class="gallery-item"
+                    [class.gallery-wide]="i % 5 === 0"
+                    (click)="openLightbox(image)"
+                    role="button"
+                    [attr.aria-label]="'Ver ' + image.title"
+                    tabindex="0"
+                    (keydown.enter)="openLightbox(image)"
+                  >
+                    @if (image.src) {
+                      <img [src]="image.src" [alt]="image.title" class="gallery-item-img" loading="lazy" />
+                    } @else {
+                      <div class="gallery-item-bg" [style.background]="gradientColors[i % gradientColors.length]">
+                        <mat-icon class="gallery-item-icon">photo_camera</mat-icon>
+                      </div>
+                    }
+                    <div class="gallery-item-overlay">
+                      <div class="gallery-item-info">
+                        <h3 class="gallery-item-title">{{ image.title }}</h3>
+                        <span class="gallery-item-category">{{ image.category }}</span>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>photo_library</mat-icon>
+                <p>No hay imágenes en esta categoría.</p>
+              </div>
+            }
+          } @loading (minimum 300ms) {
+            <div class="gallery-masonry">
+              @for (item of [1,2,3,4,5,6]; track item) {
+                <div class="gallery-skeleton"></div>
+              }
+            </div>
+          } @placeholder {
+            <div class="gallery-masonry">
+              @for (item of [1,2,3,4,5,6]; track item) {
+                <div class="gallery-skeleton"></div>
+              }
+            </div>
+          }
+        </mat-tab>
+
+        <mat-tab label="Vídeos">
+          @defer (on viewport) {
+            <div class="videos-grid">
+              @for (video of videos(); track video.id) {
+                <div class="video-card">
+                  <div class="video-embed">
+                    <iframe
+                      [src]="safeVideoUrl()[video.id]"
+                      [title]="video.title"
+                      frameborder="0"
+                      allowfullscreen
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                  <h3 class="video-title">{{ video.title }}</h3>
+                </div>
+              }
+            </div>
+          } @loading (minimum 300ms) {
+            <div class="videos-grid">
+              @for (item of [1,2]; track item) {
+                <div class="video-skeleton"></div>
+              }
+            </div>
+          } @placeholder {
+            <div class="videos-grid">
+              @for (item of [1,2]; track item) {
+                <div class="video-skeleton"></div>
+              }
+            </div>
+          }
+        </mat-tab>
+
+        <mat-tab label="Instagram">
+          @defer (on viewport) {
+            @if (instagramPosts().length > 0) {
+              <div class="instagram-grid">
+                @for (post of instagramPosts(); track post.id) {
+                  <div class="instagram-card">
+                    <a [routerLink]="['/noticia', post.slug]" class="instagram-card-link">
+                      @if (post.src) {
+                        <div class="instagram-card-img-wrapper">
+                          <img [src]="post.src" [alt]="post.title" class="instagram-card-img" loading="lazy" />
+                          @if (post.mediaCount > 1) {
+                            <span class="instagram-card-media-count">
+                              <mat-icon>collections</mat-icon>
+                              {{ post.mediaCount }}
+                            </span>
+                          }
+                        </div>
+                      } @else {
+                        <div class="instagram-card-bg">
+                          <mat-icon>photo_camera</mat-icon>
+                        </div>
+                      }
+                      <div class="instagram-card-body">
+                        <h3 class="instagram-card-title">{{ post.title }}</h3>
+                        @if (post.caption) {
+                          <p class="instagram-card-caption">{{ post.caption }}</p>
+                        }
+                        <div class="instagram-card-footer">
+                          @if (post.date) {
+                            <span class="instagram-card-date">{{ post.date | date:"dd MMM yyyy":'':'es' }}</span>
+                          }
+                          <span class="instagram-card-source">
+                            <mat-icon class="instagram-icon">camera_alt</mat-icon>
+                            Instagram
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                    <div class="instagram-card-actions">
+                      <a mat-raised-button color="primary" [routerLink]="['/noticia', post.slug]">
+                        Ver todas las fotos
+                      </a>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-state">
+                <mat-icon>camera_alt</mat-icon>
+                <p>No hay publicaciones de Instagram importadas.</p>
+                <p class="empty-state-hint">Usa el endpoint <code>POST /api/v1/instagram/import-url</code> desde el panel de administración para importar publicaciones.</p>
+              </div>
+            }
+          } @loading (minimum 300ms) {
+            <div class="instagram-grid">
+              @for (item of [1,2,3,4]; track item) {
+                <div class="instagram-skeleton"></div>
+              }
+            </div>
+          } @placeholder {
+            <div class="instagram-grid">
+              @for (item of [1,2,3,4]; track item) {
+                <div class="instagram-skeleton"></div>
+              }
+            </div>
+          }
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </section>
+</div>
+
+<!-- Lightbox -->
+@if (selectedImage(); as img) {
+  <div class="lightbox-overlay" (click)="closeLightbox()" role="dialog" aria-label="Visor de imagen">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar">
+        <mat-icon>close</mat-icon>
+      </button>
+      @if (img.src) {
+        <img [src]="img.src" [alt]="img.title" class="lightbox-image-full" />
+      } @else {
+        <div class="lightbox-image" style="background: linear-gradient(135deg, #1B8A3D, #D4A017)">
+          <mat-icon class="lightbox-icon">photo</mat-icon>
+        </div>
+      }
+      <div class="lightbox-info">
+        <h3>{{ img.title }}</h3>
+        <span class="lightbox-category">{{ img.category }}</span>
+      </div>
+    </div>
+  </div>
+}

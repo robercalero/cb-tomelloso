@@ -1,0 +1,441 @@
+.gallery-page {
+  .page-hero {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    padding: 120px 0 60px;
+    color: var(--color-white);
+    text-align: center;
+  }
+
+  .page-hero-title {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 3rem;
+    margin: 0 0 var(--spacing-sm);
+  }
+
+  .page-hero-subtitle {
+    font-size: 1.15rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .section {
+    padding: var(--spacing-2xl) 0;
+  }
+}
+
+.gallery-toolbar {
+  margin: var(--spacing-lg) 0;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+
+  button {
+    font-size: 0.85rem !important;
+    text-transform: capitalize;
+
+    &.active {
+      background: var(--color-primary) !important;
+      color: var(--color-dark) !important;
+    }
+  }
+}
+
+.gallery-masonry {
+  columns: 3;
+  column-gap: var(--spacing-md);
+}
+
+.gallery-item {
+  break-inside: avoid;
+  margin-bottom: var(--spacing-md);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  position: relative;
+
+  &.gallery-wide {
+    column-span: 1;
+  }
+}
+
+.gallery-item-img {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+
+  .gallery-item:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.gallery-item-bg {
+  width: 100%;
+  aspect-ratio: 4/3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform var(--transition-slow);
+
+  .gallery-item:hover & {
+    transform: scale(1.05);
+  }
+}
+
+.gallery-item:nth-child(3n) .gallery-item-bg {
+  aspect-ratio: 3/4;
+}
+
+.gallery-item-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: rgba(255, 255, 255, 0.4);
+  transition: all var(--transition-fast);
+}
+
+.gallery-item:hover .gallery-item-icon {
+  transform: scale(1.2);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.gallery-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 60%, rgba(0, 0, 0, 0.7));
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  display: flex;
+  align-items: flex-end;
+  padding: var(--spacing-md);
+
+  .gallery-item:hover & {
+    opacity: 1;
+  }
+}
+
+.gallery-item-info {
+  color: var(--color-white);
+}
+
+.gallery-item-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.gallery-item-category {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.gallery-skeleton {
+  break-inside: avoid;
+  margin-bottom: var(--spacing-md);
+  height: 200px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.1) 37%, rgba(0,0,0,0.06) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Videos */
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+}
+
+.video-card {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.video-embed {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.video-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0;
+  padding: var(--spacing-md);
+}
+
+.video-skeleton {
+  height: 300px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.1) 37%, rgba(0,0,0,0.06) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Lightbox */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-content {
+  max-width: 800px;
+  width: 90%;
+  position: relative;
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: var(--color-white);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background var(--transition-fast);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}
+
+.lightbox-image-full {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  background: var(--color-dark);
+}
+
+.lightbox-image {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.lightbox-info {
+  padding: var(--spacing-lg);
+
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+}
+
+.lightbox-category {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* Instagram Grid */
+.instagram-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+  padding-top: var(--spacing-lg);
+}
+
+.instagram-card {
+  background: var(--color-white);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-fast);
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+}
+
+.instagram-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.instagram-card-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.instagram-card-bg {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: rgba(255, 255, 255, 0.5);
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+.instagram-card-body {
+  padding: var(--spacing-md);
+}
+
+.instagram-card-title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0 0 var(--spacing-xs);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.instagram-card-caption {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--spacing-sm);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.instagram-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.instagram-card-date {
+  text-transform: capitalize;
+}
+
+.instagram-card-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+.instagram-icon {
+  font-size: 0.85rem;
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.instagram-skeleton {
+  height: 360px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.06) 25%, rgba(0,0,0,0.1) 37%, rgba(0,0,0,0.06) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-md);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-3xl);
+  color: var(--color-text-muted);
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.empty-state-hint {
+  margin-top: var(--spacing-md) !important;
+  font-size: 0.85rem;
+  opacity: 0.7;
+
+  code {
+    background: rgba(0,0,0,0.06);
+    padding: 0.1rem 0.4rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-page {
+    .page-hero-title {
+      font-size: 2rem;
+    }
+  }
+
+  .gallery-masonry {
+    columns: 2;
+  }
+
+  .videos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lightbox-image {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-masonry {
+    columns: 1;
+  }
+}

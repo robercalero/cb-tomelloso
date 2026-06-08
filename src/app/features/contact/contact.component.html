@@ -1,0 +1,233 @@
+<div class="contact-page">
+  <section class="page-hero">
+    <div class="container">
+      <h1 class="page-hero-title">Contacto</h1>
+      <p class="page-hero-subtitle">Ponte en contacto con el CB Tomelloso</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="contact-grid">
+        <!-- Info Column -->
+        <div class="contact-info">
+          <mat-card class="info-card">
+            <mat-card-content>
+              <div class="info-item">
+                <mat-icon>location_on</mat-icon>
+                <div>
+                  <h3>Dirección</h3>
+                  <p>Pabellón San José<br />Tomelloso, Ciudad Real<br />Castilla-La Mancha, España</p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>email</mat-icon>
+                <div>
+                  <h3>Email</h3>
+                  <p><a href="mailto:info@cbtomelloso.es" class="info-link">info@cbtomelloso.es</a></p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>phone</mat-icon>
+                <div>
+                  <h3>Teléfono</h3>
+                  <p><a href="tel:+34926123456" class="info-link">926 123 456</a></p>
+                </div>
+              </div>
+              <div class="info-item">
+                <mat-icon>schedule</mat-icon>
+                <div>
+                  <h3>Horario</h3>
+                  <p>Lunes a Viernes: 17:00 - 21:00<br />(Horario de entrenamientos)</p>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          @defer (on viewport) {
+            <div class="map-container">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3088.0!2d-3.0!3d39.0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd0e0e0e0e0e0e0%3A0x0!2zUGFiZWxsw7NuIFNhbiBKb3PDqQ!5e0!3m2!1ses!2ses!4v1"
+                width="100%"
+                height="300"
+                style="border:0; border-radius: 8px;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Ubicación del Pabellón San José - Tomelloso"
+              ></iframe>
+            </div>
+          } @loading (minimum 300ms) {
+            <div class="map-placeholder">
+              <mat-icon>map</mat-icon>
+              <p>Cargando mapa...</p>
+            </div>
+          } @placeholder {
+            <div class="map-placeholder">
+              <mat-icon>map</mat-icon>
+              <p>Cargando mapa...</p>
+            </div>
+          }
+        </div>
+
+        <!-- Forms Column -->
+        <div class="contact-forms">
+          <mat-tab-group class="contact-tabs">
+            <!-- Contact Form Tab -->
+            <mat-tab label="Contáctanos">
+              @if (isSubmitted()) {
+                <div class="success-message">
+                  <mat-icon>check_circle</mat-icon>
+                  <h3>¡Mensaje enviado!</h3>
+                  <p>Gracias por contactar con el CB Tomelloso. Te responderemos lo antes posible.</p>
+                  <button mat-raised-button color="primary" (click)="isSubmitted.set(false)">
+                    Enviar otro mensaje
+                  </button>
+                </div>
+              } @else {
+                <form [formGroup]="contactForm" (ngSubmit)="onSubmitContact()" class="contact-form">
+                  <div class="form-field">
+                    <label for="contact-name">Nombre *</label>
+                    <input
+                      id="contact-name"
+                      type="text"
+                      formControlName="name"
+                      placeholder="Tu nombre"
+                      [class.field-error]="showFieldError('name')"
+                    />
+                    @if (nameError()) {
+                      <span class="error-text">{{ nameError() }}</span>
+                    }
+                  </div>
+
+                  <div class="form-field">
+                    <label for="contact-email">Email *</label>
+                    <input
+                      id="contact-email"
+                      type="email"
+                      formControlName="email"
+                      placeholder="tu@email.com"
+                      [class.field-error]="showFieldError('email')"
+                    />
+                    @if (emailError()) {
+                      <span class="error-text">{{ emailError() }}</span>
+                    }
+                  </div>
+
+                  <div class="form-field">
+                    <label for="contact-subject">Asunto</label>
+                    <select id="contact-subject" formControlName="subject">
+                      <option value="general">Consulta general</option>
+                      <option value="patrocinio">Patrocinio</option>
+<option value="socio">Hacerse socio</option>
+<option value="prensa">Prensa</option>
+<option value="otro">Otros</option>
+                    </select>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="contact-message">Mensaje *</label>
+                    <textarea
+                      id="contact-message"
+                      formControlName="message"
+                      rows="5"
+                      placeholder="Escribe tu mensaje aquí..."
+                      [class.field-error]="showFieldError('message')"
+                    ></textarea>
+                    @if (messageError()) {
+                      <span class="error-text">{{ messageError() }}</span>
+                    }
+                  </div>
+
+                  <button type="submit" mat-raised-button color="primary" class="submit-btn">
+                    <mat-icon>send</mat-icon>
+                    Enviar mensaje
+                  </button>
+                </form>
+              }
+            </mat-tab>
+
+            <!-- Member Form Tab -->
+            <mat-tab label="Hazte Socio">
+              @if (isMemberSubmitted()) {
+                <div class="success-message">
+                  <mat-icon>check_circle</mat-icon>
+                  <h3>¡Solicitud enviada!</h3>
+                  <p>Gracias por querer formar parte del CB Tomelloso. Te contactaremos con los detalles para formalizar tu inscripción.</p>
+                  <button mat-raised-button color="primary" (click)="isMemberSubmitted.set(false)">
+                    Nueva solicitud
+                  </button>
+                </div>
+              } @else {
+                <form [formGroup]="memberForm" (ngSubmit)="onSubmitMember()" class="contact-form">
+                  <div class="form-field">
+                    <label for="member-name">Nombre completo *</label>
+                    <input
+                      id="member-name"
+                      type="text"
+                      formControlName="name"
+                      placeholder="Tu nombre completo"
+                      [class.field-error]="showMemberFieldError('name')"
+                    />
+                    @if (memberNameError()) {
+                      <span class="error-text">{{ memberNameError() }}</span>
+                    }
+                  </div>
+
+                  <div class="form-field">
+                    <label for="member-email">Email *</label>
+                    <input
+                      id="member-email"
+                      type="email"
+                      formControlName="email"
+                      placeholder="tu@email.com"
+                      [class.field-error]="showMemberFieldError('email')"
+                    />
+                    @if (memberEmailError()) {
+                      <span class="error-text">{{ memberEmailError() }}</span>
+                    }
+                  </div>
+
+                  <div class="form-field">
+                    <label for="member-phone">Teléfono</label>
+                    <input
+                      id="member-phone"
+                      type="tel"
+                      formControlName="phone"
+                      placeholder="Teléfono de contacto"
+                    />
+                  </div>
+
+                  <div class="form-field">
+                    <label for="member-category">Categoría *</label>
+                    <select id="member-category" formControlName="category">
+                      <option value="adulto">Socio adulto</option>
+                      <option value="juvenil">Socio juvenil (hasta 18 años)</option>
+                      <option value="familia">Socio familiar (2 adultos + hijos)</option>
+                      <option value="honorario">Socio honorario</option>
+                    </select>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="member-msg">Notas</label>
+                    <textarea
+                      id="member-msg"
+                      formControlName="message"
+                      rows="3"
+                      placeholder="¿Algo que quieras añadir?"
+                    ></textarea>
+                  </div>
+
+                  <button type="submit" mat-raised-button color="accent" class="submit-btn">
+                    <mat-icon>person_add</mat-icon>
+                    Solicitar adhesión
+                  </button>
+                </form>
+              }
+            </mat-tab>
+          </mat-tab-group>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

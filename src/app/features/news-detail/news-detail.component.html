@@ -1,0 +1,113 @@
+<div class="news-detail-page">
+  @if (loading()) {
+    <div class="news-loading">
+      <div class="skeleton skeleton-title"></div>
+      <div class="skeleton skeleton-image"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text"></div>
+      <div class="skeleton skeleton-text-short"></div>
+    </div>
+  } @else if (notFound()) {
+    <div class="news-not-found">
+      <mat-icon class="not-found-icon">search_off</mat-icon>
+      <h1>Noticia no encontrada</h1>
+      <p>La noticia que buscas no existe o ha sido eliminada.</p>
+      <a mat-raised-button color="primary" routerLink="/">Volver al inicio</a>
+    </div>
+  } @else if (news(); as n) {
+    <article class="news-article">
+      <div class="news-header">
+        <div class="news-category-badge" [class]="'cat-' + n.category">{{ n.category }}</div>
+        <h1 class="news-title">{{ n.title }}</h1>
+        <div class="news-meta">
+          <time class="news-date">{{ (n.publishedAt || n.createdAt) | date:'dd/MM/yyyy' }}</time>
+          @if (n.author) {
+            <span class="news-source">{{ n.author.name }}</span>
+          }
+        </div>
+      </div>
+      @if (n.imageUrl) {
+        <div class="news-image-container">
+          <img [src]="n.imageUrl" [alt]="n.title" class="news-image" />
+        </div>
+      }
+      <div class="news-content">
+        <div class="news-body" [innerHTML]="n.content"></div>
+      </div>
+
+      @if (n.source === 'instagram' && n.media && n.media.length > 1) {
+        <div class="news-media-gallery">
+          <h2 class="news-media-gallery-title">
+            <mat-icon>collections</mat-icon>
+            Fotos de la publicación ({{ n.media.length }})
+          </h2>
+          <div class="news-media-grid">
+            @for (item of n.media; track trackMedia($index, item); let i = $index) {
+              @if (item.type === 'image' || !item.type) {
+                <div class="news-media-item" (click)="openLightbox(i)" role="button" tabindex="0"
+                     (keydown.enter)="openLightbox(i)">
+                  <img [src]="item.thumbnail || item.url" [alt]="'Foto ' + (i + 1)" class="news-media-thumb" loading="lazy" />
+                  <div class="news-media-overlay">
+                    <mat-icon>zoom_in</mat-icon>
+                  </div>
+                </div>
+              }
+              @if (item.type === 'video') {
+                <div class="news-media-item news-media-video" (click)="openLightbox(i)" role="button" tabindex="0"
+                     (keydown.enter)="openLightbox(i)">
+                  <img [src]="item.thumbnail || item.url" [alt]="'Vídeo ' + (i + 1)" class="news-media-thumb" loading="lazy" />
+                  <div class="news-media-play">
+                    <mat-icon>play_circle</mat-icon>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <div class="news-footer">
+        @if (n.source === 'instagram' && n.sourceUrl) {
+          <a [href]="n.sourceUrl" target="_blank" rel="noopener noreferrer" mat-raised-button color="accent">
+            <mat-icon>open_in_new</mat-icon>
+            Ver en Instagram
+          </a>
+        }
+        <a routerLink="/" class="back-link">
+          <mat-icon>arrow_back</mat-icon>
+          Volver al inicio
+        </a>
+      </div>
+    </article>
+  }
+</div>
+
+@let idx = lightboxIndex(); @if (idx !== null) {
+  <div class="lightbox-overlay" (click)="closeLightbox()" role="dialog" aria-label="Visor de imágenes">
+    <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+      @if (lightboxMedia()[idx]; as media) {
+        @if (media.type === 'video') {
+          <video class="lightbox-video" controls autoplay>
+            <source [src]="media.url" type="video/mp4" />
+          </video>
+        } @else {
+          <img [src]="media.url" [alt]="'Imagen ' + (idx + 1)" class="lightbox-image" />
+        }
+        <div class="lightbox-counter">{{ idx + 1 }} / {{ lightboxMedia().length }}</div>
+      }
+    </div>
+    @if (idx !== null && idx > 0) {
+      <button class="lightbox-nav lightbox-prev" (click)="prevImage()" aria-label="Anterior">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+    }
+    @if (idx !== null && idx < lightboxMedia().length - 1) {
+      <button class="lightbox-nav lightbox-next" (click)="nextImage()" aria-label="Siguiente">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    }
+  </div>
+}

@@ -1,0 +1,40 @@
+<section class="sponsor-carousel" aria-label="Patrocinadores">
+  <div class="sponsor-track">
+    @for (sponsor of sponsors(); track sponsor.id) {
+      <a
+        [href]="sponsor.websiteUrl || '#'"
+        target="_blank"
+        rel="noopener"
+        class="sponsor-item"
+        [class.sponsor-principal]="sponsor.tier === 'principal'"
+        [class.sponsor-gold]="sponsor.tier === 'oro'"
+        [class.sponsor-silver]="sponsor.tier === 'plata'"
+        [class.sponsor-bronze]="sponsor.tier === 'bronce'"
+        [attr.aria-label]="sponsor.name"
+      >
+        <div class="sponsor-logo-placeholder">
+          <span class="sponsor-initial">{{ sponsor.name.charAt(0) }}</span>
+        </div>
+        <span class="sponsor-name">{{ sponsor.name }}</span>
+      </a>
+    }
+    @for (sponsor of sponsors(); track sponsor.id) {
+      <a
+        [href]="sponsor.websiteUrl || '#'"
+        target="_blank"
+        rel="noopener"
+        class="sponsor-item"
+        [class.sponsor-principal]="sponsor.tier === 'principal'"
+        [class.sponsor-gold]="sponsor.tier === 'oro'"
+        [class.sponsor-silver]="sponsor.tier === 'plata'"
+        [class.sponsor-bronze]="sponsor.tier === 'bronce'"
+        [attr.aria-label]="sponsor.name"
+      >
+        <div class="sponsor-logo-placeholder">
+          <span class="sponsor-initial">{{ sponsor.name.charAt(0) }}</span>
+        </div>
+        <span class="sponsor-name">{{ sponsor.name }}</span>
+      </a>
+    }
+  </div>
+</section>

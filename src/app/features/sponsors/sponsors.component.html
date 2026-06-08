@@ -1,0 +1,99 @@
+<div class="sponsors-page">
+  <section class="page-hero">
+    <div class="container">
+      <h1 class="page-hero-title">Patrocinadores</h1>
+      <p class="page-hero-subtitle">Colaboradores que hacen posible el CB Tomelloso</p>
+    </div>
+  </section>
+
+  <!-- Main Sponsor -->
+  <section class="section">
+    <div class="container">
+      @if (mainSponsor(); as sponsor) {
+        <div class="main-sponsor-card">
+          <div class="main-sponsor-badge">Patrocinador Principal</div>
+          <div class="main-sponsor-content">
+            <div class="main-sponsor-logo">
+              <div class="sponsor-big-placeholder">
+                <span>{{ sponsor.name.charAt(0) }}{{ sponsor.name.charAt(1) }}</span>
+              </div>
+            </div>
+            <div class="main-sponsor-info">
+              <h2 class="main-sponsor-name">{{ sponsor.name }}</h2>
+              <p class="main-sponsor-desc">{{ sponsor.description }}</p>
+              <a [href]="sponsor.websiteUrl || '#'" target="_blank" rel="noopener" mat-raised-button color="primary">
+                <mat-icon>open_in_new</mat-icon>
+                Visitar sitio web
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Other Sponsors -->
+  @if (otherSponsors().length > 0) {
+    <section class="section section-dark">
+      <div class="container">
+        <h2 class="section-title text-center">Patrocinadores Colaboradores</h2>
+        <div class="sponsors-grid">
+          @for (sponsor of otherSponsors(); track sponsor.id) {
+            <a [href]="sponsor.websiteUrl || '#'" target="_blank" rel="noopener" class="sponsor-card" [class.sponsor-gold]="sponsor.tier === 'oro'">
+              <div class="sponsor-card-logo" [class.border-gold]="sponsor.tier === 'oro'" [class.border-silver]="sponsor.tier === 'plata'">
+                <span class="sponsor-card-initial">{{ sponsor.name.charAt(0) }}</span>
+              </div>
+              <h3 class="sponsor-card-name">{{ sponsor.name }}</h3>
+              <span class="sponsor-card-tier">{{ sponsor.tier | titlecase }}</span>
+            </a>
+          }
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Plans -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title text-center">Planes de Patrocinio</h2>
+      <p class="section-subtitle text-center">Elige el plan que mejor se adapte a tu empresa</p>
+
+      <div class="plans-grid">
+        @for (plan of plans; track plan.tier) {
+          <div class="plan-card" [class.plan-highlighted]="plan.highlighted">
+            @if (plan.highlighted) {
+              <div class="plan-badge">Recomendado</div>
+            }
+            <div class="plan-header">
+              <h3 class="plan-tier">{{ plan.tier }}</h3>
+              <p class="plan-price">{{ plan.price }}</p>
+            </div>
+            <ul class="plan-benefits">
+              @for (benefit of plan.benefits; track benefit) {
+                <li class="plan-benefit">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>{{ benefit }}</span>
+                </li>
+              }
+            </ul>
+            <a mat-raised-button [color]="plan.highlighted ? 'accent' : 'primary'" routerLink="/contacto" class="plan-cta">
+              Contactar
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container text-center">
+      <h2 class="cta-title">¿Quieres patrocinar al CB Tomelloso?</h2>
+      <p class="cta-text">Contacta con nosotros para conocer las ventajas de formar parte de nuestro proyecto deportivo.</p>
+      <a mat-raised-button color="accent" routerLink="/contacto" class="cta-btn">
+        <mat-icon>mail</mat-icon>
+        Solicitar información
+      </a>
+    </div>
+  </section>
+</div>

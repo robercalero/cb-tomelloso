@@ -1,0 +1,116 @@
+<div class="agenda-page">
+  <section class="page-hero">
+    <div class="container">
+      <h1 class="page-hero-title">Agenda / Partidos</h1>
+      <p class="page-hero-subtitle">Calendario de encuentros del CB Tomelloso</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <!-- View Toggle -->
+      <div class="view-toolbar">
+        <div class="view-buttons">
+          <button mat-stroked-button [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')">
+            <mat-icon>list</mat-icon>
+            Lista
+          </button>
+          <button mat-stroked-button [class.active]="viewMode() === 'calendar'" (click)="viewMode.set('calendar')">
+            <mat-icon>calendar_month</mat-icon>
+            Calendario
+          </button>
+        </div>
+        <div class="filter-buttons">
+          @for (comp of competitionTypes; track comp) {
+            <button
+              mat-stroked-button
+              [class.active]="filterTeam() === (comp === 'Todas' ? null : comp)"
+              (click)="filterTeam.set(comp === 'Todas' ? null : comp)"
+            >
+              {{ comp }}
+            </button>
+          }
+        </div>
+      </div>
+
+      @switch (viewMode()) {
+        @case ('calendar') {
+          <!-- Calendar View -->
+          <div class="calendar-view">
+            <div class="calendar-header">
+              <h2 class="calendar-month">{{ currentMonthYear }}</h2>
+            </div>
+            <div class="calendar-weekdays">
+              @for (day of ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']; track day) {
+                <div class="calendar-weekday">{{ day }}</div>
+              }
+            </div>
+            <div class="calendar-grid">
+              @for (day of calendarDays(); track day) {
+                <div class="calendar-day" [class.has-match]="getMatchesForDay(day).length > 0">
+                  <span class="day-number">{{ day }}</span>
+                  @if (getMatchesForDay(day); as dayMatches) {
+                    @for (match of dayMatches; track match.id) {
+                      <div class="day-match" [class.match-home]="match.isHome">
+                        {{ match.awayTeam }}
+                      </div>
+                    }
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+        @default {
+          <!-- List View -->
+          <div class="list-view">
+            <mat-tab-group class="agenda-tabs">
+              <mat-tab label="Próximos">
+                @if (upcomingMatches().length > 0) {
+                  <div class="matches-list">
+                    @for (match of upcomingMatches(); track match.id) {
+                      <app-match-card [match]="match" />
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-state">
+                    <mat-icon>event_busy</mat-icon>
+                    <p>No hay próximos partidos programados.</p>
+                  </div>
+                }
+              </mat-tab>
+              <mat-tab label="Resultados">
+                @if (recentResults().length > 0) {
+                  <div class="matches-list">
+                    @for (match of recentResults(); track match.id) {
+                      <app-match-card [match]="match" />
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-state">
+                    <mat-icon>sports_score</mat-icon>
+                    <p>No hay resultados disponibles.</p>
+                  </div>
+                }
+              </mat-tab>
+              <mat-tab label="Todos">
+                @if (matches().length > 0) {
+                  <div class="matches-list">
+                    @for (match of matches(); track match.id) {
+                      <app-match-card [match]="match" />
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-state">
+                    <mat-icon>event</mat-icon>
+                    <p>No hay partidos registrados.</p>
+                  </div>
+                }
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        }
+      }
+    </div>
+  </section>
+</div>

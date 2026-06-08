@@ -1,0 +1,61 @@
+<article
+  class="match-card"
+  [class.match-home]="match().isHome"
+  [class.match-away]="!match().isHome"
+  (click)="handleClick()"
+  role="article"
+  [attr.aria-label]="match().homeTeam + ' vs ' + match().awayTeam"
+>
+  <div class="match-badge" [class.badge-home]="match().isHome">
+    {{ match().isHome ? 'LOCAL' : 'VISITANTE' }}
+  </div>
+
+  <div class="match-content">
+    <div class="match-teams">
+      <div class="team team-home">
+        <div class="team-logo placeholder-logo">
+          <span class="team-initial">{{ match().homeTeam.charAt(0) }}</span>
+        </div>
+        <span class="team-name">{{ match().homeTeam }}</span>
+      </div>
+
+      <div class="match-center">
+        @if (match().status === 'finished' && match().scoreHome != null) {
+          <div class="match-result" [class.result-win]="isHomeWin()" [class.result-loss]="!isHomeWin()">
+            <span class="result-score">{{ match().scoreHome }}</span>
+            <span class="result-separator">-</span>
+            <span class="result-score">{{ match().scoreAway }}</span>
+          </div>
+        } @else if (match().status === 'live') {
+          <div class="match-live">
+            <span class="live-dot"></span>
+            <span>EN DIRECTO</span>
+          </div>
+        } @else {
+          <div class="match-vs">VS</div>
+        }
+      </div>
+
+      <div class="team team-away">
+        <div class="team-logo placeholder-logo">
+          <span class="team-initial">{{ match().awayTeam.charAt(0) }}</span>
+        </div>
+        <span class="team-name">{{ match().awayTeam }}</span>
+      </div>
+    </div>
+
+    <div class="match-info">
+      <span class="match-date">{{ match().matchDate | date:'dd/MM/yyyy' }}</span>
+      <span class="match-time">{{ match().matchTime }}</span>
+      <span class="match-competition">{{ match().competition }}</span>
+    </div>
+  </div>
+
+  <div class="match-venue">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+      <circle cx="12" cy="10" r="3"/>
+    </svg>
+    {{ match().venue }}
+  </div>
+</article>
