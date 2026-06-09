@@ -55,7 +55,7 @@ export class NavbarComponent {
     { icon: 'instagram', url: 'https://www.instagram.com/cbtomelloso', label: 'Instagram' },
     { icon: 'twitter', url: 'https://x.com/cbttomelloso', label: 'Twitter/X' },
     { icon: 'facebook', url: 'https://www.facebook.com/cbtomelloso', label: 'Facebook' },
-    { icon: 'youtube', url: 'https://www.youtube.com/@cbtomelloso', label: 'YouTube' }
+    { icon: 'youtube', url: 'https://www.youtube.com/@cbt2019', label: 'YouTube' }
   ];
 
   @HostListener('window:scroll')
