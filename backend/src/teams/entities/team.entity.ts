@@ -3,7 +3,7 @@ import { Player } from '../../players/entities/player.entity';
 import { Match } from '../../matches/entities/match.entity';
 import { Gallery } from '../../gallery/entities/gallery.entity';
 
-export type TeamCategory = 'Senior Autonómica' | 'Senior Zonal' | 'Júnior' | 'Cadete' | 'Infantil' | 'Alevín' | 'Benjamín' | 'Minibasket';
+export type TeamCategory = 'Senior Autonómica' | 'Júnior' | 'Junior U19' | 'Cadete' | 'Infantil' | 'Alevín' | 'Benjamín' | 'Minibasket';
 
 @Entity('teams')
 export class Team {
@@ -13,7 +13,7 @@ export class Team {
   @Column({ length: 100 })
   name: string;
 
-  @Column({ type: 'enum', enum: ['Senior Autonómica', 'Senior Zonal', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket'] })
+  @Column({ type: 'enum', enum: ['Senior Autonómica', 'Junior U19', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket'] })
   category: TeamCategory;
 
   @Column({ length: 10 })

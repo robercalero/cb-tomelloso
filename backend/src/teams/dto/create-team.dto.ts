@@ -8,8 +8,8 @@ export class CreateTeamDto {
   @Length(1, 100)
   name: string;
 
-  @ApiProperty({ enum: ['Senior Autonómica', 'Senior Zonal', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket'] })
-  @IsEnum(['Senior Autonómica', 'Senior Zonal', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket'])
+  @ApiProperty({ enum: ['Senior Autonómica', 'Junior U19', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket'] })
+  @IsEnum(['Senior Autonómica', 'Junior U19', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket'])
   category: TeamCategory;
 
   @ApiProperty({ example: '2025/2026' })

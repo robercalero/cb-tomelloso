@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
@@ -33,7 +33,23 @@ export class TeamsComponent implements OnInit {
   readonly recentResults = this.matchesService.recentResults;
   readonly activeTab = signal(0);
 
-  readonly teamTabs = ['Senior Autonómica', 'Senior Zonal', 'Júnior', 'Categorías Base'];
+  readonly teamTabs = ['Senior Autonómica', 'Júnior', 'Categorías Base'];
+
+  readonly seniorTeams = computed(() =>
+    this.teams().filter(t => t.category === 'Senior Autonómica')
+  );
+  readonly juniorTeams = computed(() =>
+    this.teams().filter(t => t.category === 'Junior U19')
+  );
+  readonly baseTeams = computed(() =>
+    this.teams().filter(t => t.category === 'Minibasket')
+  );
+
+  readonly tabTeams = computed(() => [
+    this.seniorTeams(),
+    this.juniorTeams(),
+    this.baseTeams(),
+  ]);
 
   readonly displayedColumns = ['pos', 'team', 'pj', 'pg', 'pp', 'pts'];
 
@@ -48,6 +64,6 @@ export class TeamsComponent implements OnInit {
 
   ngOnInit(): void {
     this.title.setTitle(`Equipos - ${environment.titleSuffix}`);
-    this.meta.updateTag({ name: 'description', content: 'Conoce todos los equipos del Club Baloncesto Tomelloso: Senior Autonómica, Senior Zonal, Júnior y categorías base.' });
+    this.meta.updateTag({ name: 'description', content: 'Conoce todos los equipos del Club Baloncesto Tomelloso: Senior Autonómica, Júnior y categorías base.' });
   }
 }

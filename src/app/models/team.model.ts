@@ -2,8 +2,8 @@ import { Player } from './player.model';
 
 export type TeamCategory =
   | 'Senior Autonómica'
-  | 'Senior Zonal'
   | 'Júnior'
+  | 'Junior U19'
   | 'Cadete'
   | 'Infantil'
   | 'Alevín'

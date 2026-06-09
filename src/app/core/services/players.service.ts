@@ -24,12 +24,8 @@ export class PlayersService {
     this.teams().find(t => t.category === 'Senior Autonómica')
   );
 
-  readonly seniorZonalTeam = computed(() =>
-    this.teams().find(t => t.category === 'Senior Zonal')
-  );
-
-  readonly juniorTeam = computed(() =>
-    this.teams().find(t => t.category === 'Júnior')
+  readonly juniorTeams = computed(() =>
+    this.teams().filter(t => t.category === 'Junior U19')
   );
 
   readonly baseTeam = computed(() =>
