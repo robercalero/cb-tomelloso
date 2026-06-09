@@ -102,7 +102,29 @@
                       <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.highlight-row]="row.team.includes('Tomelloso')"></tr>
                     </table>
                   </div>
+
+                  <!-- Season Links (only for Senior tab) -->
+                  <h3 class="subsection-title">Calendario Liga Regular</h3>
+                  <div class="season-rounds">
+                    @for (r of regularSeasonRounds; track r.round) {
+                      <a [href]="r.url" target="_blank" rel="noopener noreferrer" class="btn-round">
+                        J{{ r.round }}
+                      </a>
+                    }
+                  </div>
+
+                  <div class="season-links-extra">
+                    <a [href]="classificationUrl" target="_blank" rel="noopener noreferrer" class="btn-season">
+                      <mat-icon>leaderboard</mat-icon>
+                      Clasificación Liga Regular
+                    </a>
+                    <a [href]="ascensoUrl" target="_blank" rel="noopener noreferrer" class="btn-season btn-ascenso">
+                      <mat-icon>emoji_events</mat-icon>
+                      Fase de Ascenso
+                    </a>
+                  </div>
                 }
+
               } @else {
                 <div class="empty-state">
                   <mat-icon>error_outline</mat-icon>

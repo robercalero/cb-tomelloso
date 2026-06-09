@@ -51,6 +51,14 @@ export class TeamsComponent implements OnInit {
     this.baseTeams(),
   ]);
 
+  readonly regularSeasonRounds = Array.from({ length: 14 }, (_, i) => ({
+    round: i + 1,
+    url: `https://fbclm.net/pagina-de-grupo/?id=952&round=${14 - i}`
+  }));
+
+  readonly classificationUrl = 'https://fbclm.net/pagina-de-grupo/?id=952';
+  readonly ascensoUrl = 'https://fbclm.net/pagina-de-grupo/?id=1019';
+
   readonly displayedColumns = ['pos', 'team', 'pj', 'pg', 'pp', 'pts'];
 
   readonly standings = [
