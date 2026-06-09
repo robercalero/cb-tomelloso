@@ -17,7 +17,9 @@ import { ConfigService } from '@nestjs/config';
         synchronize: config.get<string>('NODE_ENV') !== 'production',
         logging: config.get<string>('NODE_ENV') !== 'production',
         charset: 'utf8mb4',
-        ssl: config.get<string>('DB_SSL') === 'REQUIRED' ? {} : false,
+        ssl: config.get<string>('DB_SSL') === 'REQUIRED'
+          ? { rejectUnauthorized: false }
+          : false,
       }),
     }),
   ],
