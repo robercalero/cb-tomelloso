@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } 
 import { Title, Meta } from '@angular/platform-browser';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTableModule } from '@angular/material/table';
+
 import { PlayersService } from '../../core/services/players.service';
 import { PlayerCardComponent } from '../../shared/components/player-card/player-card.component';
 import { MatchCardComponent } from '../../shared/components/match-card/match-card.component';
@@ -15,7 +15,6 @@ import { environment } from '../../../environments/environment';
   imports: [
     MatTabsModule,
     MatIconModule,
-    MatTableModule,
     PlayerCardComponent,
     MatchCardComponent
   ],
@@ -58,17 +57,6 @@ export class TeamsComponent implements OnInit {
 
   readonly classificationUrl = 'https://fbclm.net/pagina-de-grupo/?id=952';
   readonly ascensoUrl = 'https://fbclm.net/pagina-de-grupo/?id=1019';
-
-  readonly displayedColumns = ['pos', 'team', 'pj', 'pg', 'pp', 'pts'];
-
-  readonly standings = [
-    { pos: 1, team: 'CB La Roda', pj: 18, pg: 15, pp: 3, pts: 33 },
-    { pos: 2, team: 'Baloncesto Alcázar', pj: 18, pg: 14, pp: 4, pts: 32 },
-    { pos: 3, team: 'CB Puertollano', pj: 18, pg: 12, pp: 6, pts: 30 },
-    { pos: 4, team: 'CB Villarrobledo', pj: 18, pg: 11, pp: 7, pts: 29 },
-    { pos: 5, team: 'Val Brokers CB Tomelloso', pj: 18, pg: 10, pp: 8, pts: 28 },
-    { pos: 6, team: 'CB Daimiel', pj: 18, pg: 8, pp: 10, pts: 26 }
-  ];
 
   ngOnInit(): void {
     this.title.setTitle(`Equipos - ${environment.titleSuffix}`);

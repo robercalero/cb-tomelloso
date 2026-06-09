@@ -120,35 +120,6 @@
   }
 }
 
-.standings-table-wrapper {
-  overflow-x: auto;
-  background: var(--color-white);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-}
-
-.standings-table {
-  width: 100%;
-
-  .highlight-row {
-    background: rgba(212, 160, 23, 0.08);
-    font-weight: 600;
-  }
-
-  th {
-    font-family: var(--font-heading);
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--color-text-muted);
-  }
-
-  td {
-    font-size: 0.9rem;
-  }
-}
-
 .season-rounds {
   display: flex;
   flex-wrap: wrap;
