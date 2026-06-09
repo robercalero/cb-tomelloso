@@ -35,7 +35,7 @@ export class AgendaComponent implements OnInit {
   readonly viewMode = signal<ViewMode>('list');
   readonly filterTeam = signal<string | null>(null);
 
-  readonly competitionTypes = ['Todas', '1ª Nacional CLM', 'Copa CLM'];
+  readonly competitionTypes = ['Todas', '1ª Autonómica CLM', 'Copa CLM'];
 
   ngOnInit(): void {
     this.title.setTitle(`Agenda / Partidos - ${environment.titleSuffix}`);

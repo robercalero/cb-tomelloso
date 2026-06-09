@@ -35,7 +35,7 @@ export class CreateMatchDto {
   @IsString()
   matchTime: string;
 
-  @ApiProperty({ example: '1ª Nacional CLM' })
+  @ApiProperty({ example: '1ª Autonómica CLM' })
   @IsString()
   @Length(1, 100)
   competition: string;
