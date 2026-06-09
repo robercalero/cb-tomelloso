@@ -5,10 +5,10 @@ export type MatchStatus = 'scheduled' | 'live' | 'finished' | 'postponed' | 'can
 
 @Entity('matches')
 export class Match {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'team_id', type: 'int', unsigned: true })
+  @Column({ name: 'team_id', type: 'int' })
   teamId: number;
 
   @Column({ length: 100 })
@@ -38,10 +38,10 @@ export class Match {
   @Column({ name: 'is_home', default: true })
   isHome: boolean;
 
-  @Column({ name: 'score_home', type: 'tinyint', unsigned: true, nullable: true })
+  @Column({ name: 'score_home', type: 'smallint', nullable: true })
   scoreHome: number | null;
 
-  @Column({ name: 'score_away', type: 'tinyint', unsigned: true, nullable: true })
+  @Column({ name: 'score_away', type: 'smallint', nullable: true })
   scoreAway: number | null;
 
   @Column({ type: 'enum', enum: ['scheduled', 'live', 'finished', 'postponed', 'cancelled'], default: 'scheduled' })

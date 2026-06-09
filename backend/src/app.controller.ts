@@ -8,4 +8,15 @@ export class AppController {
   root() {
     return { message: 'CB Tomelloso API', version: '1.0', docs: '/api/docs' };
   }
+
+  @Get('health')
+  @ApiExcludeEndpoint()
+  healthCheck() {
+    return {
+      status: 'ok',
+      service: 'CB Tomelloso API',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+    };
+  }
 }

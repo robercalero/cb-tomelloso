@@ -6,10 +6,10 @@ export type NewsSource = 'instagram' | 'twitter' | 'facebook' | 'youtube' | 'web
 
 @Entity('news')
 export class News {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'author_id', type: 'int', unsigned: true, nullable: true })
+  @Column({ name: 'author_id', type: 'int', nullable: true })
   authorId: number | null;
 
   @Column({ length: 255 })
@@ -21,7 +21,7 @@ export class News {
   @Column({ length: 500 })
   excerpt: string;
 
-  @Column({ type: 'longtext' })
+  @Column({ type: 'text' })
   content: string;
 
   @Column({ type: 'enum', enum: ['resultado', 'club', 'cantera', 'evento', 'general'], default: 'general' })
@@ -45,7 +45,7 @@ export class News {
   @Column({ type: 'json', nullable: true })
   media: { url: string; type: string; thumbnail?: string }[] | null;
 
-  @Column({ type: 'int', unsigned: true, default: 0 })
+  @Column({ type: 'int', default: 0 })
   views: number;
 
   @ManyToOne(() => User, (user) => user.news, { onDelete: 'SET NULL' })

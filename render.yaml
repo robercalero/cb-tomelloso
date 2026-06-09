@@ -1,68 +1,78 @@
+# render.yaml — raíz del monorepo cb-tomelloso
 services:
+  # ─── BACKEND NestJS ───────────────────────────────────────────────
   - type: web
     name: cb-tomelloso-api
     runtime: node
-    repo: https://github.com/robercalero/cb-tomelloso
     plan: free
     rootDir: backend
-    buildCommand: npm install --include=dev && npm run build
-    startCommand: npm run start:prod
-    healthCheckPath: /api/v1/news
+    buildCommand: npm install && npm run build
+    startCommand: node dist/main
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: "3000"
       - key: API_PREFIX
         value: api/v1
+      - key: DB_HOST
+        fromDatabase:
+          name: cb-tomelloso-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: cb-tomelloso-db
+          property: port
+      - key: DB_USERNAME
+        fromDatabase:
+          name: cb-tomelloso-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: cb-tomelloso-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: cb-tomelloso-db
+          property: database
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 15m
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: 7d
       - key: CORS_ORIGIN
-        value: https://cb-tomelloso-web.onrender.com
-      - key: BASE_URL
-        value: https://cb-tomelloso-api.onrender.com
-      - key: DB_SYNC
-        value: "false"
-      - key: DB_LOGGING
-        value: "false"
-      - key: DB_SSL
-        value: REQUIRED
+        value: https://cb-tomelloso-web.onrender.com,http://localhost:4200
       - key: THROTTLE_TTL
         value: "60000"
       - key: THROTTLE_LIMIT
         value: "60"
-      - key: DB_HOST
-        sync: false
-      - key: DB_PORT
-        sync: false
-      - key: DB_USERNAME
-        sync: false
-      - key: DB_PASSWORD
-        sync: false
-      - key: DB_NAME
-        sync: false
-      - key: DB_CA_CERT
-        sync: false
-      - key: JWT_SECRET
-        sync: false
-      - key: JWT_REFRESH_SECRET
-        sync: false
-      - key: JWT_EXPIRES_IN
-        sync: false
-      - key: JWT_REFRESH_EXPIRES_IN
-        sync: false
       - key: INSTAGRAM_ACCESS_TOKEN
         sync: false
       - key: INSTAGRAM_USER_ID
         sync: false
 
+  # ─── FRONTEND Angular ─────────────────────────────────────────────
   - type: static
     name: cb-tomelloso-web
     runtime: static
-    repo: https://github.com/robercalero/cb-tomelloso
     plan: free
     rootDir: .
-    buildCommand: npm install && npm run build -- --configuration production
+    buildCommand: npm install && npm run build
     staticPublishPath: ./dist/cb-tomelloso-web/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     headers:
       - path: /*
         name: Cache-Control
         value: public, max-age=3600, s-maxage=3600
+
+# ─── BASE DE DATOS PostgreSQL ──────────────────────────────────────
+databases:
+  - name: cb-tomelloso-db
+    databaseName: cbtomelloso
+    user: cbtomelloso_user
+    plan: free

@@ -4,7 +4,7 @@ export type ContactSubject = 'general' | 'socio' | 'patrocinio' | 'prensa' | 'ot
 
 @Entity('contact_messages')
 export class ContactMessage {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 100 })

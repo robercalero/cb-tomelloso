@@ -7,7 +7,7 @@ export type TeamCategory = 'Senior Autonómica' | 'Senior Zonal' | 'Júnior' | '
 
 @Entity('teams')
 export class Team {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 100 })

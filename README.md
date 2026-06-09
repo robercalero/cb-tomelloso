@@ -1,59 +1,46 @@
-# CbTomellosoWeb
+# CB Tomelloso — Web Oficial
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.14.
+## URLs de producción
+- Frontend: https://cb-tomelloso-web.onrender.com
+- API:      https://cb-tomelloso-api.onrender.com/api/v1
 
-## Development server
+## Stack técnico
+- Frontend: Angular 21 (Static Site en Render CDN)
+- Backend:  NestJS 11 + TypeORM (Web Service en Render)
+- Base de datos: PostgreSQL (Render managed DB)
+- Deploy: GitHub → Render (auto-deploy en push a main)
 
-To start a local development server, run:
+## Limitaciones del tier gratuito
+- El backend se duerme tras 15 minutos de inactividad
+- El primer visitante puede esperar 30-60 segundos (cold start)
+- Solución recomendada: configurar UptimeRobot para hacer ping a
+  https://cb-tomelloso-api.onrender.com/health cada 5 minutos
 
-```bash
-ng serve
+## Desarrollo local
+```
+# Terminal 1 — Backend
+cd backend && npm run start:dev
+
+# Terminal 2 — Frontend
+cd frontend && ng serve
+
+# Base de datos local (PostgreSQL)
+net start PostgreSQL
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Despliegue
+El despliegue es automático: cualquier push a `main` activa Render.
+Para forzar un redeploy manual: Dashboard Render > Manual Deploy
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+## Base de datos en Render
+Para inicializar la BD desde cero:
+```
+psql "[External DB URL de Render]" -f database/schema_postgres.sql
+psql "[External DB URL de Render]" -f database/seeds/001_initial_data_postgres.sql
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
+## Scripts de base de datos
+Para migrar datos locales a Render PostgreSQL:
 ```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
+.\scripts\deploy-db.ps1 -RenderHost "host.render.com" -RenderPort 5432 -RenderUser "user" -RenderPass "pass" -RenderDb "dbname"
 ```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

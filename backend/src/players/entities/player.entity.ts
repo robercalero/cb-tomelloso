@@ -5,10 +5,10 @@ export type PlayerPosition = 'Base' | 'Escolta' | 'Alero' | 'Ala-Pívot' | 'Pív
 
 @Entity('players')
 export class Player {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'team_id', type: 'int', unsigned: true })
+  @Column({ name: 'team_id', type: 'int' })
   teamId: number;
 
   @Column({ length: 100 })
@@ -17,7 +17,7 @@ export class Player {
   @Column({ length: 100 })
   surname: string;
 
-  @Column({ name: 'dorsal', type: 'tinyint', unsigned: true, nullable: true })
+  @Column({ name: 'dorsal', type: 'smallint', nullable: true })
   dorsal: number | null;
 
   @Column({ type: 'enum', enum: ['Base', 'Escolta', 'Alero', 'Ala-Pívot', 'Pívot'], nullable: true })
@@ -26,10 +26,10 @@ export class Player {
   @Column({ length: 60, default: 'España' })
   nationality: string;
 
-  @Column({ name: 'birth_year', type: 'year', nullable: true })
+  @Column({ name: 'birth_year', type: 'smallint', nullable: true })
   birthYear: number | null;
 
-  @Column({ name: 'height_cm', type: 'smallint', unsigned: true, nullable: true })
+  @Column({ name: 'height_cm', type: 'smallint', nullable: true })
   heightCm: number | null;
 
   @Column({ name: 'photo_url', type: 'varchar', length: 500, nullable: true })

@@ -4,7 +4,7 @@ export type ActivityType = 'torneo' | 'escuela' | 'evento' | 'copa' | 'amistoso'
 
 @Entity('activities')
 export class Activity {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 255 })

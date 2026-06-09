@@ -5,10 +5,10 @@ export type MediaType = 'image' | 'video';
 
 @Entity('gallery')
 export class Gallery {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'team_id', type: 'int', unsigned: true, nullable: true })
+  @Column({ name: 'team_id', type: 'int', nullable: true })
   teamId: number | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
@@ -35,7 +35,7 @@ export class Gallery {
   @Column({ name: 'is_published', default: true })
   isPublished: boolean;
 
-  @Column({ name: 'sort_order', type: 'smallint', unsigned: true, default: 99 })
+  @Column({ name: 'sort_order', type: 'smallint', default: 99 })
   sortOrder: number;
 
   @ManyToOne(() => Team, (team) => team.gallery, { onDelete: 'SET NULL' })

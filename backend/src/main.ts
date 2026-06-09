@@ -1,5 +1,5 @@
 import { NestFactory, Reflector } from '@nestjs/core';
-import { ValidationPipe, Logger, ClassSerializerInterceptor } from '@nestjs/common';
+import { ValidationPipe, Logger, ClassSerializerInterceptor, RequestMethod } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -18,14 +18,10 @@ async function bootstrap() {
   const apiPrefix = process.env.API_PREFIX ?? 'api/v1';
   app.setGlobalPrefix(apiPrefix);
 
-  const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:4200').split(',').map(s => s.trim());
   app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
-      if (corsOrigins.includes(origin)) return callback(null, true);
-      if (/^https?:\/\/[^:]+:(4200|3000)$/.test(origin)) return callback(null, true);
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
-    },
+    origin: process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+      : ['http://localhost:4200'],
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -53,7 +49,7 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT ?? 3000;
-  await app.listen(port);
-  logger.log(`Backend CB Tomelloso corriendo en: http://localhost:${port}/${apiPrefix}`);
+  await app.listen(port, '0.0.0.0');
+  logger.log(`Backend CB Tomelloso corriendo en: http://0.0.0.0:${port}/${apiPrefix}`);
 }
 bootstrap();

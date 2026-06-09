@@ -1,34 +1,39 @@
 param(
     [Parameter(Mandatory)]
-    [string]$AivenHost,
+    [string]$RenderHost,
     [Parameter(Mandatory)]
-    [string]$AivenPort,
+    [string]$RenderPort,
     [Parameter(Mandatory)]
-    [string]$AivenUser,
+    [string]$RenderUser,
     [Parameter(Mandatory)]
-    [string]$AivenPass,
+    [string]$RenderPass,
     [Parameter(Mandatory)]
-    [string]$AivenDb
+    [string]$RenderDb
 )
 
 $ErrorActionPreference = "Stop"
 $dt = Get-Date -Format "yyyyMMdd_HHmmss"
 $dumpFile = "$PSScriptRoot\..\backup_cbtomelloso_prod_$dt.sql"
-$mysqlDump = "C:\Program Files\MariaDB 12.2\bin\mysqldump.exe"
-$mysql = "C:\Program Files\MariaDB 12.2\bin\mysql.exe"
+$pgDump = "pg_dump"
+$psql = "psql"
 $localUser = "cbtomelloso_user"
 $localPass = "CbTom2025!Secure"
+$localDb = "cbtomelloso"
 
-Write-Host "=== DUMP LOCAL ===> $dumpFile ==="
-& $mysqlDump -h 127.0.0.1 -u $localUser -p"$localPass" --databases $AivenDb --routines --triggers --events --add-drop-database --result-file="$dumpFile" 2>&1
+Write-Host "=== DUMP LOCAL (PostgreSQL) ===> $dumpFile ==="
+$env:PGPASSWORD = $localPass
+& $pgDump -h 127.0.0.1 -p 5432 -U $localUser -d $localDb --no-owner --no-acl --file="$dumpFile" 2>&1
 if ($LASTEXITCODE -ne 0) { Write-Host "ERROR: Dump local falló"; exit 1 }
 
-Write-Host "=== RESTORE ===> Aiven ($AivenHost`:$AivenPort) ==="
-& $mysql -h $AivenHost -P $AivenPort -u $AivenUser -p"$AivenPass" --ssl --ssl-verify-server-cert=OFF $AivenDb -e "source $dumpFile" 2>&1
-if ($LASTEXITCODE -ne 0) { Write-Host "ERROR: Restore en Aiven falló"; exit 1 }
+Write-Host "=== RESTORE ===> Render PostgreSQL ($RenderHost`:$RenderPort) ==="
+$env:PGPASSWORD = $RenderPass
+& $psql -h $RenderHost -p $RenderPort -U $RenderUser -d $RenderDb --ssl-mode=require -f "$dumpFile" 2>&1
+if ($LASTEXITCODE -ne 0) { Write-Host "ERROR: Restore en Render falló"; exit 1 }
 
 Write-Host "=== VERIFICANDO ==="
-$tables = & $mysql -h $AivenHost -P $AivenPort -u $AivenUser -p"$AivenPass" --ssl --ssl-verify-server-cert=OFF $AivenDb -e "SHOW TABLES" 2>&1
-Write-Host "Tablas en Aiven:`n$tables"
+$env:PGPASSWORD = $RenderPass
+$tables = & $psql -h $RenderHost -p $RenderPort -U $RenderUser -d $RenderDb --ssl-mode=require -c "\dt" 2>&1
+Write-Host "Tablas en Render:`n$tables"
 
+$env:PGPASSWORD = ""
 Write-Host "=== LISTO ==="

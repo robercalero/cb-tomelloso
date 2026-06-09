@@ -5,10 +5,10 @@ export type MemberType = 'adulto' | 'juvenil' | 'familia' | 'honorario';
 
 @Entity('members')
 export class Member {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'user_id', type: 'int', unsigned: true, nullable: true })
+  @Column({ name: 'user_id', type: 'int', nullable: true })
   userId: number | null;
 
   @Column({ length: 100 })

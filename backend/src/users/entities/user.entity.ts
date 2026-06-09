@@ -7,13 +7,13 @@ export type UserRole = 'admin' | 'editor' | 'socio' | 'visitante';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 255, unique: true })
   email: string;
 
-  @Column({ name: 'passwordHash', length: 255 })
+  @Column({ name: 'password_hash', length: 255 })
   @Exclude()
   passwordHash: string;
 

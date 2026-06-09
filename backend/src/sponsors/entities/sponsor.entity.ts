@@ -4,7 +4,7 @@ export type SponsorTier = 'principal' | 'oro' | 'plata' | 'bronce';
 
 @Entity('sponsors')
 export class Sponsor {
-  @PrimaryGeneratedColumn({ unsigned: true })
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 100 })
@@ -31,7 +31,7 @@ export class Sponsor {
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 
-  @Column({ name: 'sort_order', type: 'tinyint', unsigned: true, default: 99 })
+  @Column({ name: 'sort_order', type: 'smallint', default: 99 })
   sortOrder: number;
 
   @CreateDateColumn({ name: 'created_at' })
