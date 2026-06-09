@@ -15,25 +15,15 @@ services:
       - key: API_PREFIX
         value: api/v1
       - key: DB_HOST
-        fromDatabase:
-          name: cb-tomelloso-db
-          property: host
+        value: mysql-9465549-robercalero2004-69ea.i.aivencloud.com
       - key: DB_PORT
-        fromDatabase:
-          name: cb-tomelloso-db
-          property: port
+        value: "16883"
       - key: DB_USERNAME
-        fromDatabase:
-          name: cb-tomelloso-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: cb-tomelloso-db
-          property: password
+        value: avnadmin
       - key: DB_NAME
-        fromDatabase:
-          name: cb-tomelloso-db
-          property: database
+        value: cbtomelloso
+      - key: DB_PASSWORD
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
@@ -70,9 +60,3 @@ services:
         name: Cache-Control
         value: public, max-age=3600, s-maxage=3600
 
-# ─── BASE DE DATOS PostgreSQL ──────────────────────────────────────
-databases:
-  - name: cb-tomelloso-db
-    databaseName: cbtomelloso
-    user: cbtomelloso_user
-    plan: free

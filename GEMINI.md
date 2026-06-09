@@ -6,8 +6,8 @@ Eres el agente de desarrollo de la **web oficial del Club Baloncesto Tomelloso**
 
 ## Stack técnico
 - **Frontend:** Angular 21 (standalone, zoneless, signals, Signal Forms, @defer, OnPush)
-- **Backend:** NestJS 11 + TypeORM + PostgreSQL
-- **Base de datos:** PostgreSQL (Render managed, migrada desde MariaDB)
+- **Backend:** NestJS 11 + TypeORM + MySQL (Aiven)
+- **Base de datos:** MySQL (Aiven Cloud)
 - **Despliegue:** GitHub → Render (auto-deploy en push a `main`)
 - **URLs producción:**
   - Frontend: https://cb-tomelloso-web.onrender.com

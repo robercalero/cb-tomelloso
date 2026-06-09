@@ -2,8 +2,8 @@
 
 ## Stack técnico
 - Frontend: Angular 21 (standalone, zoneless, signals, OnPush)
-- Backend: NestJS 11 + TypeORM + PostgreSQL
-- Base de datos: PostgreSQL (Render managed)
+- Backend: NestJS 11 + TypeORM + MySQL (Aiven)
+- Base de datos: MySQL (Aiven Cloud)
 - Despliegue: GitHub → Render (auto-deploy en push a main)
 
 ## Frontend (Angular 21)
@@ -17,7 +17,7 @@
 - `catchError(() => of([]))` en todos los observables HTTP
 
 ## Backend (NestJS)
-- PostgreSQL con SSL en producción: `ssl: { rejectUnauthorized: false }`
+- MySQL con SSL: `ssl: DB_SSL === 'REQUIRED' ? {} : false`
 - `synchronize: false` en producción (NODE_ENV=production)
 - Puerto dinámico: `process.env.PORT || 3000`
 - Escuchar en `'0.0.0.0'` no en `'localhost'`
@@ -26,9 +26,8 @@
 - Soft delete (isActive: false) en lugar de delete físico
 
 ## Base de datos
-- PostgreSQL — NO MySQL ni MariaDB
-- Tipos PostgreSQL: SERIAL, BOOLEAN, SMALLINT, TIMESTAMPTZ, TEXT
-- No usar tipos MySQL: TINYINT(1), AUTO_INCREMENT, YEAR, LONGTEXT
+- MySQL (Aiven Cloud) — NO PostgreSQL
+- SSL configurable via DB_SSL env var (DISABLED | REQUIRED)
 
 ## Git y despliegue
 - Nunca committear .env con credenciales reales
