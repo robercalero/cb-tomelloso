@@ -1,3 +1,8 @@
+-- ⚠️  ARCHIVO OBSOLETO — NO USAR EN PRODUCCIÓN
+-- Este archivo es un schema PostgreSQL de una versión anterior del proyecto.
+-- El proyecto usa MySQL 8 (Aiven Cloud). Ver database/schema.sql para el schema actual.
+-- Este archivo se conserva solo como referencia histórica.
+-- Última actualización del schema real: database/schema.sql
 -- ============================================================
 -- ESQUEMA COMPLETO — CB TOMELLOSO
 -- PostgreSQL
@@ -29,7 +34,7 @@ DROP TYPE IF EXISTS user_role CASCADE;
 
 -- Creación de Tipos ENUM para PostgreSQL
 CREATE TYPE user_role AS ENUM ('admin', 'editor', 'socio', 'visitante');
-CREATE TYPE team_category AS ENUM ('Senior Autonómica', 'Senior Zonal', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket');
+CREATE TYPE team_category AS ENUM ('Senior Autonómica', 'Junior U19', 'Júnior', 'Cadete', 'Infantil', 'Alevín', 'Benjamín', 'Minibasket');
 CREATE TYPE player_position AS ENUM ('Base', 'Escolta', 'Alero', 'Ala-Pívot', 'Pívot');
 CREATE TYPE match_status AS ENUM ('scheduled', 'live', 'finished', 'postponed', 'cancelled');
 CREATE TYPE news_category AS ENUM ('resultado', 'club', 'cantera', 'evento', 'general');

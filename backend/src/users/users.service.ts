@@ -37,15 +37,12 @@ export class UsersService {
 
   async update(id: number, dto: UpdateUserDto): Promise<User> {
     await this.findOne(id);
+    const updateData: Record<string, any> = { ...dto };
     if (dto.password) {
-      dto.password = await bcrypt.hash(dto.password, 12);
+      updateData['passwordHash'] = await bcrypt.hash(dto.password, 12);
+      delete updateData['password'];
     }
-    const data: any = { ...dto };
-    if (data.password) {
-      data.passwordHash = data.password;
-      delete data.password;
-    }
-    await this.userRepo.update(id, data);
+    await this.userRepo.update(id, updateData);
     return this.findOne(id);
   }
 

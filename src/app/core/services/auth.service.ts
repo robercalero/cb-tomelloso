@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject, tap, catchError, of } from 'rxjs';
+import { Observable, Subject, tap, catchError, of, throwError } from 'rxjs';
 import { getApiBaseUrl } from '../utils/api-url.utils';
 
 export interface AuthUser {
@@ -32,6 +32,10 @@ export class AuthService {
   readonly isAdmin = computed(() => this._currentUser()?.role === 'admin');
   readonly isEditor = computed(() => ['admin', 'editor'].includes(this._currentUser()?.role ?? ''));
 
+  setCurrentUser(user: AuthUser): void {
+    this._currentUser.set(user);
+  }
+
   private readonly TOKEN_KEY = 'cb_access_token';
   private readonly REFRESH_KEY = 'cb_refresh_token';
 
@@ -42,6 +46,10 @@ export class AuthService {
         this.storeTokens(tokens.accessToken, tokens.refreshToken);
         this._currentUser.set(tokens.user);
         this._isLoading.set(false);
+      }),
+      catchError((err) => {
+        this._isLoading.set(false);
+        return throwError(() => err);
       }),
     );
   }

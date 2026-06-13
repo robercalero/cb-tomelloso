@@ -3,7 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "57f15ef4-8729-4ba1-9d34-8b1399e0e54c"
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -50,6 +50,15 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "assets/icons"
+              },
+              {
+                "glob": "manifest.webmanifest",
+                "input": "src"
               }
             ],
             "styles": [
@@ -64,6 +73,7 @@
                   "with": "src/environments/environment.production.ts"
                 }
               ],
+              "serviceWorker": "ngsw-config.json",
               "budgets": [
                 {
                   "type": "initial",

@@ -1,4 +1,4 @@
-import { Injectable, inject, computed } from '@angular/core';
+import { Injectable, inject, computed, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
@@ -30,9 +30,12 @@ function mapToHeroSlides(news: News[]): HeroSlide[] {
 export class NewsService {
   private api = inject(ApiService);
 
+  private _cachedNews = signal<NewsListResponse>({ data: [], total: 0, page: 1, limit: 10 });
+
   readonly newsResponse = toSignal(
     this.api.get<NewsListResponse>('news', { page: 1, limit: 10 }).pipe(
-      catchError(() => of({ data: [] as News[], total: 0, page: 1, limit: 10 }))
+      tap(response => this._cachedNews.set(response)),
+      catchError(() => of(this._cachedNews()))
     ),
     { initialValue: { data: [] as News[], total: 0, page: 1, limit: 10 } }
   );
@@ -40,9 +43,12 @@ export class NewsService {
   readonly news = computed(() => this.newsResponse().data);
   readonly totalNews = computed(() => this.newsResponse().total);
 
+  private _cachedHeroSlides = signal<News[]>([]);
+
   readonly heroSlidesResponse = toSignal(
     this.api.get<News[]>('news/hero').pipe(
-      catchError(() => of([] as News[]))
+      tap(slides => this._cachedHeroSlides.set(slides)),
+      catchError(() => of(this._cachedHeroSlides()))
     ),
     { initialValue: [] as News[] }
   );
@@ -65,14 +71,14 @@ export class NewsService {
 
   private newsCache = new Map<string, News>();
 
-  getBySlug(slug: string): Observable<News> {
+  getBySlug(slug: string): Observable<News | null> {
     const cached = this.newsCache.get(slug);
     if (cached) {
       return of(cached);
     }
     return this.api.get<News>(`news/${slug}`).pipe(
       tap(result => this.newsCache.set(slug, result)),
-      catchError(() => of(null as unknown as News))
+      catchError(() => of(null))
     );
   }
 }
