@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -10,6 +10,8 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent {
+  readonly year = signal(new Date().getFullYear());
+
   readonly socialLinks = [
     { icon: 'instagram', url: 'https://www.instagram.com/cbtomelloso', label: 'Instagram' },
     { icon: 'twitter', url: 'https://x.com/cbttomelloso', label: 'Twitter/X' },
@@ -28,8 +30,8 @@ export class FooterComponent {
   ];
 
   readonly legalLinks = [
-    { label: 'Política de Privacidad', path: '#' },
-    { label: 'Aviso Legal', path: '#' },
-    { label: 'Política de Cookies', path: '#' }
+    { label: 'Política de Privacidad', path: '/club' },
+    { label: 'Aviso Legal', path: '/club' },
+    { label: 'Política de Cookies', path: '/club' }
   ];
 }

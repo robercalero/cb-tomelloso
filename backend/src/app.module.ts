@@ -17,6 +17,15 @@ import { ContactModule } from './contact/contact.module';
 import { MembersModule } from './members/members.module';
 import { InstagramModule } from './instagram/instagram.module';
 import { MediaModule } from './media/media.module';
+import { ProductCategoriesModule } from './shop/product-categories/product-categories.module';
+import { ProductsModule } from './shop/products/products.module';
+import { CartModule } from './shop/cart/cart.module';
+import { OrdersModule } from './shop/orders/orders.module';
+import { PaymentsModule } from './shop/payments/payments.module';
+import { MailModule } from './mail/mail.module';
+import { AdminModule } from './admin/admin.module';
+import { ShopSeedModule } from './shop/seed/shop-seed.module';
+import { DatabaseSeedModule } from './database-seed/database-seed.module';
 
 @Module({
   imports: [
@@ -36,6 +45,15 @@ import { MediaModule } from './media/media.module';
     MembersModule,
     InstagramModule,
     MediaModule,
+    ProductCategoriesModule,
+    ProductsModule,
+    CartModule,
+    OrdersModule,
+    PaymentsModule,
+    MailModule,
+    AdminModule,
+    ShopSeedModule,
+    DatabaseSeedModule,
   ],
   controllers: [AppController],
   providers: [

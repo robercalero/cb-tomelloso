@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #212529; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #1a5276, #1e8449); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .header h1 { color: white; margin: 0; font-size: 24px; }
+    .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; }
+    .body { background: white; padding: 30px; border: 1px solid #e0e0e0; }
+    .items-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    .items-table th { background: #f8f9fa; padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6; }
+    .items-table td { padding: 10px; border-bottom: 1px solid #f0f0f0; }
+    .btn { display: inline-block; background: #f39c12; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; }
+    .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; border-radius: 0 0 8px 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Nuevo pedido recibido</h1>
+      <p>Panel de Administración — CB Tomelloso</p>
+    </div>
+    <div class="body">
+      <p>Se ha realizado un nuevo pedido en la tienda:</p>
+
+      <p><strong>Pedido:</strong> {{orderNumber}}<br>
+      <strong>Cliente:</strong> {{customerName}}<br>
+      <strong>Email:</strong> {{customerEmail}}<br>
+      <strong>Total:</strong> {{totalAmount}}</p>
+
+      <table class="items-table">
+        <thead>
+          <tr><th>Producto</th><th>Cant.</th><th>Subtotal</th></tr>
+        </thead>
+        <tbody>
+          {{#each items}}
+          <tr><td>{{this.productName}}</td><td>{{this.quantity}}</td><td>{{this.subtotal}} €</td></tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+      <br>
+      <a href="{{adminUrl}}" class="btn">Gestionar pedido</a>
+    </div>
+    <div class="footer">
+      <p>CB Tomelloso — Panel de Administración</p>
+    </div>
+  </div>
+</body>
+</html>

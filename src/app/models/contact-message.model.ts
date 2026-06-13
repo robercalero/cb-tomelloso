@@ -4,5 +4,6 @@ export interface ContactMessage {
   email: string;
   subject: 'general' | 'socio' | 'patrocinio' | 'prensa' | 'otro';
   message: string;
+  isRead: boolean;
   createdAt: string;
 }

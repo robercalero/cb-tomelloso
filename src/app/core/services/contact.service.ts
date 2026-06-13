@@ -8,9 +8,9 @@ import { ContactMessage } from '../../models/contact-message.model';
 export class ContactService {
   private api = inject(ApiService);
 
-  sendMessage(data: { name: string; email: string; subject?: string; message: string }): Observable<ContactMessage> {
+  sendMessage(data: { name: string; email: string; subject?: string; message: string }): Observable<ContactMessage | null> {
     return this.api.post<ContactMessage>('contact', data).pipe(
-      catchError(() => of(null as unknown as ContactMessage))
+      catchError(() => of(null))
     );
   }
 }

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #212529; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #1a5276, #1e8449); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .header h1 { color: white; margin: 0; font-size: 24px; }
+    .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; }
+    .body { background: white; padding: 30px; border: 1px solid #e0e0e0; }
+    .btn { display: inline-block; background: #f39c12; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; }
+    .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; border-radius: 0 0 8px 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Tu pedido está en camino</h1>
+      <p>Club Baloncesto Tomelloso — Tienda Oficial</p>
+    </div>
+    <div class="body">
+      <p>Hola, <strong>{{customerName}}</strong>.</p>
+      <p>Tu pedido <strong>{{orderNumber}}</strong> ha sido enviado.</p>
+
+      <p><strong>Número de seguimiento:</strong> {{trackingNumber}}</p>
+
+      <p>Puedes consultar el estado de tu pedido en cualquier momento:</p>
+      <br>
+      <a href="{{trackUrl}}" class="btn">Seguir pedido</a>
+    </div>
+    <div class="footer">
+      <p>CB Tomelloso · Pabellón San José, Tomelloso (Ciudad Real)</p>
+      <p>¿Preguntas? <a href="mailto:info@cbtomelloso.es">info@cbtomelloso.es</a></p>
+    </div>
+  </div>
+</body>
+</html>

@@ -47,14 +47,13 @@
             </div>
             <div class="calendar-grid">
               @for (day of calendarDays(); track day) {
-                <div class="calendar-day" [class.has-match]="getMatchesForDay(day).length > 0">
+                @let dayMatches = getMatchesForDay(day);
+                <div class="calendar-day" [class.has-match]="dayMatches.length > 0">
                   <span class="day-number">{{ day }}</span>
-                  @if (getMatchesForDay(day); as dayMatches) {
-                    @for (match of dayMatches; track match.id) {
-                      <div class="day-match" [class.match-home]="match.isHome">
-                        {{ match.awayTeam }}
-                      </div>
-                    }
+                  @for (match of dayMatches; track match.id) {
+                    <div class="day-match" [class.match-home]="match.isHome">
+                      {{ match.awayTeam }}
+                    </div>
                   }
                 </div>
               }

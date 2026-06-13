@@ -12,8 +12,13 @@ export class NewsService {
     private readonly newsRepo: Repository<News>,
   ) {}
 
-  async findAll(category?: string, page = 1, limit = 10, source?: string): Promise<{ data: News[]; total: number; page: number; limit: number }> {
-    const where: any = { isPublished: true };
+  async findAll(category?: string, page = 1, limit = 10, source?: string, isPublished?: string): Promise<{ data: News[]; total: number; page: number; limit: number }> {
+    const where: any = {};
+    if (!isPublished || isPublished === 'true') {
+      where.isPublished = true;
+    } else if (isPublished === 'false') {
+      where.isPublished = false;
+    }
     if (category && category !== 'all') where.category = category;
     if (source) where.source = source;
     const [data, total] = await this.newsRepo.findAndCount({

@@ -139,9 +139,9 @@
                     }
                   </div>
 
-                  <button type="submit" mat-raised-button color="primary" class="submit-btn">
+                  <button type="submit" mat-raised-button color="primary" class="submit-btn" [disabled]="isSending()">
                     <mat-icon>send</mat-icon>
-                    Enviar mensaje
+                    {{ isSending() ? 'Enviando...' : 'Enviar mensaje' }}
                   </button>
                 </form>
               }
@@ -218,9 +218,9 @@
                     ></textarea>
                   </div>
 
-                  <button type="submit" mat-raised-button color="accent" class="submit-btn">
+                  <button type="submit" mat-raised-button color="accent" class="submit-btn" [disabled]="isSending()">
                     <mat-icon>person_add</mat-icon>
-                    Solicitar adhesión
+                    {{ isSending() ? 'Enviando...' : 'Solicitar adhesión' }}
                   </button>
                 </form>
               }

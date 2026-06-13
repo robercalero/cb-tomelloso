@@ -1,9 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -14,8 +14,12 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(dto: CreateUserDto) {
-    const user = await this.usersService.create(dto);
+  async register(dto: RegisterDto) {
+    const user = await this.usersService.create({
+      ...dto,
+      role: 'visitante' as const,
+      isActive: true,
+    });
     const tokens = await this.generateTokens(user.id, user.email, user.role);
     await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
     return { ...tokens, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
@@ -58,7 +62,7 @@ export class AuthService {
 
   async validateUser(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
-    if (user && (await bcrypt.compare(password, user.passwordHash))) {
+    if (user && user.isActive && (await bcrypt.compare(password, user.passwordHash))) {
       return { id: user.id, email: user.email, role: user.role, name: user.name };
     }
     return null;

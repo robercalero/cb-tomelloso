@@ -10,6 +10,30 @@
   (slideChanged)="onSlideChanged($event)"
 />
 
+<!-- Productos Destacados de la Tienda -->
+@defer (on viewport) {
+  @if (featuredProducts().length > 0) {
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Tienda Oficial</h2>
+          <a routerLink="/tienda" class="section-link">Ver todos &rarr;</a>
+        </div>
+        <div class="products-grid">
+          @for (product of featuredProducts(); track product.id) {
+            <app-product-card
+              [product]="product"
+              (addToCart)="onAddToCart($event)"
+            />
+          }
+        </div>
+      </div>
+    </section>
+  }
+} @placeholder {
+  <section class="section"><div class="container"><div class="products-grid products-grid--skeleton">@for (n of [1,2,3,4]; track n) {<div class="product-card--skeleton"></div>}</div></div></section>
+}
+
 <!-- Próximos Partidos -->
 <section class="section section-dark">
   <div class="container">

@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CartStore } from '../../../core/services/cart.store';
 
 interface NavLink {
   label: string;
@@ -28,6 +29,7 @@ interface NavLink {
 export class NavbarComponent {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  readonly cartStore = inject(CartStore);
 
   readonly isScrolled = signal(false);
   readonly isMobileMenuOpen = signal(false);
@@ -48,6 +50,7 @@ export class NavbarComponent {
     { label: 'Agenda', path: '/agenda' },
     { label: 'Galería', path: '/galeria' },
     { label: 'Patrocinadores', path: '/patrocinadores' },
+    { label: 'Tienda', path: '/tienda' },
     { label: 'Contacto', path: '/contacto' }
   ];
 

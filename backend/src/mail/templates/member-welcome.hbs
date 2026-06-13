@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #212529; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #1a5276, #1e8449); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .header h1 { color: white; margin: 0; font-size: 24px; }
+    .header p { color: rgba(255,255,255,0.85); margin: 8px 0 0; }
+    .body { background: white; padding: 30px; border: 1px solid #e0e0e0; }
+    .btn { display: inline-block; background: #f39c12; color: white; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; }
+    .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #6c757d; border-radius: 0 0 8px 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>¡Bienvenido/a al CB Tomelloso!</h1>
+      <p>Club Baloncesto Tomelloso</p>
+    </div>
+    <div class="body">
+      <p>Hola, <strong>{{name}}</strong>.</p>
+      <p>Nos alegra darte la bienvenida como <strong>{{memberTypeLabel}}</strong> del Club Baloncesto Tomelloso.</p>
+
+      {{#if memberNumber}}
+      <p><strong>Número de socio/a:</strong> {{memberNumber}}</p>
+      {{/if}}
+
+      <p>Gracias por formar parte de nuestra gran familia. #CreciendoJuntos</p>
+      <br>
+      <a href="{{clubUrl}}" class="btn">Visitar web del club</a>
+    </div>
+    <div class="footer">
+      <p>CB Tomelloso · Pabellón San José, Tomelloso (Ciudad Real)</p>
+      <p><a href="mailto:info@cbtomelloso.es">info@cbtomelloso.es</a></p>
+    </div>
+  </div>
+</body>
+</html>

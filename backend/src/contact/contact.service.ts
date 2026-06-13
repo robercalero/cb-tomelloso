@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ContactMessage } from './entities/contact-message.entity';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
+import { MailService } from '../mail/mail.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ContactService {
   constructor(
     @InjectRepository(ContactMessage)
     private readonly contactRepo: Repository<ContactMessage>,
+    private readonly mailService: MailService,
+    private readonly config: ConfigService,
   ) {}
 
   async findAll(isRead?: boolean): Promise<ContactMessage[]> {
@@ -31,7 +35,17 @@ export class ContactService {
       ...dto,
       ipAddress: ipAddress || null,
     });
-    return this.contactRepo.save(message);
+    const saved = await this.contactRepo.save(message);
+
+    const subject = dto.subject || 'general';
+    await this.mailService.sendContactConfirmation(dto.name, dto.email, subject);
+    const adminEmail = this.config.get<string>('ADMIN_EMAIL', 'admin@cbtomelloso.es');
+    await this.mailService.notifyAdminNewContact(
+      { name: dto.name, email: dto.email, subject, message: dto.message },
+      adminEmail,
+    );
+
+    return saved;
   }
 
   async markAsRead(id: number): Promise<void> {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, Query, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ContactService } from './contact.service';
@@ -17,8 +17,10 @@ export class ContactController {
   @Roles('admin')
   @ApiBearerAuth()
   @ApiOperation({ summary: '[Admin] Ver mensajes recibidos' })
-  findAll() {
-    return this.contactService.findAll();
+  findAll(@Query('isRead') isRead?: string) {
+    return this.contactService.findAll(
+      isRead !== undefined ? isRead === 'true' : undefined
+    );
   }
 
   @Post()

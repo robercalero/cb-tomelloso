@@ -108,6 +108,7 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmitContact(): void {
+    if (this.isSending()) return;
     if (this.contactForm.valid) {
       this.isSending.set(true);
       const { name, email, subject, message } = this.contactForm.value;
@@ -125,6 +126,7 @@ export class ContactComponent implements OnInit {
   }
 
   onSubmitMember(): void {
+    if (this.isSending()) return;
     if (this.memberForm.valid) {
       this.isSending.set(true);
       const { name, email, phone, category } = this.memberForm.value;

@@ -7,7 +7,7 @@
 ## Stack técnico
 - Frontend: Angular 21 (Static Site en Render CDN)
 - Backend:  NestJS 11 + TypeORM (Web Service en Render)
-- Base de datos: PostgreSQL (Render managed DB)
+- Base de datos: MySQL 8 (Aiven Cloud)
 - Deploy: GitHub → Render (auto-deploy en push a main)
 
 ## Limitaciones del tier gratuito
@@ -24,23 +24,23 @@ cd backend && npm run start:dev
 # Terminal 2 — Frontend
 cd frontend && ng serve
 
-# Base de datos local (PostgreSQL)
-net start PostgreSQL
+# Base de datos local (MariaDB/MySQL)
+net start MariaDB  # o MySQL
 ```
 
 ## Despliegue
 El despliegue es automático: cualquier push a `main` activa Render.
 Para forzar un redeploy manual: Dashboard Render > Manual Deploy
 
-## Base de datos en Render
+## Base de datos en Aiven
 Para inicializar la BD desde cero:
 ```
-psql "[External DB URL de Render]" -f database/schema_postgres.sql
-psql "[External DB URL de Render]" -f database/seeds/001_initial_data_postgres.sql
+mysql -h [host] -P [port] -u [user] -p cbtomelloso < database/schema.sql
+mysql -h [host] -P [port] -u [user] -p cbtomelloso < database/seeds/001_initial_data.sql
 ```
 
 ## Scripts de base de datos
-Para migrar datos locales a Render PostgreSQL:
+Para desplegar BD local:
 ```
-.\scripts\deploy-db.ps1 -RenderHost "host.render.com" -RenderPort 5432 -RenderUser "user" -RenderPass "pass" -RenderDb "dbname"
+.\scripts\deploy-db.ps1
 ```

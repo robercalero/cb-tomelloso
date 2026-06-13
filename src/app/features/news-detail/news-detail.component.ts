@@ -5,7 +5,7 @@ import { Title, Meta } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs';
+import { map, switchMap, catchError, of } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { News, MediaItem } from '../../models/news.model';
 import { environment } from '../../../environments/environment';
@@ -31,8 +31,17 @@ export class NewsDetailComponent implements OnInit {
   private readonly rawNews = toSignal(
     this.route.paramMap.pipe(
       map(params => params.get('slug') as string),
-      switchMap(slug => this.api.get<News>(`news/${slug}`)),
-    )
+      switchMap(slug =>
+        this.api.get<News>(`news/${slug}`).pipe(
+          catchError(() => {
+            this.notFound.set(true);
+            this.loading.set(false);
+            return of(null);
+          }),
+        )
+      ),
+    ),
+    { initialValue: null }
   );
 
   readonly news = computed(() => {
@@ -52,8 +61,6 @@ export class NewsDetailComponent implements OnInit {
   readonly lightboxIndex = signal<number | null>(null);
   readonly lightboxMedia = signal<MediaItem[]>([]);
 
-  private slug = this.route.snapshot.params['slug'];
-
   constructor() {
     effect(() => {
       const n = this.news();
@@ -70,7 +77,8 @@ export class NewsDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.slug) {
+    const slug = this.route.snapshot.paramMap.get('slug');
+    if (!slug) {
       this.loading.set(false);
       this.notFound.set(true);
     }

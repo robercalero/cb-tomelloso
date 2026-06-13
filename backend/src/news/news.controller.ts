@@ -18,13 +18,15 @@ export class NewsController {
   @ApiQuery({ name: 'source', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'isPublished', required: false, type: String, description: 'Filtrar por estado: true | false | all (todas)' })
   findAll(
     @Query('category') category?: string,
     @Query('source') source?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @Query('isPublished') isPublished?: string,
   ) {
-    return this.newsService.findAll(category, page ? +page : 1, limit ? +limit : 10, source);
+    return this.newsService.findAll(category, page ? +page : 1, limit ? +limit : 10, source, isPublished);
   }
 
   @Get('hero')

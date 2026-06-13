@@ -6,11 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatchesService } from '../../core/services/matches.service';
 import { NewsService } from '../../core/services/news.service';
 import { SponsorsService } from '../../core/services/sponsors.service';
+import { ShopService } from '../../core/services/shop.service';
+import { CartStore } from '../../core/services/cart.store';
 import { MatchCardComponent } from '../../shared/components/match-card/match-card.component';
 import { NewsSliderComponent } from '../../shared/components/news-slider/news-slider.component';
 import { HeroSlide } from '../../models/news.model';
 import { SponsorCarouselComponent } from '../../shared/components/sponsor-carousel/sponsor-carousel.component';
 import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader.component';
+import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -23,7 +26,8 @@ import { environment } from '../../../environments/environment';
     MatchCardComponent,
     NewsSliderComponent,
     SponsorCarouselComponent,
-    SkeletonLoaderComponent
+    SkeletonLoaderComponent,
+    ProductCardComponent
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -33,6 +37,8 @@ export class HomeComponent implements OnInit {
   private matchesService = inject(MatchesService);
   private newsService = inject(NewsService);
   private sponsorsService = inject(SponsorsService);
+  private shopService = inject(ShopService);
+  private cartStore = inject(CartStore);
   private title = inject(Title);
   private meta = inject(Meta);
 
@@ -40,6 +46,7 @@ export class HomeComponent implements OnInit {
   readonly recentResults = this.matchesService.recentResults;
   readonly heroSlides = this.newsService.heroSlides;
   readonly sponsors = this.sponsorsService.sponsors;
+  readonly featuredProducts = this.shopService.featuredProducts;
 
   readonly stats = [
     { value: 40, label: 'Años de historia', icon: 'history' },
@@ -49,6 +56,10 @@ export class HomeComponent implements OnInit {
   ];
 
   onSlideChanged(slide: HeroSlide): void {
+  }
+
+  onAddToCart(event: { productId: number; quantity: number }): void {
+    this.cartStore.addItem(event.productId, event.quantity);
   }
 
   ngOnInit(): void {
