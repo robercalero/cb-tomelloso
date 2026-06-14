@@ -50,14 +50,11 @@ export class CartStore {
   }
 
   addItem(productId: number, quantity: number, size?: string, color?: string): void {
-    this._isLoading.set(true);
     this.shopService.addToCart(this._sessionId(), { productId, quantity, size, color })
-      .subscribe({
-        next: () => {
-          this.loadCart();
-          this.openCart();
-        },
-        error: () => this._isLoading.set(false),
+      .pipe(catchError(() => of(null)))
+      .subscribe(() => {
+        this.reloadCartSilently();
+        this.openCart();
       });
   }
 
@@ -68,13 +65,13 @@ export class CartStore {
     }
     this.shopService.updateCartItem(this._sessionId(), itemId, quantity)
       .pipe(catchError(() => of(null)))
-      .subscribe(() => this.loadCart());
+      .subscribe(() => this.reloadCartSilently());
   }
 
   removeItem(itemId: number): void {
     this.shopService.removeCartItem(this._sessionId(), itemId)
       .pipe(catchError(() => of(null)))
-      .subscribe(() => this.loadCart());
+      .subscribe(() => this.reloadCartSilently());
   }
 
   clearCart(): void {
@@ -88,6 +85,12 @@ export class CartStore {
   closeCart(): void { this._isOpen.set(false); }
 
   toggleCart(): void { this._isOpen.update(v => !v); }
+
+  private reloadCartSilently(): void {
+    this.shopService.getCart(this._sessionId()).pipe(
+      catchError(() => of([] as CartItem[]))
+    ).subscribe(items => this._items.set(items));
+  }
 
   private getOrCreateSessionId(): string {
     try {

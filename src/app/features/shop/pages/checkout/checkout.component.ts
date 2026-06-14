@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
@@ -108,8 +108,12 @@ import { environment } from '../../../../../environments/environment';
               <strong>{{ cartStore.formattedTotal() }}</strong>
             </div>
 
+            @if (errorMessage()) {
+              <div class="checkout__error">{{ errorMessage() }}</div>
+            }
+
             <button class="btn-pay"
-                    [disabled]="isProcessing() || !isFormValid()"
+                    [disabled]="isProcessing() || checkoutForm.invalid"
                     (click)="placeOrder()">
               @if (isProcessing()) {
                 Procesando...
@@ -117,6 +121,10 @@ import { environment } from '../../../../../environments/environment';
                 Pagar con tarjeta
               }
             </button>
+
+            @if (checkoutForm.invalid && checkoutForm.touched) {
+              <p class="checkout__form-error">Revisa los campos obligatorios</p>
+            }
 
             <p class="checkout__secure">
               Pago seguro procesado por Stripe.
@@ -210,6 +218,15 @@ import { environment } from '../../../../../environments/environment';
       text-align: center; font-size: 0.8rem;
       color: var(--color-text-muted); margin-top: 0.75rem;
     }
+    .checkout__error {
+      background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+      border-radius: var(--radius-md); padding: 0.75rem 1rem;
+      margin-bottom: 1rem; font-size: 0.9rem;
+    }
+    .checkout__form-error {
+      text-align: center; font-size: 0.8rem;
+      color: var(--color-error); margin-top: 0.5rem;
+    }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -232,8 +249,7 @@ export class CheckoutComponent {
   });
 
   readonly isProcessing = signal(false);
-
-  readonly isFormValid = computed(() => this.checkoutForm.valid);
+  readonly errorMessage = signal('');
 
   constructor() {
     this.title.setTitle(`Finalizar compra — ${environment.titleSuffix}`);
@@ -246,18 +262,21 @@ export class CheckoutComponent {
     }
 
     this.isProcessing.set(true);
+    this.errorMessage.set('');
 
     this.shopService.createCheckoutSession({
       sessionId: this.cartStore.sessionId(),
       form: this.checkoutForm.value as any,
-    }).pipe(catchError(() => {
+    }).pipe(catchError((err) => {
       this.isProcessing.set(false);
+      this.errorMessage.set(err.error?.message || err.error?.error || 'Error al procesar el pago. Inténtalo de nuevo.');
       return of(null);
     })).subscribe(result => {
       if (result?.url) {
         window.location.href = result.url;
-      } else {
+      } else if (result && !result.url) {
         this.isProcessing.set(false);
+        this.errorMessage.set('Error al crear la sesión de pago.');
       }
     });
   }
