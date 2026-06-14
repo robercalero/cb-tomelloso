@@ -50,3 +50,6 @@ Thumbs.db
 # Log files
 *.err
 *.log
+
+# Project reports
+INFORME_PROYECTO_*.md

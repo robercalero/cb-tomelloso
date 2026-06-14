@@ -1,11 +1,11 @@
-import { Controller, Post, Get, Param, Body, Req, Headers } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, Headers } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { OrdersService } from '../orders/orders.service';
 import { CartService } from '../cart/cart.service';
-import { CreateOrderDto } from '../orders/dto/create-order.dto';
+import { CheckoutDto } from './dto/checkout.dto';
 
 @ApiTags('shop / payments')
 @Controller('shop/payments')
@@ -18,7 +18,7 @@ export class PaymentsController {
   ) {}
 
   @Post('checkout')
-  async createCheckout(@Body() dto: CreateOrderDto & { sessionId: string }) {
+  async createCheckout(@Body() dto: CheckoutDto) {
     const cart = await this.cartService.getCart(dto.sessionId);
     if (cart.length === 0) {
       return { error: 'El carrito está vacío' };
@@ -35,7 +35,7 @@ export class PaymentsController {
       ...dto,
       items: orderItems,
       sessionId: dto.sessionId,
-    });
+    } as any);
 
     const stripeItems = cart.map(item => ({
       name: item.product.name,
