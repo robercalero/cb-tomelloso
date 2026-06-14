@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { catchError, of } from 'rxjs';
@@ -7,10 +6,10 @@ import { catchError, of } from 'rxjs';
 @Component({
   selector: 'app-admin-login',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [RouterLink],
   template: `
     <div class="login-page">
-      <form class="login-form" (ngSubmit)="login()">
+      <form class="login-form" (submit)="login(); $event.preventDefault()">
         <h1>Panel de Administración</h1>
         <p class="login-form__sub">CB Tomelloso</p>
 
@@ -20,11 +19,11 @@ import { catchError, of } from 'rxjs';
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input id="email" type="email" [(ngModel)]="email" name="email" required placeholder="admin@cbtomelloso.es" />
+          <input id="email" type="email" [value]="email()" (input)="email.set($any($event.target).value)" required placeholder="admin@cbtomelloso.es" />
         </div>
         <div class="form-group">
           <label for="password">Contraseña</label>
-          <input id="password" type="password" [(ngModel)]="password" name="password" required placeholder="••••••" />
+          <input id="password" type="password" [value]="password()" (input)="password.set($any($event.target).value)" required placeholder="••••••" />
         </div>
 
         <button type="submit" class="btn-submit" [disabled]="loading()">
@@ -69,20 +68,24 @@ export class AdminLoginComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  email = '';
-  password = '';
+  email = signal('');
+  password = signal('');
   loading = signal(false);
   error = signal('');
 
   login(): void {
-    if (!this.email || !this.password) return;
+    const e = this.email();
+    const p = this.password();
+    if (!e || !p) return;
     this.loading.set(true);
     this.error.set('');
 
-    this.authService.login(this.email, this.password).pipe(
-      catchError(() => {
+    this.authService.login(e, p).pipe(
+      catchError((err: any) => {
         this.loading.set(false);
-        this.error.set('Email o contraseña incorrectos');
+        const msg = err.error?.message || err.error?.error || err.statusText || '';
+        this.error.set(msg || 'Email o contraseña incorrectos');
+        console.error('Login error:', err);
         return of(null);
       }),
     ).subscribe(result => {
