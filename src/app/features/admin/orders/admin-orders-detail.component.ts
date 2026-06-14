@@ -9,12 +9,12 @@ import { Order } from '../../../models/shop.model';
 const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
 const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ['paid', 'cancelled'],
-  paid: ['processing', 'refunded'],
-  processing: ['shipped'],
-  shipped: ['delivered'],
-  delivered: [],
-  cancelled: [],
-  refunded: [],
+  paid: ['pending', 'processing', 'refunded'],
+  processing: ['paid', 'shipped'],
+  shipped: ['processing', 'delivered'],
+  delivered: ['shipped'],
+  cancelled: ['pending'],
+  refunded: ['paid'],
 };
 
 @Component({

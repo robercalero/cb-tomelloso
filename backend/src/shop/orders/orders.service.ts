@@ -157,12 +157,12 @@ export class OrdersService {
 
   private readonly validTransitions: Record<OrderStatus, OrderStatus[]> = {
     pending: ['paid', 'cancelled'],
-    paid: ['processing', 'refunded'],
-    processing: ['shipped'],
-    shipped: ['delivered'],
-    delivered: [],
-    cancelled: [],
-    refunded: [],
+    paid: ['pending', 'processing', 'refunded'],
+    processing: ['paid', 'shipped'],
+    shipped: ['processing', 'delivered'],
+    delivered: ['shipped'],
+    cancelled: ['pending'],
+    refunded: ['paid'],
   };
 
   async updateStatus(id: number, status: OrderStatus, trackingNumber?: string): Promise<Order> {
