@@ -7,5 +7,6 @@ import { ShopSeedService } from './shop-seed.service';
 @Module({
   imports: [TypeOrmModule.forFeature([ProductCategory, Product])],
   providers: [ShopSeedService],
+  exports: [ShopSeedService],
 })
 export class ShopSeedModule {}

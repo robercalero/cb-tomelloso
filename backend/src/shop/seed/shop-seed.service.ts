@@ -24,10 +24,24 @@ export class ShopSeedService implements OnModuleInit {
       return;
     }
 
+    await this.seed();
+  }
+
+  async seed(): Promise<{ message: string; categories: number; products: number }> {
+    const existingCategories = await this.categoryRepo.count();
+    if (existingCategories > 0) {
+      return { message: 'La tienda ya tiene datos — seed ignorado', categories: existingCategories, products: await this.productRepo.count() };
+    }
+
     this.logger.log('Sembrando datos iniciales de la tienda...');
     await this.seedCategories();
     await this.seedProducts();
+
+    const catCount = await this.categoryRepo.count();
+    const prodCount = await this.productRepo.count();
     this.logger.log('Seed de tienda completado');
+
+    return { message: 'Seed completado', categories: catCount, products: prodCount };
   }
 
   private async seedCategories(): Promise<void> {

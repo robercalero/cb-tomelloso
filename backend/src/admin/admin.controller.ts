@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { Order } from '../shop/orders/entities/order.entity';
 import { ContactMessage } from '../contact/entities/contact-message.entity';
 import { Member } from '../members/entities/member.entity';
 import { Product } from '../shop/products/entities/product.entity';
+import { ShopSeedService } from '../shop/seed/shop-seed.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -28,6 +29,7 @@ export class AdminController {
     private readonly memberRepo: Repository<Member>,
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
+    private readonly shopSeedService: ShopSeedService,
   ) {}
 
   @Get('stats')
@@ -65,5 +67,11 @@ export class AdminController {
       totalProducts,
       revenueThisMonth: Number(revenueResult?.total ?? 0),
     };
+  }
+
+  @Post('seed')
+  @ApiOperation({ summary: '[Admin] Poblar tienda con datos de ejemplo' })
+  async seedShop() {
+    return this.shopSeedService.seed();
   }
 }
