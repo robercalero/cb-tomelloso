@@ -16,6 +16,15 @@ interface Order {
 }
 
 const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+const ORDER_TRANSITIONS: Record<string, string[]> = {
+  pending: ['paid', 'cancelled'],
+  paid: ['processing', 'refunded'],
+  processing: ['shipped'],
+  shipped: ['delivered'],
+  delivered: [],
+  cancelled: [],
+  refunded: [],
+};
 
 @Component({
   selector: 'app-admin-orders',
@@ -54,7 +63,7 @@ const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered',
                     [disabled]="updating() === order.id"
                     (change)="updateStatus(order.id, $any($event.target).value)"
                   >
-                    @for (opt of STATUS_OPTIONS; track opt) {
+                    @for (opt of allowedOptions(order.status); track opt) {
                       <option [value]="opt">{{ opt }}</option>
                     }
                   </select>
@@ -100,6 +109,11 @@ export class AdminOrdersComponent {
   readonly updating = signal<number | null>(null);
 
   protected readonly STATUS_OPTIONS = STATUS_OPTIONS;
+
+  allowedOptions(current: string): string[] {
+    const t = ORDER_TRANSITIONS[current];
+    return t ? [current, ...t] : [current];
+  }
 
   constructor() {
     this.loadOrders();

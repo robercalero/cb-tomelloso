@@ -7,6 +7,15 @@ import { ApiService } from '../../../core/services/api.service';
 import { Order } from '../../../models/shop.model';
 
 const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+const VALID_TRANSITIONS: Record<string, string[]> = {
+  pending: ['paid', 'cancelled'],
+  paid: ['processing', 'refunded'],
+  processing: ['shipped'],
+  shipped: ['delivered'],
+  delivered: [],
+  cancelled: [],
+  refunded: [],
+};
 
 @Component({
   selector: 'app-admin-orders-detail',
@@ -33,7 +42,7 @@ const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered',
               <dt>Estado</dt>
               <dd>
                 <select class="status-select" [value]="o.status" (change)="updateStatus($any($event.target).value)">
-                  @for (opt of STATUS_OPTIONS; track opt) {
+                  @for (opt of allowedOptions(o.status); track opt) {
                     <option [value]="opt">{{ opt }}</option>
                   }
                 </select>
@@ -169,6 +178,11 @@ export class AdminOrdersDetailComponent {
   readonly error = signal('');
 
   protected readonly STATUS_OPTIONS = STATUS_OPTIONS;
+
+  allowedOptions(current: string): string[] {
+    const transitions = VALID_TRANSITIONS[current];
+    return transitions ? [current, ...transitions] : [current];
+  }
 
   constructor() {
     const orderNumber = this.route.snapshot.paramMap.get('orderNumber');
