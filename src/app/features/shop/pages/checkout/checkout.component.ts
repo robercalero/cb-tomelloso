@@ -274,9 +274,9 @@ export class CheckoutComponent {
     })).subscribe(result => {
       if (result?.url) {
         window.location.href = result.url;
-      } else if (result && !result.url) {
+      } else if (result) {
         this.isProcessing.set(false);
-        this.errorMessage.set('Error al crear la sesión de pago.');
+        this.errorMessage.set((result as any).error || 'Error al crear la sesión de pago.');
       }
     });
   }

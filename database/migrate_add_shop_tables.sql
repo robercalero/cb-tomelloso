@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `stripe_payment_intent` VARCHAR(200)  NULL,
   `paid_at`             TIMESTAMP       NULL,
   `shipped_at`          TIMESTAMP       NULL,
+  `tracking_number`     VARCHAR(100)    NULL,
   `created_at`          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at`          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
