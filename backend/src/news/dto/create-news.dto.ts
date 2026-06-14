@@ -8,6 +8,11 @@ export class CreateNewsDto {
   @IsNumber()
   authorId?: number;
 
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  publishedAt?: string;
+
   @ApiProperty({ example: 'Gran victoria del senior en Puertollano' })
   @IsString()
   @Length(1, 255)
