@@ -1,5 +1,4 @@
-import { Injectable, inject, computed } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Injectable, inject, computed, signal } from '@angular/core';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
@@ -10,15 +9,11 @@ import { Team } from '../../models/team.model';
 export class PlayersService {
   private api = inject(ApiService);
 
-  readonly players = toSignal(
-    this.api.get<Player[]>('players').pipe(catchError(() => of([] as Player[]))),
-    { initialValue: [] as Player[] }
-  );
+  private _players = signal<Player[]>([]);
+  private _teams = signal<Team[]>([]);
 
-  readonly teams = toSignal(
-    this.api.get<Team[]>('teams').pipe(catchError(() => of([] as Team[]))),
-    { initialValue: [] as Team[] }
-  );
+  readonly players = this._players.asReadonly();
+  readonly teams = this._teams.asReadonly();
 
   readonly seniorAutoTeam = computed(() =>
     this.teams().find(t => t.category === 'Senior Autonómica')
@@ -34,5 +29,17 @@ export class PlayersService {
 
   getPlayersByTeam(teamId: number): Player[] {
     return this.players().filter(p => p.teamId === teamId);
+  }
+
+  loadPlayers(): void {
+    this.api.get<Player[]>('players').pipe(
+      catchError(() => of(this._players()))
+    ).subscribe(p => this._players.set(p));
+  }
+
+  loadTeams(): void {
+    this.api.get<Team[]>('teams').pipe(
+      catchError(() => of(this._teams()))
+    ).subscribe(t => this._teams.set(t));
   }
 }

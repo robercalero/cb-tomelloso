@@ -86,5 +86,7 @@ export class SponsorsComponent implements OnInit {
   ngOnInit(): void {
     this.title.setTitle(`Patrocinadores - ${environment.titleSuffix}`);
     this.meta.updateTag({ name: 'description', content: 'Patrocinadores del Club Baloncesto Tomelloso. Descubre cómo colaborar con el CB Tomelloso.' });
+
+    this.sponsorsService.loadSponsors();
   }
 }

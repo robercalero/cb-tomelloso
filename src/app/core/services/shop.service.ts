@@ -1,5 +1,4 @@
-import { Injectable, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Injectable, inject, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
@@ -9,19 +8,23 @@ import { Product, ProductCategory, CartItem, Order, CheckoutForm } from '../../m
 export class ShopService {
   private api = inject(ApiService);
 
-  readonly featuredProducts = toSignal(
-    this.api.get<Product[]>('shop/products/featured').pipe(
-      catchError(() => of([] as Product[]))
-    ),
-    { initialValue: [] as Product[] }
-  );
+  private _featuredProducts = signal<Product[]>([]);
+  private _categories = signal<ProductCategory[]>([]);
 
-  readonly categories = toSignal(
+  readonly featuredProducts = this._featuredProducts.asReadonly();
+  readonly categories = this._categories.asReadonly();
+
+  loadFeaturedProducts(): void {
+    this.api.get<Product[]>('shop/products/featured').pipe(
+      catchError(() => of(this._featuredProducts()))
+    ).subscribe(p => this._featuredProducts.set(p));
+  }
+
+  loadCategories(): void {
     this.api.get<ProductCategory[]>('shop/categories').pipe(
-      catchError(() => of([] as ProductCategory[]))
-    ),
-    { initialValue: [] as ProductCategory[] }
-  );
+      catchError(() => of(this._categories()))
+    ).subscribe(c => this._categories.set(c));
+  }
 
   getProducts(filters: {
     category?: string;

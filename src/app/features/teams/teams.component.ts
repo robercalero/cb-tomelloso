@@ -61,5 +61,9 @@ export class TeamsComponent implements OnInit {
   ngOnInit(): void {
     this.title.setTitle(`Equipos - ${environment.titleSuffix}`);
     this.meta.updateTag({ name: 'description', content: 'Conoce todos los equipos del Club Baloncesto Tomelloso: Senior Autonómica, Júnior y categorías base.' });
+
+    this.matchesService.loadRecentResults();
+    this.playersService.loadPlayers();
+    this.playersService.loadTeams();
   }
 }

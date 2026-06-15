@@ -40,6 +40,10 @@ export class AgendaComponent implements OnInit {
   ngOnInit(): void {
     this.title.setTitle(`Agenda / Partidos - ${environment.titleSuffix}`);
     this.meta.updateTag({ name: 'description', content: 'Calendario de partidos del Club Baloncesto Tomelloso. Próximos encuentros y resultados.' });
+
+    this.matchesService.loadMatches();
+    this.matchesService.loadUpcomingMatches();
+    this.matchesService.loadRecentResults();
   }
 
   readonly monthNames = [

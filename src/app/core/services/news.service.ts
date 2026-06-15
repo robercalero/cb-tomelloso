@@ -1,5 +1,4 @@
 import { Injectable, inject, computed, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
@@ -30,28 +29,11 @@ function mapToHeroSlides(news: News[]): HeroSlide[] {
 export class NewsService {
   private api = inject(ApiService);
 
-  private _cachedNews = signal<NewsListResponse>({ data: [], total: 0, page: 1, limit: 10 });
+  private _newsResponse = signal<NewsListResponse>({ data: [], total: 0, page: 1, limit: 10 });
+  private _heroSlides = signal<News[]>([]);
 
-  readonly newsResponse = toSignal(
-    this.api.get<NewsListResponse>('news', { page: 1, limit: 10 }).pipe(
-      tap(response => this._cachedNews.set(response)),
-      catchError(() => of(this._cachedNews()))
-    ),
-    { initialValue: { data: [] as News[], total: 0, page: 1, limit: 10 } }
-  );
-
-  readonly news = computed(() => this.newsResponse().data);
-  readonly totalNews = computed(() => this.newsResponse().total);
-
-  private _cachedHeroSlides = signal<News[]>([]);
-
-  readonly heroSlidesResponse = toSignal(
-    this.api.get<News[]>('news/hero').pipe(
-      tap(slides => this._cachedHeroSlides.set(slides)),
-      catchError(() => of(this._cachedHeroSlides()))
-    ),
-    { initialValue: [] as News[] }
-  );
+  readonly news = computed(() => this._newsResponse().data);
+  readonly totalNews = computed(() => this._newsResponse().total);
 
   readonly latestNews = computed(() =>
     [...this.news()].sort((a, b) =>
@@ -63,13 +45,25 @@ export class NewsService {
     this.news().filter(n => n.category === 'club')
   );
 
-  readonly heroSlides = computed<HeroSlide[]>(() => mapToHeroSlides(this.heroSlidesResponse()));
+  readonly heroSlides = computed<HeroSlide[]>(() => mapToHeroSlides(this._heroSlides()));
 
   readonly resultsNews = computed(() =>
     this.news().filter(n => n.category === 'resultado')
   );
 
   private newsCache = new Map<string, News>();
+
+  loadNews(): void {
+    this.api.get<NewsListResponse>('news', { page: 1, limit: 10 }).pipe(
+      catchError(() => of(this._newsResponse()))
+    ).subscribe(r => this._newsResponse.set(r));
+  }
+
+  loadHeroSlides(): void {
+    this.api.get<News[]>('news/hero').pipe(
+      catchError(() => of(this._heroSlides()))
+    ).subscribe(s => this._heroSlides.set(s));
+  }
 
   getBySlug(slug: string): Observable<News | null> {
     const cached = this.newsCache.get(slug);

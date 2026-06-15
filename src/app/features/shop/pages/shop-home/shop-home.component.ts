@@ -193,6 +193,8 @@ export class ShopHomeComponent {
   constructor() {
     this.title.setTitle(`Tienda Oficial — ${environment.titleSuffix}`);
     this.meta.updateTag({ name: 'description', content: 'Tienda oficial del CB Tomelloso. Camisetas, equipaciones y merchandising del club.' });
+
+    this.shopService.loadCategories();
   }
 
   selectCategory(slug: string | null): void {

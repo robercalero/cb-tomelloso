@@ -69,5 +69,20 @@ export class HomeComponent implements OnInit {
       content: 'Web oficial del Club Baloncesto Tomelloso (Val Brokers C.B. Tomelloso). Noticias, partidos, equipos y toda la información del club de Tomelloso, Ciudad Real.'
     });
     this.meta.updateTag({ property: 'og:title', content: `CB Tomelloso - ${environment.titleSuffix}` });
+
+    // Critical - above the fold: fire immediately
+    this.newsService.loadHeroSlides();
+    this.shopService.loadFeaturedProducts();
+
+    // Deferred 500ms: visible content just below hero
+    setTimeout(() => {
+      this.matchesService.loadUpcomingMatches();
+      this.matchesService.loadRecentResults();
+    }, 500);
+
+    // Deferred 1500ms: below the fold
+    setTimeout(() => {
+      this.sponsorsService.loadSponsors();
+    }, 1500);
   }
 }
