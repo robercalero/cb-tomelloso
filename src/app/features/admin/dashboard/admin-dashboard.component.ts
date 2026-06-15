@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, signal, DestroyRef } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, of } from 'rxjs';
+import { catchError, of, finalize } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
 import { Title } from '@angular/platform-browser';
@@ -13,6 +13,13 @@ interface DashboardStats {
   totalActiveMembers: number;
   totalProducts: number;
   revenueThisMonth: number;
+}
+
+interface MigrateResult {
+  message: string;
+  total: number;
+  migrated: number;
+  errors: number;
 }
 
 @Component({
@@ -67,6 +74,25 @@ interface DashboardStats {
           </div>
         </div>
       </div>
+
+      <section class="tools-section">
+        <h2>Herramientas</h2>
+        <div class="tool-card">
+          <div class="tool-card__info">
+            <strong>Migrar imágenes de Instagram</strong>
+            <span>Convierte las imágenes de Instagram a almacenamiento persistente en la base de datos.</span>
+          </div>
+          <button class="tool-btn" (click)="migrate()" [disabled]="migrating()">
+            {{ migrating() ? 'Migrando…' : 'Migrar imágenes' }}
+          </button>
+          @if (migrateResult(); as r) {
+            <div class="migrate-result" [class.migrate-result--ok]="r.errors === 0">
+              <p>{{ r.message }}</p>
+              <small>Migradas: {{ r.migrated }} / Errores: {{ r.errors }} / Total: {{ r.total }}</small>
+            </div>
+          }
+        </div>
+      </section>
     </div>
   `,
   styles: [`
@@ -84,6 +110,30 @@ interface DashboardStats {
     .metric-card--warning .metric-card__number { color: #e67e22; }
     .metric-card--success .metric-card__number { color: #27ae60; }
     .metric-card--info .metric-card__number { color: #2980b9; }
+    .tools-section { margin-top: 3rem; }
+    .tools-section h2 { font-family: var(--font-heading); font-weight: 700; margin: 0 0 1rem; font-size: 1.2rem; }
+    .tool-card {
+      background: white; border-radius: 12px; padding: 1.5rem;
+      display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .tool-card__info { flex: 1; min-width: 200px; }
+    .tool-card__info strong { display: block; margin-bottom: 0.25rem; }
+    .tool-card__info span { font-size: 0.85rem; color: var(--color-text-muted); }
+    .tool-btn {
+      background: #1a5276; color: white; border: none; border-radius: 8px;
+      padding: 0.75rem 1.5rem; font-weight: 600; cursor: pointer;
+      white-space: nowrap; transition: opacity 0.2s;
+    }
+    .tool-btn:hover:not(:disabled) { opacity: 0.9; }
+    .tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .migrate-result {
+      width: 100%; padding: 0.75rem 1rem; border-radius: 8px;
+      background: #fff3cd; border: 1px solid #ffc107; font-size: 0.85rem;
+    }
+    .migrate-result--ok { background: #d4edda; border-color: #28a745; }
+    .migrate-result p { margin: 0 0 0.25rem; }
+    .migrate-result small { opacity: 0.7; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -97,9 +147,27 @@ export class AdminDashboardComponent {
     totalActiveMembers: 0, totalProducts: 0,
   });
 
+  readonly migrating = signal(false);
+  readonly migrateResult = signal<MigrateResult | null>(null);
+
   constructor() {
     this.title.setTitle(`Dashboard — ${environment.titleSuffix}`);
     this.loadStats();
+  }
+
+  migrate(): void {
+    this.migrating.set(true);
+    this.migrateResult.set(null);
+    this.api.post<MigrateResult>('admin/migrate-instagram-images', {}).pipe(
+      finalize(() => this.migrating.set(false)),
+      catchError(() => {
+        this.migrateResult.set({ message: 'Error al conectar con el servidor', total: 0, migrated: 0, errors: -1 });
+        return of(null);
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(r => {
+      if (r) this.migrateResult.set(r);
+    });
   }
 
   private loadStats(): void {

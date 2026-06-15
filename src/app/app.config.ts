@@ -8,26 +8,24 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom, catchError, of } from 'rxjs';
+import { firstValueFrom, catchError, of, timeout } from 'rxjs';
 import { AuthService, AuthUser } from './core/services/auth.service';
 import { getApiBaseUrl } from './core/utils/api-url.utils';
 
 registerLocaleData(localeEs);
 
 function initAuth(authService: AuthService, http: HttpClient) {
-  return async () => {
+  return () => {
     const token = authService.getAccessToken();
     if (!token) return;
-    try {
-      const user = await firstValueFrom(
-        http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
-          catchError(() => of(null))
-        )
-      );
+    firstValueFrom(
+      http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
+        timeout(10_000),
+        catchError(() => of(null))
+      )
+    ).then(user => {
       if (user) authService.setCurrentUser(user);
-    } catch {
-      // Token inválido o expirado — el interceptor manejará el refresh
-    }
+    });
   };
 }
 

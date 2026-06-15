@@ -3,8 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { News } from '../news/entities/news.entity';
+import { MediaService } from '../media/media.service';
 
-const PROXY_PATH = '/api/v1/media/proxy?url=';
+const PROXY_PATH_ID = '/api/v1/media/proxy?id=';
+const PROXY_PATH_URL = '/api/v1/media/proxy?url=';
 const INSTAGRAM_URL = 'https://www.instagram.com';
 
 function slugify(text: string): string {
@@ -17,10 +19,6 @@ function slugify(text: string): string {
     .slice(0, 200);
 }
 
-function toProxyUrl(raw: string, baseUrl: string): string {
-  return `${baseUrl}${PROXY_PATH}${encodeURIComponent(raw)}`;
-}
-
 @Injectable()
 export class InstagramService {
   private readonly logger = new Logger(InstagramService.name);
@@ -29,6 +27,7 @@ export class InstagramService {
   constructor(
     @InjectRepository(News)
     private readonly newsRepo: Repository<News>,
+    private readonly mediaService: MediaService,
     private readonly configService: ConfigService,
   ) {
     this.baseUrl = this.configService.get<string>('BASE_URL', 'http://localhost:3000');
@@ -63,16 +62,36 @@ export class InstagramService {
 
     const mediaDetails = result.media_details || [];
 
+    const downloadOne = async (rawUrl: string): Promise<string> => {
+      try {
+        const resp = await fetch(rawUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            Accept: 'image/webp,image/avif,image/*,*/*;q=0.8',
+            Referer: 'https://www.instagram.com/',
+          },
+        });
+        if (!resp.ok) return `${this.baseUrl}${PROXY_PATH_URL}${encodeURIComponent(rawUrl)}`;
+        const buffer = Buffer.from(await resp.arrayBuffer());
+        const contentType = resp.headers.get('content-type') || 'image/jpeg';
+        const ext = contentType.split('/').pop() || 'jpg';
+        const media = await this.mediaService.saveImage(`instagram.${ext}`, buffer, contentType);
+        return `${this.baseUrl}${PROXY_PATH_ID}${media.id}`;
+      } catch {
+        return `${this.baseUrl}${PROXY_PATH_URL}${encodeURIComponent(rawUrl)}`;
+      }
+    };
+
     const media = mediaDetails.length > 0
-      ? mediaDetails.map((m: any) => ({
-          url: toProxyUrl(m.url, this.baseUrl),
-          type: m.type || 'image',
-          ...(m.thumbnail ? { thumbnail: toProxyUrl(m.thumbnail, this.baseUrl) } : {}),
+      ? await Promise.all(mediaDetails.map(async (m: any) => {
+          const url = await downloadOne(m.url);
+          const thumbnail = m.thumbnail ? await downloadOne(m.thumbnail) : undefined;
+          return { url, type: m.type || 'image', ...(thumbnail ? { thumbnail } : {}) };
         }))
-      : result.url_list.map((u: string) => ({
-          url: toProxyUrl(u, this.baseUrl),
+      : await Promise.all(result.url_list.map(async (u: string) => ({
+          url: await downloadOne(u),
           type: 'image',
-        }));
+        })));
 
     const first = media[0];
     const imageUrl = first.type === 'video' && first.thumbnail

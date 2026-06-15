@@ -1,6 +1,6 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, filter, retry, switchMap, take, throwError, timer } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
 let isRefreshing = false;
@@ -25,6 +25,14 @@ export const authInterceptor: HttpInterceptorFn = (
     : req;
 
   return next(authReq).pipe(
+    retry({
+      count: 3,
+      delay: (error: HttpErrorResponse, retryCount: number) => {
+        const retryable = error instanceof HttpErrorResponse && (error.status === 0 || error.status >= 500);
+        if (!retryable) throw error;
+        return timer(Math.min(1000 * Math.pow(2, retryCount - 1), 5000));
+      },
+    }),
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && token) {
         if (!isRefreshing) {

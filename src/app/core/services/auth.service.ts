@@ -25,10 +25,12 @@ export class AuthService {
 
   private _currentUser = signal<AuthUser | null>(null);
   private _isLoading = signal(false);
+  private _isRetrying = signal(false);
 
   readonly currentUser = this._currentUser.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
-  readonly isLoggedIn = computed(() => this._currentUser() !== null);
+  readonly isRetrying = this._isRetrying.asReadonly();
+  readonly isLoggedIn = computed(() => this._currentUser() !== null || !!this.getAccessToken());
   readonly isAdmin = computed(() => this._currentUser()?.role === 'admin');
   readonly isEditor = computed(() => ['admin', 'editor'].includes(this._currentUser()?.role ?? ''));
 
