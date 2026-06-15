@@ -108,7 +108,7 @@
   font-size: 1.5rem;
 
   &.result-win {
-    color: var(--color-secondary);
+    color: var(--color-secondary-text);
   }
 
   &.result-loss {
@@ -168,7 +168,7 @@
   padding: 8px var(--spacing-lg);
   background: var(--color-light);
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: #495057;
   display: flex;
   align-items: center;
   gap: 4px;

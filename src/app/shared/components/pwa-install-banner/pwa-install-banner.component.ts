@@ -40,7 +40,7 @@ import { isPlatformBrowser } from '@angular/common';
       border: none; border-radius: 6px; padding: 0.5rem 1rem;
       font-weight: 600; cursor: pointer; font-size: 0.8rem;
     }
-    .pwa-banner__btn--install { background: #f39c12; color: white; }
+    .pwa-banner__btn--install { background: var(--color-accent); color: #1a1a1a; }
     .pwa-banner__btn--dismiss {
       background: transparent; color: rgba(255,255,255,0.6);
       padding: 0.5rem; font-size: 1.1rem;
