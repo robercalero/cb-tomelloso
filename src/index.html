@@ -6,14 +6,26 @@
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cb-tomelloso-api.onrender.com" crossorigin />
-    <script>fetch('https://cb-tomelloso-api.onrender.com/health',{mode:'no-cors'}).catch(()=>{})</script>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Inter:wght@400;500;600&display=optional"
-      rel="stylesheet"
-    />
+    <script>
+    (async()=>{
+      try {
+        fetch('https://cb-tomelloso-api.onrender.com/health',{mode:'no-cors'});
+        const r = await fetch('https://cb-tomelloso-api.onrender.com/api/v1/news/hero');
+        if(r.ok){
+          const data = await r.json();
+          if(data?.length && data[0]?.imageUrl){
+            let imgUrl = data[0].imageUrl;
+            if(imgUrl.startsWith('/')) imgUrl = 'https://cb-tomelloso-api.onrender.com' + imgUrl;
+            imgUrl += (imgUrl.includes('?') ? '&' : '?') + 'w=640';
+            const link = document.createElement('link');
+            link.rel = 'preload'; link.as = 'image'; link.href = imgUrl; link.fetchPriority = 'high';
+            document.head.appendChild(link);
+          }
+        }
+      } catch(e) {}
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=optional" rel="stylesheet" />
 
     <!-- PWA -->
@@ -44,7 +56,7 @@
         display: flex; flex-direction: column;
         align-items: center; justify-content: center;
         background: #f8f9fa;
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: system-ui, -apple-system, sans-serif;
         z-index: 9999;
       }
       .app-loader .spinner {
