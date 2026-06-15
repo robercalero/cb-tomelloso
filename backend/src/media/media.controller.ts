@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Res, Logger, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Query, Res, Logger } from '@nestjs/common';
 import { ApiTags, ApiQuery, ApiOperation } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { MediaService } from './media.service';
@@ -24,21 +24,30 @@ export class MediaController {
     @Query('w') w: string | undefined,
     @Res() res: Response,
   ) {
-    const width = w ? Math.min(parseInt(w, 10) || 1200, 1920) : 1200;
+    const width = w ? Math.min(parseInt(w, 10) || 1200, 1920) : undefined;
 
     if (id) {
       try {
         const media = await this.mediaService.findById(+id);
-        const webp = await sharp(media.data)
-          .resize(width, undefined, { withoutEnlargement: true, fit: 'inside' })
-          .webp({ quality: 80 })
-          .toBuffer();
-        res.set({
-          'Content-Type': 'image/webp',
-          'Cache-Control': 'public, max-age=31536000, immutable',
-          'Access-Control-Allow-Origin': '*',
-        });
-        res.end(webp);
+        if (width) {
+          const webp = await sharp(media.data)
+            .resize(width, undefined, { withoutEnlargement: true, fit: 'inside' })
+            .webp({ quality: 80 })
+            .toBuffer();
+          res.set({
+            'Content-Type': 'image/webp',
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Access-Control-Allow-Origin': '*',
+          });
+          res.end(webp);
+        } else {
+          res.set({
+            'Content-Type': media.mimeType,
+            'Cache-Control': 'public, max-age=31536000, immutable',
+            'Access-Control-Allow-Origin': '*',
+          });
+          res.end(media.data);
+        }
       } catch {
         this.servePlaceholder(res);
       }
@@ -69,7 +78,7 @@ export class MediaController {
       const contentType = cdnResponse.headers.get('content-type') || 'image/jpeg';
       const buffer = Buffer.from(await cdnResponse.arrayBuffer());
 
-      if (contentType.startsWith('image/')) {
+      if (width && contentType.startsWith('image/')) {
         const webp = await sharp(buffer)
           .resize(width, undefined, { withoutEnlargement: true, fit: 'inside' })
           .webp({ quality: 80 })
