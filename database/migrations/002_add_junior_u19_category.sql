@@ -1,14 +1,15 @@
 -- Migration: 002_add_junior_u19_category
 -- Description: Adds 'Junior U19' to teams.category ENUM
 -- Run: Execute directly on Aiven MySQL
--- ALTER TABLE teams MODIFY COLUMN category ENUM(
---   'Senior Autonómica',
---   'Senior Zonal',
---   'Júnior',
---   'Junior U19',
---   'Cadete',
---   'Infantil',
---   'Alevín',
---   'Benjamín',
---   'Minibasket'
--- ) NOT NULL;
+
+ALTER TABLE teams MODIFY COLUMN category ENUM(
+  'Senior Autonómica',
+  'Senior Zonal',
+  'Júnior',
+  'Junior U19',
+  'Cadete',
+  'Infantil',
+  'Alevín',
+  'Benjamín',
+  'Minibasket'
+) NOT NULL;

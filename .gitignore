@@ -53,3 +53,6 @@ Thumbs.db
 
 # Project reports
 INFORME_PROYECTO_*.md
+
+database/_check_pwd.js
+
