@@ -44,6 +44,10 @@
   }
 }
 
+.section-dark .section-link {
+  color: var(--color-secondary-light);
+}
+
 /* ===== Matches ===== */
 .matches-grid {
   display: grid;
