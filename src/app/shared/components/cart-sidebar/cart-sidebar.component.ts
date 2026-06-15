@@ -18,7 +18,8 @@ import { PRODUCT_PLACEHOLDER } from '../../utils/placeholder';
            [class.cart-sidebar--open]="cartStore.isOpen()"
            role="dialog"
            aria-label="Carrito de compra"
-           [attr.aria-hidden]="!cartStore.isOpen()">
+           [attr.aria-hidden]="!cartStore.isOpen()"
+           [attr.inert]="!cartStore.isOpen() ? '' : null">
 
       <div class="cart-sidebar__header">
         <h2 class="cart-sidebar__title">

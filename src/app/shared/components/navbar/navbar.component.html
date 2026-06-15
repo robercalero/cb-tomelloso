@@ -23,7 +23,7 @@
 
   <nav class="navbar-main" role="navigation" aria-label="Navegación principal">
     <div class="container nav-container">
-      <a routerLink="/" class="logo" aria-label="Volver al inicio">
+      <a routerLink="/" class="logo" aria-label="CB Tomelloso VAL BROKERS - Volver al inicio">
         <img ngSrc="/images/logo-club-lg.jpg" alt="CB Tomelloso" class="logo-img" width="40" height="40" />
         <div class="logo-text">
           <span class="logo-title">CB Tomelloso</span>
@@ -31,14 +31,13 @@
         </div>
       </a>
 
-      <div class="nav-links" [class.open]="isMobileMenuOpen()" role="menubar">
+      <div class="nav-links" [class.open]="isMobileMenuOpen()">
         @for (link of navLinks; track link.path) {
           <a
             [routerLink]="link.path"
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: link.path === '/' }"
             class="nav-link"
-            role="menuitem"
             (click)="closeMobileMenu()"
           >
             {{ link.label }}

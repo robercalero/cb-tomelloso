@@ -94,7 +94,7 @@ import { PRODUCT_PLACEHOLDER } from '../../utils/placeholder';
       gap: 0.5rem; margin-bottom: 0.75rem;
     }
     .product-card__price {
-      font-size: 1.1rem; font-weight: 700; color: var(--color-primary);
+      font-size: 1.1rem; font-weight: 700; color: var(--color-primary-text);
     }
     .product-card__compare {
       font-size: 0.9rem; text-decoration: line-through;
@@ -102,12 +102,12 @@ import { PRODUCT_PLACEHOLDER } from '../../utils/placeholder';
     }
     .product-card__badge {
       font-size: 0.7rem; font-weight: 700;
-      background: var(--color-accent); color: white;
+      background: var(--color-accent); color: #1a1a1a;
       padding: 0.15rem 0.4rem; border-radius: 4px;
     }
     .product-card__cta {
       width: 100%; padding: 0.6rem;
-      background: var(--color-primary); color: white;
+      background: var(--color-primary); color: #1a1a1a;
       border: none; border-radius: var(--radius-md);
       font-weight: 600; font-size: 0.9rem;
       cursor: pointer; transition: background 150ms ease;

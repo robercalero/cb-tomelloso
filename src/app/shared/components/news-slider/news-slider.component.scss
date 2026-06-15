@@ -136,7 +136,7 @@
 
 .slide__category-badge {
   background: var(--color-accent);
-  color: #fff;
+  color: #1a1a1a;
 }
 
 .slide__title {
@@ -192,7 +192,7 @@
 
   &--primary {
     background: var(--color-accent);
-    color: #fff;
+    color: #1a1a1a;
 
     &:hover {
       background: var(--color-accent-hover, #e67e22);
@@ -263,8 +263,8 @@
 }
 
 .slider__dot {
-  width: 10px;
-  height: 10px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.6);
   background: transparent;
