@@ -6,8 +6,8 @@
   [attr.aria-live]="isPaused() ? 'polite' : 'off'"
   (mouseenter)="onMouseEnter()"
   (mouseleave)="onMouseLeave()"
-  (touchstart)="onTouchStart($event)"
-  (touchend)="onTouchEnd($event)"
+  (touchstart.passive)="onTouchStart($any($event))"
+  (touchend.passive)="onTouchEnd($any($event))"
   (keydown)="onKeydown($event)"
   tabindex="0"
 >
@@ -19,14 +19,23 @@
         [attr.aria-hidden]="i !== activeIndex()"
         [attr.aria-label]="'Diapositiva ' + (i + 1) + ' de ' + totalSlides()"
       >
-        <div
-          class="slide__bg"
-          [style.background-image]="slide.imageUrl
-            ? 'url(' + slide.imageUrl + ')'
-            : 'var(--gradient-hero-fallback)'"
-          role="img"
-          [attr.aria-label]="slide.imageUrl ? slide.title : 'Imagen del CB Tomelloso'"
-        ></div>
+        @if (slide.imageUrl) {
+          <img
+            [src]="slide.imageUrl"
+            alt=""
+            class="slide__bg slide__bg--img"
+            [attr.fetchpriority]="i === 0 ? 'high' : null"
+            [loading]="i === 0 ? 'eager' : 'lazy'"
+            width="1600"
+            height="900"
+          />
+        } @else {
+          <div
+            class="slide__bg slide__bg--fallback"
+            role="img"
+            aria-label="Imagen del CB Tomelloso"
+          ></div>
+        }
         <div class="slide__overlay" aria-hidden="true"></div>
         <div class="slide__content">
           <div class="slide__meta">

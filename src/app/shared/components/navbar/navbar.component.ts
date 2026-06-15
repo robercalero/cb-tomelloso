@@ -4,7 +4,7 @@ import { RouterLink, RouterLinkActive, NavigationEnd, Router } from '@angular/ro
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { filter } from 'rxjs';
+import { filter, fromEvent } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CartStore } from '../../../core/services/cart.store';
 
@@ -37,6 +37,12 @@ export class NavbarComponent {
   readonly isMobileMenuOpen = signal(false);
 
   constructor() {
+    fromEvent(window, 'scroll', { passive: true }).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      this.isScrolled.set(window.scrollY > 50);
+    });
+
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       takeUntilDestroyed(this.destroyRef)
@@ -62,11 +68,6 @@ export class NavbarComponent {
     { icon: 'facebook', url: 'https://www.facebook.com/cbtomelloso', label: 'Facebook' },
     { icon: 'youtube', url: 'https://www.youtube.com/@cbt2019', label: 'YouTube' }
   ];
-
-  @HostListener('window:scroll')
-  onScroll(): void {
-    this.isScrolled.set(window.scrollY > 50);
-  }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
