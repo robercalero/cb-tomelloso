@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, HostListener, signal, inject, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, signal, inject, DestroyRef, NgZone } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { RouterLink, RouterLinkActive, NavigationEnd, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { filter, fromEvent } from 'rxjs';
+import { filter } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CartStore } from '../../../core/services/cart.store';
 
@@ -36,11 +36,16 @@ export class NavbarComponent {
   readonly isScrolled = signal(false);
   readonly isMobileMenuOpen = signal(false);
 
+  private ngZone = inject(NgZone);
+
   constructor() {
-    fromEvent(window, 'scroll', { passive: true }).pipe(
-      takeUntilDestroyed(this.destroyRef)
-    ).subscribe(() => {
-      this.isScrolled.set(window.scrollY > 50);
+    this.ngZone.runOutsideAngular(() => {
+      window.addEventListener('scroll', () => {
+        const scrolled = window.scrollY > 50;
+        if (scrolled !== this.isScrolled()) {
+          this.isScrolled.set(scrolled);
+        }
+      }, { passive: true });
     });
 
     this.router.events.pipe(

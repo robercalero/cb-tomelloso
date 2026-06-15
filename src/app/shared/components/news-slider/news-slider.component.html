@@ -22,6 +22,8 @@
         @if (slide.imageUrl) {
           <img
             [src]="slide.imageUrl"
+            [srcset]="getSrcset(slide.imageUrl)"
+            [sizes]="getSizes()"
             alt=""
             class="slide__bg slide__bg--img"
             [attr.fetchpriority]="i === 0 ? 'high' : null"

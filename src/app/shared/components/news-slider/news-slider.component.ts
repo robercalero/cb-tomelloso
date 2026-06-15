@@ -145,6 +145,16 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
     return source ? icons[source] : '';
   }
 
+  getSrcset(url: string | null): string {
+    if (!url) return '';
+    const separator = url.includes('?') ? '&' : '?';
+    return [640, 1024, 1600].map(w => `${url}${separator}w=${w} ${w}w`).join(', ');
+  }
+
+  getSizes(): string {
+    return '(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1600px';
+  }
+
   getSourceLabel(source: NewsSource | undefined): string {
     const labels: Record<NewsSource, string> = {
       instagram: 'Instagram',

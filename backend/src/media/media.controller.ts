@@ -2,6 +2,7 @@ import { Controller, Get, Query, Res, Logger, BadRequestException } from '@nestj
 import { ApiTags, ApiQuery, ApiOperation } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { MediaService } from './media.service';
+import sharp from 'sharp';
 
 const PLACEHOLDER_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="#e0e0e0"/><text x="400" y="280" text-anchor="middle" fill="#999" font-family="sans-serif" font-size="24">Imagen no disponible</text><text x="400" y="320" text-anchor="middle" fill="#bbb" font-family="sans-serif" font-size="16">La imagen ha expirado o no pudo cargarse</text></svg>`;
 
@@ -16,20 +17,28 @@ export class MediaController {
   @ApiOperation({ summary: 'Proxy de imágenes desde DB o CDN externo' })
   @ApiQuery({ name: 'id', required: false, type: Number })
   @ApiQuery({ name: 'url', required: false, type: String })
+  @ApiQuery({ name: 'w', required: false, type: Number })
   async proxy(
     @Query('id') id: string | undefined,
     @Query('url') url: string | undefined,
+    @Query('w') w: string | undefined,
     @Res() res: Response,
   ) {
+    const width = w ? Math.min(parseInt(w, 10) || 1200, 1920) : 1200;
+
     if (id) {
       try {
         const media = await this.mediaService.findById(+id);
+        const webp = await sharp(media.data)
+          .resize(width, undefined, { withoutEnlargement: true, fit: 'inside' })
+          .webp({ quality: 80 })
+          .toBuffer();
         res.set({
-          'Content-Type': media.mimeType,
+          'Content-Type': 'image/webp',
           'Cache-Control': 'public, max-age=31536000, immutable',
           'Access-Control-Allow-Origin': '*',
         });
-        res.end(media.data);
+        res.end(webp);
       } catch {
         this.servePlaceholder(res);
       }
@@ -52,7 +61,7 @@ export class MediaController {
       });
 
       if (!cdnResponse.ok) {
-        this.logger.warn(`CDN respondió ${cdnResponse.status} para ${url}, sirviendo placeholder`);
+        this.logger.warn(`CDN responded ${cdnResponse.status} for ${url}, serving placeholder`);
         this.servePlaceholder(res);
         return;
       }
@@ -60,13 +69,27 @@ export class MediaController {
       const contentType = cdnResponse.headers.get('content-type') || 'image/jpeg';
       const buffer = Buffer.from(await cdnResponse.arrayBuffer());
 
-      res.set({
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=86400, s-maxage=86400',
-        'Access-Control-Allow-Origin': '*',
-        'Content-Length': buffer.length,
-      });
-      res.end(buffer);
+      if (contentType.startsWith('image/')) {
+        const webp = await sharp(buffer)
+          .resize(width, undefined, { withoutEnlargement: true, fit: 'inside' })
+          .webp({ quality: 80 })
+          .toBuffer();
+        res.set({
+          'Content-Type': 'image/webp',
+          'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+          'Access-Control-Allow-Origin': '*',
+          'Content-Length': webp.length,
+        });
+        res.end(webp);
+      } else {
+        res.set({
+          'Content-Type': contentType,
+          'Cache-Control': 'public, max-age=86400, s-maxage=86400',
+          'Access-Control-Allow-Origin': '*',
+          'Content-Length': buffer.length,
+        });
+        res.end(buffer);
+      }
     } catch (err: any) {
       this.logger.error(`Proxy error for ${url}: ${err.message}`);
       this.servePlaceholder(res);
