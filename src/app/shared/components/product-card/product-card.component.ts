@@ -14,7 +14,7 @@ import { PRODUCT_PLACEHOLDER } from '../../utils/placeholder';
         <img [src]="(product().images ?? [])[0] || placeholder"
              [alt]="product().name"
              class="product-card__image"
-             [attr.fetchpriority]="priority() === 'high' ? 'high' : null"
+             fetchpriority="auto"
              [loading]="priority() === 'high' ? 'eager' : 'lazy'" />
       </a>
       <div class="product-card__body">
@@ -120,6 +120,7 @@ import { PRODUCT_PLACEHOLDER } from '../../utils/placeholder';
 export class ProductCardComponent {
   readonly product = input.required<Product>();
   readonly priority = input<'high' | 'auto'>('auto');
+
 
   readonly addToCart = output<{ productId: number; quantity: number }>();
 

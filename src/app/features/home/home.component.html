@@ -16,7 +16,7 @@
     <div class="container">
       <div class="section-header">
         <h2 class="section-title">Tienda Oficial</h2>
-        <a routerLink="/tienda" class="section-link">Ver todos &rarr;</a>
+        <a routerLink="/tienda" class="section-link" aria-label="Ver todos los productos de la tienda">Ver todos &rarr;</a>
       </div>
       <div class="products-grid">
         @for (product of featuredProducts(); track product.id; let first = $first) {
@@ -36,7 +36,7 @@
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">Próximos Partidos</h2>
-      <a routerLink="/agenda" class="section-link">Ver todos &rarr;</a>
+      <a routerLink="/agenda" class="section-link" aria-label="Ver todos los partidos">Ver todos &rarr;</a>
     </div>
     @defer (on viewport) {
       @if (upcomingMatches().length > 0) {
@@ -68,7 +68,7 @@
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">Últimos Resultados</h2>
-      <a routerLink="/agenda" class="section-link">Ver todos &rarr;</a>
+      <a routerLink="/agenda" class="section-link" aria-label="Ver todos los resultados">Ver todos &rarr;</a>
     </div>
     @if (recentResults().length > 0) {
       <div class="matches-grid">
@@ -90,7 +90,7 @@
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">Nuestros Equipos</h2>
-      <a routerLink="/equipos" class="section-link">Ver todos &rarr;</a>
+      <a routerLink="/equipos" class="section-link" aria-label="Ver todos los equipos">Ver todos &rarr;</a>
     </div>
     <div class="teams-grid">
       <div class="team-card">
@@ -99,7 +99,7 @@
         </div>
         <h3 class="team-card-title">Sénior Autonómica</h3>
         <p class="team-card-desc">Senior Autonómica CLM</p>
-        <a mat-stroked-button routerLink="/equipos" class="team-card-btn">Ver plantilla</a>
+        <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla del equipo Sénior Autonómica">Ver plantilla</a>
       </div>
       <div class="team-card">
         <div class="team-card-icon team-junior">
@@ -107,7 +107,7 @@
         </div>
         <h3 class="team-card-title">Júnior U19</h3>
         <p class="team-card-desc">CB Tomelloso U19 Amarillo y Verde</p>
-        <a mat-stroked-button routerLink="/equipos" class="team-card-btn">Ver plantilla</a>
+        <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla del equipo Júnior U19">Ver plantilla</a>
       </div>
 
       <div class="team-card">
@@ -116,7 +116,7 @@
         </div>
         <h3 class="team-card-title">Categorías Base</h3>
         <p class="team-card-desc">Minibasket y formación</p>
-        <a mat-stroked-button routerLink="/equipos" class="team-card-btn">Ver plantilla</a>
+        <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla de las Categorías Base">Ver plantilla</a>
       </div>
     </div>
   </div>
@@ -142,7 +142,7 @@
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">Patrocinadores</h2>
-      <a routerLink="/patrocinadores" class="section-link">Ver todos &rarr;</a>
+      <a routerLink="/patrocinadores" class="section-link" aria-label="Ver todos los patrocinadores">Ver todos &rarr;</a>
     </div>
     @defer (on viewport) {
       <app-sponsor-carousel [sponsors]="sponsors()" />

@@ -7,26 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="preconnect" href="https://cb-tomelloso-api.onrender.com" crossorigin />
+    <meta name="description" content="Web oficial del Club Baloncesto Tomelloso. Noticias, partidos, tienda online y más. #CreciendoJuntos" />
     <link rel="preload" as="image" fetchpriority="high" href="https://cb-tomelloso-api.onrender.com/api/v1/media/proxy?id=2&w=640" />
-    <script>
-    (async()=>{
-      try {
-        fetch('https://cb-tomelloso-api.onrender.com/api/v1/health',{mode:'no-cors'});
-        const r = await fetch('https://cb-tomelloso-api.onrender.com/api/v1/news/hero');
-        if(r.ok){
-          const data = await r.json();
-          if(data?.length && data[0]?.imageUrl){
-            let imgUrl = data[0].imageUrl;
-            if(imgUrl.startsWith('/')) imgUrl = 'https://cb-tomelloso-api.onrender.com' + imgUrl;
-            imgUrl += (imgUrl.includes('?') ? '&' : '?') + 'w=640';
-            const link = document.createElement('link');
-            link.rel = 'preload'; link.as = 'image'; link.href = imgUrl; link.fetchPriority = 'high';
-            document.head.appendChild(link);
-          }
-        }
-      } catch(e) {}
-    })();
-    </script>
+    <link rel="preload" as="fetch" crossorigin href="https://cb-tomelloso-api.onrender.com/api/v1/health" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=optional" rel="stylesheet" />
 
     <!-- PWA -->

@@ -311,13 +311,15 @@
   bottom: 0;
   left: 0;
   height: 3px;
+  width: 100%;
   background: var(--color-accent);
   z-index: 10;
-  width: 0%;
+  transform: scaleX(0);
+  transform-origin: left;
   animation: progress-bar linear forwards;
 }
 
 @keyframes progress-bar {
-  from { width: 0%; }
-  to { width: 100%; }
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
 }

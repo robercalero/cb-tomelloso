@@ -28,7 +28,7 @@
       </div>
       @if (n.imageUrl) {
         <div class="news-image-container">
-          <img [src]="n.imageUrl" [alt]="n.title" class="news-image" />
+          <img [src]="n.imageUrl" [alt]="n.title" class="news-image" width="1200" height="675" />
         </div>
       }
       <div class="news-content">
@@ -84,28 +84,28 @@
 
 @let idx = lightboxIndex(); @if (idx !== null) {
   <div class="lightbox-overlay" (click)="closeLightbox()" role="dialog" aria-label="Visor de imágenes">
-    <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar">
+    <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar visor de imágenes">
       <mat-icon>close</mat-icon>
     </button>
     <div class="lightbox-content" (click)="$event.stopPropagation()">
       @if (lightboxMedia()[idx]; as media) {
         @if (media.type === 'video') {
-          <video class="lightbox-video" controls autoplay>
+          <video class="lightbox-video" controls autoplay aria-label="Vídeo {{ idx + 1 }} de {{ lightboxMedia().length }}">
             <source [src]="media.url" type="video/mp4" />
           </video>
         } @else {
-          <img [src]="media.url" [alt]="'Imagen ' + (idx + 1)" class="lightbox-image" />
+          <img [src]="media.url" [alt]="'Imagen ' + (idx + 1) + ' de ' + lightboxMedia().length" class="lightbox-image" />
         }
-        <div class="lightbox-counter">{{ idx + 1 }} / {{ lightboxMedia().length }}</div>
+        <div class="lightbox-counter" aria-live="polite">{{ idx + 1 }} / {{ lightboxMedia().length }}</div>
       }
     </div>
     @if (idx !== null && idx > 0) {
-      <button class="lightbox-nav lightbox-prev" (click)="prevImage()" aria-label="Anterior">
+      <button class="lightbox-nav lightbox-prev" (click)="prevImage()" aria-label="Imagen anterior">
         <mat-icon>chevron_left</mat-icon>
       </button>
     }
     @if (idx !== null && idx < lightboxMedia().length - 1) {
-      <button class="lightbox-nav lightbox-next" (click)="nextImage()" aria-label="Siguiente">
+      <button class="lightbox-nav lightbox-next" (click)="nextImage()" aria-label="Siguiente imagen">
         <mat-icon>chevron_right</mat-icon>
       </button>
     }

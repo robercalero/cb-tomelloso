@@ -18,7 +18,7 @@
     <time class="news-date">{{ (news().publishedAt || news().createdAt) | date:'dd/MM/yyyy' }}</time>
     <h3 class="news-title">{{ news().title }}</h3>
     <p class="news-excerpt">{{ news().excerpt }}</p>
-    <a [routerLink]="['/noticia', news().slug]" class="news-read-more">
+    <a [routerLink]="['/noticia', news().slug]" class="news-read-more" aria-label="Leer más: {{ news().title }}">
       Leer más
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M5 12h14M12 5l7 7-7 7"/>

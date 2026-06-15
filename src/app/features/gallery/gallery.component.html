@@ -38,7 +38,7 @@
                     (keydown.enter)="openLightbox(image)"
                   >
                     @if (image.src) {
-                      <img [src]="image.src" [alt]="image.title" class="gallery-item-img" loading="lazy" />
+                      <img [src]="image.src" [alt]="image.title" class="gallery-item-img" loading="lazy" width="400" height="300" />
                     } @else {
                       <div class="gallery-item-bg" [style.background]="gradientColors[i % gradientColors.length]">
                         <mat-icon class="gallery-item-icon">photo_camera</mat-icon>
@@ -116,7 +116,7 @@
                     <a [routerLink]="['/noticia', post.slug]" class="instagram-card-link">
                       @if (post.src) {
                         <div class="instagram-card-img-wrapper">
-                          <img [src]="post.src" [alt]="post.title" class="instagram-card-img" loading="lazy" />
+                          <img [src]="post.src" [alt]="post.title" class="instagram-card-img" loading="lazy" width="400" height="300" />
                           @if (post.mediaCount > 1) {
                             <span class="instagram-card-media-count">
                               <mat-icon>collections</mat-icon>
@@ -146,7 +146,7 @@
                       </div>
                     </a>
                     <div class="instagram-card-actions">
-                      <a mat-raised-button color="primary" [routerLink]="['/noticia', post.slug]">
+                      <a mat-raised-button color="primary" [routerLink]="['/noticia', post.slug]" aria-label="Ver todas las fotos de {{ post.title }}">
                         Ver todas las fotos
                       </a>
                     </div>
@@ -183,11 +183,11 @@
 @if (selectedImage(); as img) {
   <div class="lightbox-overlay" (click)="closeLightbox()" role="dialog" aria-label="Visor de imagen">
     <div class="lightbox-content" (click)="$event.stopPropagation()">
-      <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar">
+      <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar visor de imágenes">
         <mat-icon>close</mat-icon>
       </button>
       @if (img.src) {
-        <img [src]="img.src" [alt]="img.title" class="lightbox-image-full" />
+        <img [src]="img.src" [alt]="img.title" class="lightbox-image-full" loading="lazy" />
       } @else {
         <div class="lightbox-image" style="background: linear-gradient(135deg, #1B8A3D, #D4A017)">
           <mat-icon class="lightbox-icon">photo</mat-icon>
