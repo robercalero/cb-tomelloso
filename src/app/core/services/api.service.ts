@@ -1,12 +1,27 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { timeout, catchError } from 'rxjs/operators';
 import { getApiBaseUrl } from '../utils/api-url.utils';
+
+const REQUEST_TIMEOUT = 30_000;
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
   private baseUrl = getApiBaseUrl();
+
+  private pipeTimeout<T>(source: Observable<T>): Observable<T> {
+    return source.pipe(
+      timeout(REQUEST_TIMEOUT),
+      catchError(err => {
+        if (err.name === 'TimeoutError') {
+          console.warn(`[ApiService] Request timed out after ${REQUEST_TIMEOUT}ms`);
+        }
+        return throwError(() => err);
+      })
+    );
+  }
 
   get<T>(path: string, params?: Record<string, string | number | undefined>): Observable<T> {
     let httpParams = new HttpParams();
@@ -15,18 +30,18 @@ export class ApiService {
         if (v !== undefined) httpParams = httpParams.set(k, String(v));
       });
     }
-    return this.http.get<T>(`${this.baseUrl}/${path}`, { params: httpParams });
+    return this.pipeTimeout(this.http.get<T>(`${this.baseUrl}/${path}`, { params: httpParams }));
   }
 
   post<T>(path: string, body: unknown): Observable<T> {
-    return this.http.post<T>(`${this.baseUrl}/${path}`, body);
+    return this.pipeTimeout(this.http.post<T>(`${this.baseUrl}/${path}`, body));
   }
 
   patch<T>(path: string, body: unknown): Observable<T> {
-    return this.http.patch<T>(`${this.baseUrl}/${path}`, body);
+    return this.pipeTimeout(this.http.patch<T>(`${this.baseUrl}/${path}`, body));
   }
 
   delete<T>(path: string): Observable<T> {
-    return this.http.delete<T>(`${this.baseUrl}/${path}`);
+    return this.pipeTimeout(this.http.delete<T>(`${this.baseUrl}/${path}`));
   }
 }

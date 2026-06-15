@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideZonelessChangeDetection, APP_INITIALIZER, LOCALE_ID, ErrorHandler, isDevMode } from '@angular/core';
-import { provideRouter, withInMemoryScrolling, withPreloading, withViewTransitions, PreloadAllModules } from '@angular/router';
+import { provideRouter, withInMemoryScrolling, withViewTransitions } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -17,15 +17,18 @@ registerLocaleData(localeEs);
 function initAuth(authService: AuthService, http: HttpClient) {
   return () => {
     const token = authService.getAccessToken();
-    if (!token) return;
-    firstValueFrom(
-      http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
-        timeout(10_000),
-        catchError(() => of(null))
-      )
-    ).then(user => {
-      if (user) authService.setCurrentUser(user);
-    });
+    if (!token) return Promise.resolve();
+    Promise.resolve().then(() =>
+      firstValueFrom(
+        http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
+          timeout(10_000),
+          catchError(() => of(null))
+        )
+      ).then(user => {
+        if (user) authService.setCurrentUser(user);
+      })
+    );
+    return Promise.resolve();
   };
 }
 
@@ -41,7 +44,7 @@ class ViewTransitionErrorHandler implements ErrorHandler {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
-    provideRouter(routes, withPreloading(PreloadAllModules), withViewTransitions(), withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })),
+    provideRouter(routes, withViewTransitions(), withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     provideServiceWorker('ngsw-worker.js', {
