@@ -11,14 +11,14 @@
 />
 
 <!-- Productos Destacados de la Tienda -->
-@if (featuredProducts().length > 0) {
-  <section class="section">
-    <div class="container">
-      <div class="section-header">
-        <h2 class="section-title">Tienda Oficial</h2>
-        <a routerLink="/tienda" class="section-link" aria-label="Ver todos los productos de la tienda">Ver todos &rarr;</a>
-      </div>
-      <div class="products-grid">
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Tienda Oficial</h2>
+      <a routerLink="/tienda" class="section-link" aria-label="Ver todos los productos de la tienda">Ver todos &rarr;</a>
+    </div>
+    <div class="products-grid" [class.products-grid--empty]="featuredProducts().length === 0">
+      @if (featuredProducts().length > 0) {
         @for (product of featuredProducts(); track product.id; let first = $first) {
           <app-product-card
             [product]="product"
@@ -26,10 +26,10 @@
             (addToCart)="onAddToCart($event)"
           />
         }
-      </div>
+      }
     </div>
-  </section>
-}
+  </div>
+</section>
 
 <!-- Próximos Partidos -->
 <section class="section section-dark">

@@ -268,6 +268,10 @@
   min-height: 380px;
 }
 
+.products-grid--empty {
+  visibility: hidden;
+}
+
 .products-grid--skeleton {
   .product-card--skeleton {
     position: relative;
