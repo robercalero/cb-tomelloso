@@ -21,7 +21,7 @@
       >
         @if (slide.imageUrl) {
           <img
-            [src]="slide.imageUrl"
+            [src]="i === 0 ? getLcpUrl(slide.imageUrl) : slide.imageUrl"
             [srcset]="i > 0 ? getSrcset(slide.imageUrl) : null"
             [sizes]="i > 0 ? getSizes() : null"
             alt=""

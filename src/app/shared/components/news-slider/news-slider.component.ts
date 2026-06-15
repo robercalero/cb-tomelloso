@@ -145,6 +145,12 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
     return source ? icons[source] : '';
   }
 
+  getLcpUrl(url: string | null): string | null {
+    if (!url) return null;
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}w=640`;
+  }
+
   getSrcset(url: string | null): string {
     if (!url) return '';
     const separator = url.includes('?') ? '&' : '?';
