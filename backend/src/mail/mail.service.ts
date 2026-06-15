@@ -44,9 +44,23 @@ export class MailService {
     this.webUrl = this.config.get<string>('FRONTEND_URL', 'http://localhost:4200');
   }
 
+  private async sendWithRetry(mailOptions: any, retries = 3): Promise<void> {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        await this.mailer.sendMail(mailOptions);
+        return;
+      } catch (err) {
+        if (attempt === retries) throw err;
+        const delay = 1000 * Math.pow(2, attempt - 1);
+        this.logger.warn(`Intento ${attempt}/${retries} falló, reintentando en ${delay}ms: ${(err as Error).message}`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
   async sendOrderConfirmation(order: OrderEmailData): Promise<void> {
     try {
-      await this.mailer.sendMail({
+      await this.sendWithRetry({
         to: order.shippingEmail,
         subject: `Pedido confirmado — ${order.orderNumber} | CB Tomelloso`,
         template: 'order-confirmation',
@@ -61,13 +75,13 @@ export class MailService {
         },
       });
     } catch (err) {
-      this.logger.warn(`Email confirmación pedido falló: ${(err as Error).message}`);
+      this.logger.warn(`Email confirmación pedido falló tras reintentos: ${(err as Error).message}`);
     }
   }
 
   async sendOrderShipped(order: OrderEmailData, trackingNumber?: string): Promise<void> {
     try {
-      await this.mailer.sendMail({
+      await this.sendWithRetry({
         to: order.shippingEmail,
         subject: `Tu pedido está en camino — ${order.orderNumber}`,
         template: 'order-shipped',
@@ -79,13 +93,13 @@ export class MailService {
         },
       });
     } catch (err) {
-      this.logger.warn(`Email envío falló: ${(err as Error).message}`);
+      this.logger.warn(`Email envío falló tras reintentos: ${(err as Error).message}`);
     }
   }
 
   async notifyAdminNewOrder(order: OrderEmailData, adminEmail: string): Promise<void> {
     try {
-      await this.mailer.sendMail({
+      await this.sendWithRetry({
         to: adminEmail,
         subject: `Nuevo pedido: ${order.orderNumber} (${order.shippingName})`,
         template: 'admin-new-order',
@@ -99,13 +113,13 @@ export class MailService {
         },
       });
     } catch (err) {
-      this.logger.warn(`Email notificación admin pedido falló: ${(err as Error).message}`);
+      this.logger.warn(`Email notificación admin pedido falló tras reintentos: ${(err as Error).message}`);
     }
   }
 
   async sendContactConfirmation(name: string, email: string, subject: string): Promise<void> {
     try {
-      await this.mailer.sendMail({
+      await this.sendWithRetry({
         to: email,
         subject: `Hemos recibido tu mensaje — CB Tomelloso`,
         template: 'contact-confirmation',
@@ -116,13 +130,13 @@ export class MailService {
         },
       });
     } catch (err) {
-      this.logger.warn(`Email confirmación contacto falló: ${(err as Error).message}`);
+      this.logger.warn(`Email confirmación contacto falló tras reintentos: ${(err as Error).message}`);
     }
   }
 
   async notifyAdminNewContact(data: ContactEmailData, adminEmail: string): Promise<void> {
     try {
-      await this.mailer.sendMail({
+      await this.sendWithRetry({
         to: adminEmail,
         subject: `Nuevo mensaje de contacto de ${data.name}`,
         template: 'admin-new-contact',
@@ -132,14 +146,14 @@ export class MailService {
         },
       });
     } catch (err) {
-      this.logger.warn(`Email notificación admin contacto falló: ${(err as Error).message}`);
+      this.logger.warn(`Email notificación admin contacto falló tras reintentos: ${(err as Error).message}`);
     }
   }
 
   async sendMemberWelcome(member: MemberEmailData): Promise<void> {
     try {
       const typeLabel: Record<string, string> = { adulto: 'Adulto', juvenil: 'Juvenil', familia: 'Familia' };
-      await this.mailer.sendMail({
+      await this.sendWithRetry({
         to: member.email,
         subject: `Bienvenido/a al CB Tomelloso, ${member.name}`,
         template: 'member-welcome',
@@ -150,7 +164,7 @@ export class MailService {
         },
       });
     } catch (err) {
-      this.logger.warn(`Email bienvenida socio falló: ${(err as Error).message}`);
+      this.logger.warn(`Email bienvenida socio falló tras reintentos: ${(err as Error).message}`);
     }
   }
 }

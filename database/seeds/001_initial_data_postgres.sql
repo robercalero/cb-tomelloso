@@ -1,3 +1,6 @@
+-- ⚠️  ARCHIVO OBSOLETO — NO USAR EN PRODUCCIÓN
+-- Este archivo contiene seeds en PostgreSQL de una versión anterior del proyecto.
+-- El proyecto usa MySQL 8 (Aiven Cloud). Ver database/schema.sql para el schema actual.
 -- ============================================================
 -- SEEDS INICIALES — CB TOMELLOSO
 -- Datos reales del club para la temporada 2025/2026 (PostgreSQL)

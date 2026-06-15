@@ -41,10 +41,11 @@ CREATE TABLE IF NOT EXISTS `users` (
 CREATE TABLE IF NOT EXISTS `teams` (
   `id`              INT UNSIGNED    NOT NULL AUTO_INCREMENT,
   `name`            VARCHAR(100)    NOT NULL,
-  `category`        ENUM(
+        `category`        ENUM(
                       'Senior Autonómica',
                       'Senior Zonal',
                       'Júnior',
+                      'Junior U19',
                       'Cadete',
                       'Infantil',
                       'Alevín',

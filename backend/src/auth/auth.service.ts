@@ -26,18 +26,11 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    console.log('[AuthService.login] dto.email:', dto.email);
     const user = await this.usersService.findByEmail(dto.email);
-    console.log('[AuthService.login] user found:', !!user);
-    if (user) {
-      console.log('[AuthService.login] user.isActive:', user.isActive);
-      console.log('[AuthService.login] user.passwordHash (first 20):', user.passwordHash?.substring(0, 20));
-    }
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
     const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
-    console.log('[AuthService.login] password valid:', isPasswordValid);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
@@ -52,7 +45,7 @@ export class AuthService {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
       const user = await this.usersService.findOne(payload.sub);
-      if (!user || !user.isActive || user.refreshToken !== refreshToken) {
+      if (!user || !user.isActive || !user.refreshToken || !(await bcrypt.compare(refreshToken, user.refreshToken))) {
         throw new UnauthorizedException('Refresh token inválido');
       }
       const tokens = await this.generateTokens(user.id, user.email, user.role);

@@ -1,6 +1,6 @@
 import { Controller, Post, Get, Body, Req, Headers, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SkipThrottle } from '@nestjs/throttler';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import { PaymentsService } from './payments.service';
 import { OrdersService } from '../orders/orders.service';
@@ -20,6 +20,7 @@ export class PaymentsController {
   ) {}
 
   @Post('checkout')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   async createCheckout(@Body() dto: CheckoutDto) {
     try {
       const cart = await this.cartService.getCart(dto.sessionId);

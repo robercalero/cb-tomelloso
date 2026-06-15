@@ -10,11 +10,18 @@
 - Base de datos: MySQL 8 (Aiven Cloud)
 - Deploy: GitHub → Render (auto-deploy en push a main)
 
+## Panel de Administración
+- Acceso: `/admin/login` con credenciales de usuario con rol admin/editor
+- Gestión de: noticias, partidos, equipos, jugadores, galería, actividades,
+  patrocinadores, socios, mensajes, pedidos y tienda
+- Los formularios incluyen protección contra doble envío
+
 ## Limitaciones del tier gratuito
 - El backend se duerme tras 15 minutos de inactividad
 - El primer visitante puede esperar 30-60 segundos (cold start)
-- Solución recomendada: configurar UptimeRobot para hacer ping a
-  https://cb-tomelloso-api.onrender.com/health cada 5 minutos
+- Solución recomendada: configurar UptimeRobot (https://uptimerobot.com)
+  para hacer ping a https://cb-tomelloso-api.onrender.com/api/v1/health
+  cada 5 minutos (plan gratuito: 50 monitores)
 
 ## Desarrollo local
 ```

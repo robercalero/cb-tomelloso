@@ -14,12 +14,16 @@ export class MembersService {
     private readonly mailService: MailService,
   ) {}
 
-  async findAll(includeInactive = false): Promise<Member[]> {
-    return this.memberRepo.find({
-      where: includeInactive ? {} : { isActive: true },
+  async findAll(includeInactive = false, page = 1, limit = 20): Promise<{ data: Member[]; total: number; page: number; limit: number }> {
+    const where = includeInactive ? {} : { isActive: true };
+    const [data, total] = await this.memberRepo.findAndCount({
+      where,
       relations: { user: true },
       order: { name: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
+    return { data, total, page, limit };
   }
 
   async findOne(id: number): Promise<Member> {

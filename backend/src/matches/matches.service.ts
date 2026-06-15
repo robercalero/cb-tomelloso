@@ -12,15 +12,18 @@ export class MatchesService {
     private readonly matchRepo: Repository<Match>,
   ) {}
 
-  async findAll(teamId?: number, status?: string): Promise<Match[]> {
+  async findAll(teamId?: number, status?: string, page = 1, limit = 20): Promise<{ data: Match[]; total: number; page: number; limit: number }> {
     const where: any = {};
     if (teamId) where.teamId = teamId;
     if (status && status !== 'all') where.status = status;
-    return this.matchRepo.find({
+    const [data, total] = await this.matchRepo.findAndCount({
       where,
       relations: { team: true },
       order: { matchDate: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
+    return { data, total, page, limit };
   }
 
   async findUpcoming(limit = 4): Promise<Match[]> {

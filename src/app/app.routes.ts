@@ -148,9 +148,59 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/members/admin-members.component').then(m => m.AdminMembersComponent),
         title: 'Socios — Admin',
       },
+      {
+        path: 'galeria',
+        loadComponent: () => import('./features/admin/gallery/admin-gallery.component').then(m => m.AdminGalleryComponent),
+        title: 'Galería — Admin',
+      },
+      {
+        path: 'galeria/nueva',
+        loadComponent: () => import('./features/admin/gallery/admin-gallery-form.component').then(m => m.AdminGalleryFormComponent),
+        title: 'Nueva imagen — Admin',
+      },
+      {
+        path: 'galeria/:id',
+        loadComponent: () => import('./features/admin/gallery/admin-gallery-form.component').then(m => m.AdminGalleryFormComponent),
+        title: 'Editar imagen — Admin',
+      },
+      {
+        path: 'actividades',
+        loadComponent: () => import('./features/admin/activities/admin-activities.component').then(m => m.AdminActivitiesComponent),
+        title: 'Actividades — Admin',
+      },
+      {
+        path: 'actividades/nueva',
+        loadComponent: () => import('./features/admin/activities/admin-activities-form.component').then(m => m.AdminActivitiesFormComponent),
+        title: 'Nueva actividad — Admin',
+      },
+      {
+        path: 'actividades/:id',
+        loadComponent: () => import('./features/admin/activities/admin-activities-form.component').then(m => m.AdminActivitiesFormComponent),
+        title: 'Editar actividad — Admin',
+      },
+      {
+        path: 'patrocinadores',
+        loadComponent: () => import('./features/admin/sponsors/admin-sponsors.component').then(m => m.AdminSponsorsComponent),
+        title: 'Patrocinadores — Admin',
+      },
+      {
+        path: 'patrocinadores/nuevo',
+        loadComponent: () => import('./features/admin/sponsors/admin-sponsors-form.component').then(m => m.AdminSponsorsFormComponent),
+        title: 'Nuevo patrocinador — Admin',
+      },
+      {
+        path: 'patrocinadores/:id',
+        loadComponent: () => import('./features/admin/sponsors/admin-sponsors-form.component').then(m => m.AdminSponsorsFormComponent),
+        title: 'Editar patrocinador — Admin',
+      },
     ],
   },
 
   // ── 404 ──────────────────────────────────────────────
-  { path: '**', redirectTo: '' },
+  {
+    path: '404',
+    loadComponent: () => import('./features/not-found/not-found.component').then(m => m.NotFoundComponent),
+    title: 'Página no encontrada — CB Tomelloso',
+  },
+  { path: '**', redirectTo: '/404' },
 ];

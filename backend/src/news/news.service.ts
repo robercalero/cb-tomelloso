@@ -72,6 +72,6 @@ export class NewsService {
 
   async remove(id: number): Promise<void> {
     await this.findOne(id);
-    await this.newsRepo.delete(id);
+    await this.newsRepo.update(id, { isPublished: false });
   }
 }

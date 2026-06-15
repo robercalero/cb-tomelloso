@@ -2,7 +2,7 @@
   <div class="player-dorsal">{{ player().dorsal }}</div>
   <div class="player-avatar">
     @if (player().photoUrl) {
-      <img [src]="player().photoUrl" [alt]="player().name" class="player-img" />
+      <img [ngSrc]="player().photoUrl!" [alt]="player().name" width="300" height="300" class="player-img" />
     } @else {
       <div class="player-avatar-placeholder">
         <span>{{ (player().name.charAt(0) + player().surname.charAt(0)).toUpperCase() }}</span>

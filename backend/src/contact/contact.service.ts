@@ -15,13 +15,16 @@ export class ContactService {
     private readonly config: ConfigService,
   ) {}
 
-  async findAll(isRead?: boolean): Promise<ContactMessage[]> {
+  async findAll(isRead?: boolean, page = 1, limit = 20): Promise<{ data: ContactMessage[]; total: number; page: number; limit: number }> {
     const where: any = {};
     if (isRead !== undefined) where.isRead = isRead;
-    return this.contactRepo.find({
+    const [data, total] = await this.contactRepo.findAndCount({
       where,
       order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
     });
+    return { data, total, page, limit };
   }
 
   async findOne(id: number): Promise<ContactMessage> {
