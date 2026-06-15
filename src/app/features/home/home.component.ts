@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, effect, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, effect, afterNextRender, DestroyRef, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
@@ -43,8 +43,10 @@ export class HomeComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private title = inject(Title);
   private meta = inject(Meta);
+  private destroyRef = inject(DestroyRef);
 
   private isBrowser = isPlatformBrowser(this.platformId);
+  private deferredTimeouts: ReturnType<typeof setTimeout>[] = [];
 
   constructor() {
     effect(() => {
@@ -94,15 +96,20 @@ export class HomeComponent implements OnInit {
     this.newsService.loadHeroSlides();
     this.shopService.loadFeaturedProducts();
 
-    // Deferred 500ms: visible content just below hero
-    setTimeout(() => {
+    // Deferred: visible content just below hero
+    this.deferredTimeouts.push(setTimeout(() => {
       this.matchesService.loadUpcomingMatches();
       this.matchesService.loadRecentResults();
-    }, 500);
+    }, 500));
 
-    // Deferred 1500ms: below the fold
-    setTimeout(() => {
+    // Deferred: below the fold
+    this.deferredTimeouts.push(setTimeout(() => {
       this.sponsorsService.loadSponsors();
-    }, 1500);
+    }, 1500));
+
+    this.destroyRef.onDestroy(() => {
+      for (const t of this.deferredTimeouts) clearTimeout(t);
+      this.deferredTimeouts.length = 0;
+    });
   }
 }

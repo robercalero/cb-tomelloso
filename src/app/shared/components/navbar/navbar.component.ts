@@ -40,12 +40,14 @@ export class NavbarComponent {
 
   constructor() {
     this.ngZone.runOutsideAngular(() => {
-      window.addEventListener('scroll', () => {
+      const onScroll = () => {
         const scrolled = window.scrollY > 50;
         if (scrolled !== this.isScrolled()) {
           this.isScrolled.set(scrolled);
         }
-      }, { passive: true });
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      this.destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));
     });
 
     this.router.events.pipe(

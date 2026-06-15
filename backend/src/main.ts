@@ -18,10 +18,14 @@ async function bootstrap() {
   const apiPrefix = process.env.API_PREFIX ?? 'api/v1';
   app.setGlobalPrefix(apiPrefix);
 
+  const corsOrigins = process.env.CORS_ORIGIN
+    ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
+    : ['http://localhost:4200'];
+  const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? corsOrigins.filter(o => !o.includes('localhost'))
+    : corsOrigins;
   app.enableCors({
-    origin: process.env.CORS_ORIGIN
-      ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-      : ['http://localhost:4200'],
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,

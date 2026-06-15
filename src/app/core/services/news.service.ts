@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { News, NewsListResponse, HeroSlide } from '../../models/news.model';
-import { resolveApiUrl } from '../utils/api-url.utils';
+import { resolveApiUrl, isValidImageUrl } from '../utils/api-url.utils';
 
 function mapToHeroSlides(news: News[]): HeroSlide[] {
   return news
@@ -12,17 +12,20 @@ function mapToHeroSlides(news: News[]): HeroSlide[] {
       new Date(b.publishedAt || b.createdAt).getTime() - new Date(a.publishedAt || a.createdAt).getTime()
     )
     .slice(0, 6)
-    .map(n => ({
-      id: n.id,
-      title: n.title,
-      excerpt: n.excerpt,
-      imageUrl: resolveApiUrl(n.imageUrl!),
-      category: n.category,
-      publishedAt: n.publishedAt || null,
-      slug: n.slug,
-      source: n.source,
-      sourceUrl: n.sourceUrl,
-    }));
+    .map(n => {
+      const resolved = resolveApiUrl(n.imageUrl!);
+      return {
+        id: n.id,
+        title: n.title,
+        excerpt: n.excerpt,
+        imageUrl: isValidImageUrl(resolved) ? resolved : '',
+        category: n.category,
+        publishedAt: n.publishedAt || null,
+        slug: n.slug,
+        source: n.source,
+        sourceUrl: n.sourceUrl,
+      };
+    });
 }
 
 @Injectable({ providedIn: 'root' })

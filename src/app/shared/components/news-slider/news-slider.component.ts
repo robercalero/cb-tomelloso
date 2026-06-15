@@ -148,16 +148,18 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
 
   getLcpUrl(url: string | null | undefined): string | null {
     if (!url || url === '?w=640') return null;
-    const sep = url.includes('?') ? '&' : '?';
-    return `${url}${sep}w=640`;
+    const clean = url.replace(/([?&])w=\d+(&|$)/g, '$1').replace(/[?&]$/, '');
+    const sep = clean.includes('?') ? '&' : '?';
+    return `${clean}${sep}w=640`;
   }
 
   getSrcset(url: string | null): string | null {
     if (!url) return null;
     const clean = url.replace(/^\uFEFF/, '').trim();
     if (!clean) return null;
-    const separator = clean.includes('?') ? '&' : '?';
-    return [640, 1024, 1600].map(w => `${clean}${separator}w=${w} ${w}w`).join(', ');
+    const base = clean.replace(/([?&])w=\d+(&|$)/g, '$1').replace(/[?&]$/, '');
+    const separator = base.includes('?') ? '&' : '?';
+    return [640, 1024, 1600].map(w => `${base}${separator}w=${w} ${w}w`).join(', ');
   }
 
   getSizes(): string {

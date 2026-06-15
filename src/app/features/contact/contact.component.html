@@ -94,9 +94,11 @@
                       formControlName="name"
                       placeholder="Tu nombre"
                       [class.field-error]="showFieldError('name')"
+                      [attr.aria-invalid]="showFieldError('name') || null"
+                      [attr.aria-describedby]="nameError() ? 'contact-name-error' : null"
                     />
                     @if (nameError()) {
-                      <span class="error-text">{{ nameError() }}</span>
+                      <span id="contact-name-error" class="error-text" role="alert">{{ nameError() }}</span>
                     }
                   </div>
 
@@ -108,9 +110,11 @@
                       formControlName="email"
                       placeholder="tu@email.com"
                       [class.field-error]="showFieldError('email')"
+                      [attr.aria-invalid]="showFieldError('email') || null"
+                      [attr.aria-describedby]="emailError() ? 'contact-email-error' : null"
                     />
                     @if (emailError()) {
-                      <span class="error-text">{{ emailError() }}</span>
+                      <span id="contact-email-error" class="error-text" role="alert">{{ emailError() }}</span>
                     }
                   </div>
 
@@ -133,9 +137,11 @@
                       rows="5"
                       placeholder="Escribe tu mensaje aquí..."
                       [class.field-error]="showFieldError('message')"
+                      [attr.aria-invalid]="showFieldError('message') || null"
+                      [attr.aria-describedby]="messageError() ? 'contact-message-error' : null"
                     ></textarea>
                     @if (messageError()) {
-                      <span class="error-text">{{ messageError() }}</span>
+                      <span id="contact-message-error" class="error-text" role="alert">{{ messageError() }}</span>
                     }
                   </div>
 
@@ -168,9 +174,11 @@
                       formControlName="name"
                       placeholder="Tu nombre completo"
                       [class.field-error]="showMemberFieldError('name')"
+                      [attr.aria-invalid]="showMemberFieldError('name') || null"
+                      [attr.aria-describedby]="memberNameError() ? 'member-name-error' : null"
                     />
                     @if (memberNameError()) {
-                      <span class="error-text">{{ memberNameError() }}</span>
+                      <span id="member-name-error" class="error-text" role="alert">{{ memberNameError() }}</span>
                     }
                   </div>
 
@@ -182,9 +190,11 @@
                       formControlName="email"
                       placeholder="tu@email.com"
                       [class.field-error]="showMemberFieldError('email')"
+                      [attr.aria-invalid]="showMemberFieldError('email') || null"
+                      [attr.aria-describedby]="memberEmailError() ? 'member-email-error' : null"
                     />
                     @if (memberEmailError()) {
-                      <span class="error-text">{{ memberEmailError() }}</span>
+                      <span id="member-email-error" class="error-text" role="alert">{{ memberEmailError() }}</span>
                     }
                   </div>
 

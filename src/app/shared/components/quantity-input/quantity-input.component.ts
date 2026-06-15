@@ -19,9 +19,9 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
       border-radius: var(--radius-md); overflow: hidden;
     }
     .qty-btn {
-      width: 40px; height: 40px;
+      width: 44px; height: 44px;
       border: none; background: var(--color-light);
-      font-size: 1.1rem; cursor: pointer;
+      font-size: 1.2rem; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 150ms ease;
     }

@@ -27,63 +27,82 @@ export class OrdersService {
   ) {}
 
   async create(dto: CreateOrderDto): Promise<Order> {
-    const productIds = dto.items.map(i => i.productId);
-    const products = await this.productRepo.findBy({ id: In(productIds) });
-    const productMap = new Map<number, Product>(products.map(p => [p.id, p]));
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const productIds = dto.items.map(i => i.productId);
+      const products: Product[] = [];
+      for (const id of productIds) {
+        const p = await queryRunner.manager
+          .createQueryBuilder(Product, 'product')
+          .setLock('pessimistic_read')
+          .where('product.id = :id', { id })
+          .getOne();
+        if (!p) throw new NotFoundException(`Producto #${id} no encontrado`);
+        products.push(p);
+      }
+      const productMap = new Map<number, Product>(products.map(p => [p.id, p]));
 
-    const orderItems: Partial<OrderItem>[] = [];
-    let totalAmount = 0;
+      const orderItems: Partial<OrderItem>[] = [];
+      let totalAmount = 0;
 
-    for (const item of dto.items) {
-      const product = productMap.get(item.productId);
-      if (!product) throw new NotFoundException(`Producto #${item.productId} no encontrado`);
-      if (!product.isActive) throw new BadRequestException(`"${product.name}" no está disponible`);
-      if (product.stock < item.quantity) {
-        throw new BadRequestException(`Stock insuficiente para "${product.name}"`);
+      for (const item of dto.items) {
+        const product = productMap.get(item.productId)!;
+        if (!product.isActive) throw new BadRequestException(`"${product.name}" no está disponible`);
+        if (product.stock < item.quantity) {
+          throw new BadRequestException(`Stock insuficiente para "${product.name}"`);
+        }
+
+        const unitPrice = Number(product.price);
+        const subtotal = unitPrice * item.quantity;
+        totalAmount += subtotal;
+
+        orderItems.push({
+          productId: product.id,
+          productName: product.name,
+          productSku: product.sku,
+          size: item.size || null,
+          color: item.color || null,
+          quantity: item.quantity,
+          unitPrice,
+          subtotal,
+          imageUrl: (product.images as string[])?.[0] || null,
+        });
       }
 
-      const unitPrice = Number(product.price);
-      const subtotal = unitPrice * item.quantity;
-      totalAmount += subtotal;
+      const orderNumber = await this.generateOrderNumber(queryRunner);
 
-      orderItems.push({
-        productId: product.id,
-        productName: product.name,
-        productSku: product.sku,
-        size: item.size || null,
-        color: item.color || null,
-        quantity: item.quantity,
-        unitPrice,
-        subtotal,
-        imageUrl: (product.images as string[])?.[0] || null,
+      const order = queryRunner.manager.create(Order, {
+        orderNumber,
+        sessionId: dto.sessionId || null,
+        totalAmount,
+        shippingName: dto.shippingName,
+        shippingEmail: dto.shippingEmail,
+        shippingPhone: dto.shippingPhone || null,
+        shippingAddress: dto.shippingAddress,
+        shippingCity: dto.shippingCity,
+        shippingPostalCode: dto.shippingPostalCode,
+        shippingCountry: dto.shippingCountry || 'España',
+        notes: dto.notes || null,
+        status: 'pending',
       });
+
+      const saved = await queryRunner.manager.save(order);
+
+      for (const item of orderItems) {
+        await queryRunner.manager.save(OrderItem, { ...item, orderId: saved.id });
+      }
+      saved.items = orderItems as OrderItem[];
+
+      await queryRunner.commitTransaction();
+      return saved;
+    } catch (e) {
+      await queryRunner.rollbackTransaction();
+      throw e;
+    } finally {
+      await queryRunner.release();
     }
-
-    const orderNumber = await this.generateOrderNumber();
-
-    const order = this.orderRepo.create({
-      orderNumber,
-      sessionId: dto.sessionId || null,
-      totalAmount,
-      shippingName: dto.shippingName,
-      shippingEmail: dto.shippingEmail,
-      shippingPhone: dto.shippingPhone || null,
-      shippingAddress: dto.shippingAddress,
-      shippingCity: dto.shippingCity,
-      shippingPostalCode: dto.shippingPostalCode,
-      shippingCountry: dto.shippingCountry || 'España',
-      notes: dto.notes || null,
-      status: 'pending',
-    });
-
-    const saved = await this.orderRepo.save(order);
-
-    const savedItems = await this.orderItemRepo.save(
-      orderItems.map(i => ({ ...i, orderId: saved.id }))
-    );
-    saved.items = savedItems as OrderItem[];
-
-    return saved;
   }
 
   async confirmPayment(orderId: number): Promise<void> {
@@ -234,8 +253,17 @@ export class OrdersService {
     };
   }
 
-  private async generateOrderNumber(): Promise<string> {
+  private async generateOrderNumber(existingRunner?: import('typeorm').QueryRunner): Promise<string> {
     const year = new Date().getFullYear();
+    if (existingRunner) {
+      const count = await existingRunner.manager
+        .createQueryBuilder(Order, 'order')
+        .setLock('pessimistic_write')
+        .where('YEAR(order.createdAt) = :year', { year })
+        .getCount();
+      const next = count + 1;
+      return `CBT-${year}-${String(next).padStart(4, '0')}`;
+    }
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();

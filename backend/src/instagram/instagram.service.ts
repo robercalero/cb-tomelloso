@@ -62,6 +62,8 @@ export class InstagramService {
 
     const mediaDetails = result.media_details || [];
 
+    const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+
     const downloadOne = async (rawUrl: string): Promise<string> => {
       try {
         const controller = new AbortController();
@@ -76,7 +78,16 @@ export class InstagramService {
         });
         clearTimeout(timeout);
         if (!resp.ok) return `${this.baseUrl}${PROXY_PATH_URL}${encodeURIComponent(rawUrl)}`;
+        const contentLength = resp.headers.get('content-length');
+        if (contentLength && parseInt(contentLength, 10) > MAX_IMAGE_SIZE) {
+          this.logger.warn(`Imagen demasiado grande (${contentLength} bytes): ${rawUrl}`);
+          return `${this.baseUrl}${PROXY_PATH_URL}${encodeURIComponent(rawUrl)}`;
+        }
         const buffer = Buffer.from(await resp.arrayBuffer());
+        if (buffer.length > MAX_IMAGE_SIZE) {
+          this.logger.warn(`Imagen demasiado grande tras descarga (${buffer.length} bytes): ${rawUrl}`);
+          return `${this.baseUrl}${PROXY_PATH_URL}${encodeURIComponent(rawUrl)}`;
+        }
         const contentType = resp.headers.get('content-type') || 'image/jpeg';
         const ext = contentType.split('/').pop() || 'jpg';
         const media = await this.mediaService.saveImage(`instagram.${ext}`, buffer, contentType);

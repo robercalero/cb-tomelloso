@@ -13,9 +13,14 @@ export const authInterceptor: HttpInterceptorFn = (
   const authService = inject(AuthService);
   const token = authService.getAccessToken();
 
+  const protectedPaths = ['/admin', '/auth/me', '/auth/logout'];
+  const needsAuth = protectedPaths.some(p => req.url.includes(p));
+  if (!needsAuth) {
+    return next(req);
+  }
+
   const skipPaths = ['/auth/refresh', '/auth/login'];
   const isAuthRequest = skipPaths.some(p => req.url.endsWith(p));
-
   if (isAuthRequest) {
     return next(req);
   }

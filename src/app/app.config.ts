@@ -15,17 +15,20 @@ import { getApiBaseUrl } from './core/utils/api-url.utils';
 registerLocaleData(localeEs);
 
 function initAuth(authService: AuthService, http: HttpClient) {
-  return () => {
+  return async () => {
     const token = authService.getAccessToken();
-    if (!token) return Promise.resolve();
-    return firstValueFrom(
+    if (!token) return;
+    if (authService.isTokenExpired()) {
+      const refreshed = await firstValueFrom(authService.refreshToken().pipe(catchError(() => of(null))));
+      if (!refreshed) return;
+    }
+    const user = await firstValueFrom(
       http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
         timeout(10_000),
         catchError(() => of(null))
       )
-    ).then(user => {
-      if (user) authService.setCurrentUser(user);
-    });
+    );
+    if (user) authService.setCurrentUser(user);
   };
 }
 

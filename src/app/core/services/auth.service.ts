@@ -79,6 +79,17 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
+  isTokenExpired(): boolean {
+    const token = this.getAccessToken();
+    if (!token) return true;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return Date.now() >= payload.exp * 1000;
+    } catch {
+      return true;
+    }
+  }
+
   private storeTokens(access: string, refresh: string) {
     localStorage.setItem(this.TOKEN_KEY, access);
     localStorage.setItem(this.REFRESH_KEY, refresh);

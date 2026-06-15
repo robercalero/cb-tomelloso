@@ -19,7 +19,7 @@ import { PRODUCT_PLACEHOLDER } from '../../utils/placeholder';
       </a>
       <div class="product-card__body">
         @if (product().category) {
-          <span class="product-card__category">{{ product().category!.name }}</span>
+          <span class="product-card__category">{{ product().category?.name }}</span>
         }
         <a [routerLink]="'/tienda/' + product().slug" class="product-card__name-link">
           <h3 class="product-card__name">{{ product().name }}</h3>
