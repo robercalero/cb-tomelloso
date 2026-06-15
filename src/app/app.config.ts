@@ -18,17 +18,14 @@ function initAuth(authService: AuthService, http: HttpClient) {
   return () => {
     const token = authService.getAccessToken();
     if (!token) return Promise.resolve();
-    Promise.resolve().then(() =>
-      firstValueFrom(
-        http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
-          timeout(10_000),
-          catchError(() => of(null))
-        )
-      ).then(user => {
-        if (user) authService.setCurrentUser(user);
-      })
-    );
-    return Promise.resolve();
+    return firstValueFrom(
+      http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
+        timeout(10_000),
+        catchError(() => of(null))
+      )
+    ).then(user => {
+      if (user) authService.setCurrentUser(user);
+    });
   };
 }
 

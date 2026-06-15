@@ -61,13 +61,17 @@ export class MediaController {
 
     try {
       const decoded = decodeURIComponent(url);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
       const cdnResponse = await fetch(decoded, {
+        signal: controller.signal,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
           Accept: 'image/webp,image/avif,image/*,*/*;q=0.8',
           Referer: 'https://www.instagram.com/',
         },
       });
+      clearTimeout(timeout);
 
       if (!cdnResponse.ok) {
         this.logger.warn(`CDN responded ${cdnResponse.status} for ${url}, serving placeholder`);
@@ -100,7 +104,11 @@ export class MediaController {
         res.end(buffer);
       }
     } catch (err: any) {
-      this.logger.error(`Proxy error for ${url}: ${err.message}`);
+      if (err.name === 'AbortError') {
+        this.logger.warn(`Proxy timeout for ${url}`);
+      } else {
+        this.logger.error(`Proxy error for ${url}: ${err.message}`);
+      }
       this.servePlaceholder(res);
     }
   }
@@ -113,6 +121,6 @@ export class MediaController {
       'Access-Control-Allow-Origin': '*',
       'Content-Length': buf.length,
     });
-    res.status(200).end(buf);
+    res.status(502).end(buf);
   }
 }

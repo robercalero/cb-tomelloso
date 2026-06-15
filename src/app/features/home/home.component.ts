@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, effect, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,8 +40,27 @@ export class HomeComponent implements OnInit {
   private sponsorsService = inject(SponsorsService);
   private shopService = inject(ShopService);
   private cartStore = inject(CartStore);
+  private platformId = inject(PLATFORM_ID);
   private title = inject(Title);
   private meta = inject(Meta);
+
+  private isBrowser = isPlatformBrowser(this.platformId);
+
+  constructor() {
+    effect(() => {
+      if (!this.isBrowser) return;
+      const slides = this.heroSlides();
+      const first = slides?.[0];
+      if (!first?.imageUrl) return;
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.fetchPriority = 'high';
+      const sep = first.imageUrl.includes('?') ? '&' : '?';
+      link.href = `${first.imageUrl}${sep}w=640`;
+      document.head.appendChild(link);
+    });
+  }
 
   readonly upcomingMatches = this.matchesService.upcomingMatches;
   readonly recentResults = this.matchesService.recentResults;

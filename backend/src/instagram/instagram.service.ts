@@ -64,13 +64,17 @@ export class InstagramService {
 
     const downloadOne = async (rawUrl: string): Promise<string> => {
       try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
         const resp = await fetch(rawUrl, {
+          signal: controller.signal,
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             Accept: 'image/webp,image/avif,image/*,*/*;q=0.8',
             Referer: 'https://www.instagram.com/',
           },
         });
+        clearTimeout(timeout);
         if (!resp.ok) return `${this.baseUrl}${PROXY_PATH_URL}${encodeURIComponent(rawUrl)}`;
         const buffer = Buffer.from(await resp.arrayBuffer());
         const contentType = resp.headers.get('content-type') || 'image/jpeg';

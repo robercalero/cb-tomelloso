@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://cb-tomelloso-web.onrender.com/sitemap.xml

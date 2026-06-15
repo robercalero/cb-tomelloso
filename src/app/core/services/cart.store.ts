@@ -36,9 +36,7 @@ export class CartStore {
   );
 
   constructor() {
-    afterNextRender(() => {
-      setTimeout(() => this.loadCart(), 5000);
-    });
+    afterNextRender(() => this.loadCart());
   }
 
   loadCart(): void {

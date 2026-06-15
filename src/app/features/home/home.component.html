@@ -70,16 +70,26 @@
       <h2 class="section-title">Últimos Resultados</h2>
       <a routerLink="/agenda" class="section-link" aria-label="Ver todos los resultados">Ver todos &rarr;</a>
     </div>
-    @if (recentResults().length > 0) {
+    @defer (on viewport) {
+      @if (recentResults().length > 0) {
+        <div class="matches-grid">
+          @for (match of recentResults().slice(0, 3); track match.id) {
+            <app-match-card [match]="match" />
+          }
+        </div>
+      } @else {
+        <div class="empty-state">
+          <mat-icon>sports_score</mat-icon>
+          <p>No hay resultados disponibles.</p>
+        </div>
+      }
+    } @loading (minimum 300ms) {
       <div class="matches-grid">
-        @for (match of recentResults().slice(0, 3); track match.id) {
-          <app-match-card [match]="match" />
-        }
+        <app-skeleton-loader type="card" [count]="3" />
       </div>
-    } @else {
-      <div class="empty-state">
-        <mat-icon>sports_score</mat-icon>
-        <p>No hay resultados disponibles.</p>
+    } @placeholder {
+      <div class="matches-grid">
+        <app-skeleton-loader type="card" [count]="3" />
       </div>
     }
   </div>
@@ -92,48 +102,55 @@
       <h2 class="section-title">Nuestros Equipos</h2>
       <a routerLink="/equipos" class="section-link" aria-label="Ver todos los equipos">Ver todos &rarr;</a>
     </div>
-    <div class="teams-grid">
-      <div class="team-card">
-        <div class="team-card-icon team-senior">
-          <mat-icon>groups</mat-icon>
+    @defer (on viewport) {
+      <div class="teams-grid">
+        <div class="team-card">
+          <div class="team-card-icon team-senior">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <h3 class="team-card-title">Sénior Autonómica</h3>
+          <p class="team-card-desc">Senior Autonómica CLM</p>
+          <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla del equipo Sénior Autonómica">Ver plantilla</a>
         </div>
-        <h3 class="team-card-title">Sénior Autonómica</h3>
-        <p class="team-card-desc">Senior Autonómica CLM</p>
-        <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla del equipo Sénior Autonómica">Ver plantilla</a>
-      </div>
-      <div class="team-card">
-        <div class="team-card-icon team-junior">
-          <mat-icon>people</mat-icon>
+        <div class="team-card">
+          <div class="team-card-icon team-junior">
+            <mat-icon>people</mat-icon>
+          </div>
+          <h3 class="team-card-title">Júnior U19</h3>
+          <p class="team-card-desc">CB Tomelloso U19 Amarillo y Verde</p>
+          <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla del equipo Júnior U19">Ver plantilla</a>
         </div>
-        <h3 class="team-card-title">Júnior U19</h3>
-        <p class="team-card-desc">CB Tomelloso U19 Amarillo y Verde</p>
-        <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla del equipo Júnior U19">Ver plantilla</a>
-      </div>
-
-      <div class="team-card">
-        <div class="team-card-icon team-base">
-          <mat-icon>child_care</mat-icon>
+        <div class="team-card">
+          <div class="team-card-icon team-base">
+            <mat-icon>child_care</mat-icon>
+          </div>
+          <h3 class="team-card-title">Categorías Base</h3>
+          <p class="team-card-desc">Minibasket y formación</p>
+          <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla de las Categorías Base">Ver plantilla</a>
         </div>
-        <h3 class="team-card-title">Categorías Base</h3>
-        <p class="team-card-desc">Minibasket y formación</p>
-        <a mat-stroked-button routerLink="/equipos" class="team-card-btn" aria-label="Ver plantilla de las Categorías Base">Ver plantilla</a>
       </div>
-    </div>
+    } @placeholder {
+      <div class="teams-grid-placeholder" style="height:200px"></div>
+    }
   </div>
 </section>
 
 <!-- Estadísticas animadas -->
 <section class="stats-section">
   <div class="container">
-    <div class="stats-grid">
-      @for (stat of stats; track stat.label) {
-        <div class="stat-item">
-          <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
-          <div class="stat-value">+{{ stat.value }}</div>
-          <div class="stat-label">{{ stat.label }}</div>
-        </div>
-      }
-    </div>
+    @defer (on viewport) {
+      <div class="stats-grid">
+        @for (stat of stats; track stat.label) {
+          <div class="stat-item">
+            <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
+            <div class="stat-value">+{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        }
+      </div>
+    } @placeholder {
+      <div class="stats-placeholder" style="height:120px"></div>
+    }
   </div>
 </section>
 

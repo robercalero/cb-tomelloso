@@ -22,6 +22,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { ttl: 60000, limit: 5 } })
   @ApiOperation({ summary: 'Iniciar sesión' })
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
