@@ -19,7 +19,7 @@
         [attr.aria-hidden]="i !== activeIndex()"
         [attr.aria-label]="'Diapositiva ' + (i + 1) + ' de ' + totalSlides()"
       >
-        @if (slide.imageUrl) {
+        @if (slide.imageUrl && !imageErrors().has(slide.id)) {
           <img
             [src]="i === 0 ? getLcpUrl(slide.imageUrl) : slide.imageUrl"
             [srcset]="i > 0 ? getSrcset(slide.imageUrl) : null"
@@ -30,6 +30,7 @@
             [loading]="i === 0 ? 'eager' : 'lazy'"
             width="1600"
             height="900"
+            (error)="onImageError(slide.id)"
           />
         } @else {
           <div

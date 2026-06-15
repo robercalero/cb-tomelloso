@@ -6,9 +6,11 @@ export function getApiBaseUrl(): string {
 
 export function resolveApiUrl(url: string | null | undefined): string {
   if (!url) return '';
-  if (url.startsWith('/')) {
+  const clean = url.replace(/^\uFEFF/, '').trim();
+  if (!clean) return '';
+  if (clean.startsWith('/')) {
     const origin = environment.apiUrl.replace(/\/api\/v1\/?$/, '');
-    return `${origin}${url}`;
+    return `${origin}${clean}`;
   }
-  return url;
+  return clean;
 }

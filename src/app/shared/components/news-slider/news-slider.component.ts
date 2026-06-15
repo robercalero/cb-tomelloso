@@ -27,6 +27,7 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
   readonly isTransitioning = signal<boolean>(false);
   readonly isPaused = signal<boolean>(false);
   readonly isLoaded = signal<boolean>(false);
+  readonly imageErrors = signal<Set<number>>(new Set());
 
   readonly activeSlide = computed<HeroSlide | null>(() => {
     const s = this.slides();
@@ -151,10 +152,12 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
     return `${url}${sep}w=640`;
   }
 
-  getSrcset(url: string | null): string {
-    if (!url) return '';
-    const separator = url.includes('?') ? '&' : '?';
-    return [640, 1024, 1600].map(w => `${url}${separator}w=${w} ${w}w`).join(', ');
+  getSrcset(url: string | null): string | null {
+    if (!url) return null;
+    const clean = url.replace(/^\uFEFF/, '').trim();
+    if (!clean) return null;
+    const separator = clean.includes('?') ? '&' : '?';
+    return [640, 1024, 1600].map(w => `${clean}${separator}w=${w} ${w}w`).join(', ');
   }
 
   getSizes(): string {
@@ -170,6 +173,15 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
       web: 'Web oficial',
     };
     return source ? labels[source] : '';
+  }
+
+  onImageError(slideId: number): void {
+    this.imageErrors.update(set => {
+      if (set.has(slideId)) return set;
+      const next = new Set(set);
+      next.add(slideId);
+      return next;
+    });
   }
 
   trackBySlide(_: number, slide: HeroSlide): number {
