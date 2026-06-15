@@ -22,8 +22,8 @@
         @if (slide.imageUrl && !imageErrors().has(slide.id)) {
           <img
             [src]="i === 0 ? getLcpUrl(slide.imageUrl) : slide.imageUrl"
-            [srcset]="i > 0 ? getSrcset(slide.imageUrl) : null"
-            [sizes]="i > 0 ? getSizes() : null"
+            [srcset]="getSrcset(slide.imageUrl)"
+            [sizes]="getSizes()"
             alt=""
             class="slide__bg slide__bg--img"
             [attr.fetchpriority]="i === 0 ? 'high' : null"
