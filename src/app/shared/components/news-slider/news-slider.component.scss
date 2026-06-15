@@ -41,14 +41,11 @@
   visibility: hidden;
   transition: opacity 700ms ease, visibility 700ms ease;
   z-index: 1;
-  content-visibility: auto;
-  contain-intrinsic-size: 100vh;
 
   &--active {
     opacity: 1;
     visibility: visible;
     z-index: 3;
-    content-visibility: visible;
   }
 
   &--prev,
