@@ -73,6 +73,9 @@ services:
     rootDir: .
     buildCommand: npm install && npm run build
     startCommand: node dist/cb-tomelloso-web/server/server.mjs
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
     headers:
       - path: /assets/*
         name: Cache-Control

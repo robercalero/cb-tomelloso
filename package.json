@@ -13,6 +13,9 @@
     "serve:ssr:cb-tomelloso-web": "node dist/cb-tomelloso-web/server/server.mjs"
   },
   "private": true,
+  "engines": {
+    "node": ">=20.14.0"
+  },
   "packageManager": "npm@11.13.0",
   "dependencies": {
     "@angular/animations": "^21.2.16",
