@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = join(__dirname, '../browser');
+const SSR_TIMEOUT = parseInt(process.env['SSR_TIMEOUT'] ?? '30000', 10);
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -37,9 +38,16 @@ app.use(
 
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+
+  const timeout = setTimeout(() => {
+    console.warn(`[SSR Timeout] ${req.method} ${req.url} — serving CSR fallback`);
+    res.sendFile(join(browserDistFolder, 'index.html'));
+  }, SSR_TIMEOUT);
+
   angularApp
     .handle(req)
     .then((response) => {
+      clearTimeout(timeout);
       if (response) {
         writeResponseToNodeResponse(response, res);
       } else {
@@ -47,6 +55,7 @@ app.use((req, res, next) => {
       }
     })
     .catch((err) => {
+        clearTimeout(timeout);
         console.error('[SSR Error]', err);
         next(err);
       });

@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "node dist/cb-tomelloso-web/server/server.mjs",
     "build": "ng build",
-    "postbuild": "node -e \"require('fs').copyFileSync('dist/cb-tomelloso-web/browser/index.csr.html', 'dist/cb-tomelloso-web/browser/index.html')\"",
+    "postbuild": "node -e \"const f=require('fs'),d='dist/cb-tomelloso-web/browser/',i=f.readdirSync(d).find(x=>x.startsWith('index')&&x.endsWith('.html')&&x!=='index.html');if(i)f.copyFileSync(d+i,d+'index.html')\"",
     "build:ssr": "ng build",
     "serve:ssr": "node dist/cb-tomelloso-web/server/server.mjs",
     "dev:ssr": "ng serve",
@@ -15,7 +15,7 @@
   },
   "private": true,
   "engines": {
-    "node": ">=20.14.0"
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
   },
   "packageManager": "npm@11.13.0",
   "dependencies": {

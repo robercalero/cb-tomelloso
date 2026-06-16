@@ -75,5 +75,5 @@ services:
     startCommand: node dist/cb-tomelloso-web/server/server.mjs
     envVars:
       - key: NODE_VERSION
-        value: "20"
+        value: "22"
 
