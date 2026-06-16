@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node dist/cb-tomelloso-web/server/server.mjs",
     "build": "ng build",
     "postbuild": "node -e \"require('fs').copyFileSync('dist/cb-tomelloso-web/browser/index.csr.html', 'dist/cb-tomelloso-web/browser/index.html')\"",
     "build:ssr": "ng build",
