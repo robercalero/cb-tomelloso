@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "postbuild": "node -e \"require('fs').copyFileSync('dist/cb-tomelloso-web/browser/index.csr.html', 'dist/cb-tomelloso-web/browser/index.html')\"",
     "build:ssr": "ng build",
     "serve:ssr": "node dist/cb-tomelloso-web/server/server.mjs",
     "dev:ssr": "ng serve",
