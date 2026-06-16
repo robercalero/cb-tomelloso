@@ -21,7 +21,7 @@
             <div class="main-sponsor-info">
               <h2 class="main-sponsor-name">{{ sponsor.name }}</h2>
               <p class="main-sponsor-desc">{{ sponsor.description }}</p>
-              <a [href]="sponsor.websiteUrl || '#'" target="_blank" rel="noopener" mat-raised-button color="primary">
+              <a [href]="sponsor.websiteUrl || '#'" target="_blank" rel="noopener" mat-raised-button color="primary" [attr.aria-label]="'Visitar sitio web de ' + sponsor.name">
                 <mat-icon>open_in_new</mat-icon>
                 Visitar sitio web
               </a>
@@ -39,7 +39,7 @@
         <h2 class="section-title text-center">Patrocinadores Colaboradores</h2>
         <div class="sponsors-grid">
           @for (sponsor of otherSponsors(); track sponsor.id) {
-            <a [href]="sponsor.websiteUrl || '#'" target="_blank" rel="noopener" class="sponsor-card" [class.sponsor-gold]="sponsor.tier === 'oro'">
+            <a [href]="sponsor.websiteUrl || '#'" target="_blank" rel="noopener" class="sponsor-card" [class.sponsor-gold]="sponsor.tier === 'oro'" [attr.aria-label]="'Visitar sitio web de ' + sponsor.name">
               <div class="sponsor-card-logo" [class.border-gold]="sponsor.tier === 'oro'" [class.border-silver]="sponsor.tier === 'plata'">
                 <span class="sponsor-card-initial">{{ sponsor.name.charAt(0) }}</span>
               </div>

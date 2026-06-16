@@ -129,7 +129,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #e74c3c;
+  color: var(--color-error);
   font-weight: 700;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -138,7 +138,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: #e74c3c;
+    background: var(--color-error);
     animation: pulse-dot 1.5s ease infinite;
   }
 }
@@ -168,7 +168,7 @@
   padding: 8px var(--spacing-lg);
   background: var(--color-light);
   font-size: 0.75rem;
-  color: #495057;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
   gap: 4px;

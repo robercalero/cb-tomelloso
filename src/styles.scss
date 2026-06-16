@@ -87,3 +87,20 @@ img {
   font-weight: 600 !important;
   letter-spacing: 0.5px;
 }
+
+/* Print styles */
+@media print {
+  app-navbar, app-footer, .page-hero, .cta-section, .btn-pay,
+  .slider__arrow, .slider__dots, .slider__counter, .slider__progress,
+  .lightbox-overlay, .checkout__summary, .matches-grid,
+  .news-footer, .sponsors-placeholder, .stats-section,
+  .gallery-tabs, .view-toolbar, .season-rounds, .season-links-extra,
+  .plan-cta, .cta-btn, .cta-btn-secondary, .back-link {
+    display: none !important;
+  }
+
+  body { background: white; color: black; font-size: 11pt; }
+  a { color: inherit; text-decoration: underline; }
+  img { max-width: 100% !important; page-break-inside: avoid; }
+  .section, .news-article { padding: 1rem 0 !important; break-inside: avoid; }
+}

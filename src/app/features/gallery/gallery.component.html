@@ -182,8 +182,8 @@
 <!-- Lightbox -->
 @if (selectedImage(); as img) {
   <div class="lightbox-overlay" (click)="closeLightbox()" role="dialog" aria-label="Visor de imagen">
-    <div class="lightbox-content" (click)="$event.stopPropagation()">
-      <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar visor de imágenes">
+    <div class="lightbox-content" (click)="$event.stopPropagation()" #lightboxContent>
+      <button class="lightbox-close" (click)="closeLightbox()" tabindex="0" aria-label="Cerrar visor de imágenes">
         <mat-icon>close</mat-icon>
       </button>
       @if (img.src) {

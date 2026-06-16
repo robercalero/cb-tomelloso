@@ -38,12 +38,12 @@ export class ContactService {
     const saved = await this.contactRepo.save(message);
 
     const subject = dto.subject || 'general';
-    await this.mailService.sendContactConfirmation(dto.name, dto.email, subject);
+    this.mailService.sendContactConfirmation(dto.name, dto.email, subject).catch(() => {});
     const adminEmail = this.config.get<string>('ADMIN_EMAIL', 'admin@cbtomelloso.es');
-    await this.mailService.notifyAdminNewContact(
+    this.mailService.notifyAdminNewContact(
       { name: dto.name, email: dto.email, subject, message: dto.message },
       adminEmail,
-    );
+    ).catch(() => {});
 
     return saved;
   }

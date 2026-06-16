@@ -8,7 +8,23 @@
 
   <section class="section">
     <div class="container">
-      <mat-tab-group [(selectedIndex)]="activeTab" class="team-tabs">
+      @if (loadingTeams()) {
+        <div class="teams-loading">
+          @for (_ of [1,2,3]; track _) {
+            <div class="skeleton-card">
+              <div class="skeleton skeleton-title"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-text-short"></div>
+              <div class="skeleton-players-grid">
+                @for (_ of [1,2,3,4]; track _) {
+                  <div class="skeleton skeleton-player"></div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <mat-tab-group [(selectedIndex)]="activeTab" class="team-tabs">
         @for (tab of teamTabs; track tab; let i = $index) {
           <mat-tab [label]="tab">
             <div class="tab-content">
@@ -100,6 +116,7 @@
           </mat-tab>
         }
       </mat-tab-group>
+      }
     </div>
   </section>
 </div>

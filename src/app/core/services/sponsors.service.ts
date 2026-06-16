@@ -1,6 +1,8 @@
-import { Injectable, inject, signal, isDevMode } from '@angular/core';
+import { Injectable, inject, signal, isDevMode, PLATFORM_ID, DestroyRef } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { of, timer } from 'rxjs';
 import { tap, retry, catchError } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiService } from './api.service';
 import { Sponsor } from '../../models/sponsor.model';
 
@@ -10,6 +12,8 @@ const CACHE_KEY = 'cbt_sponsors';
 @Injectable({ providedIn: 'root' })
 export class SponsorsService {
   private api = inject(ApiService);
+  private platformId = inject(PLATFORM_ID);
+  private destroyRef = inject(DestroyRef);
 
   private _sponsors = signal<Sponsor[]>([]);
 
@@ -27,13 +31,14 @@ export class SponsorsService {
         delay: (_, retryCount) => timer(RETRY_DELAYS[retryCount - 1] ?? 15000),
       }),
       tap(s => this.saveToCache(s)),
-      catchError(() => of(this._sponsors()))
+      catchError(() => of(this._sponsors())),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe(s => this._sponsors.set(s));
   }
 
   private loadFromCache(): Sponsor[] | null {
     try {
-      if (typeof sessionStorage === 'undefined') return null;
+      if (!isPlatformBrowser(this.platformId)) return null;
       const raw = sessionStorage.getItem(CACHE_KEY);
       if (!raw) return null;
       return JSON.parse(raw) as Sponsor[];
@@ -44,7 +49,7 @@ export class SponsorsService {
 
   private saveToCache(sponsors: Sponsor[]): void {
     try {
-      if (typeof sessionStorage === 'undefined') return;
+      if (!isPlatformBrowser(this.platformId)) return;
       if (!isDevMode()) sessionStorage.setItem(CACHE_KEY, JSON.stringify(sponsors));
     } catch {
       // localStorage may be full

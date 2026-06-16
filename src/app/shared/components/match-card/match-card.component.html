@@ -3,7 +3,9 @@
   [class.match-home]="match().isHome"
   [class.match-away]="!match().isHome"
   (click)="handleClick()"
-  role="article"
+  (keydown.enter)="handleClick()"
+  role="button"
+  tabindex="0"
   [attr.aria-label]="match().homeTeam + ' vs ' + match().awayTeam"
 >
   <div class="match-badge" [class.badge-home]="match().isHome">

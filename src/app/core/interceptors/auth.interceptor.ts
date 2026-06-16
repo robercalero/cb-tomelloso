@@ -3,8 +3,16 @@ import { inject } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, filter, retry, switchMap, take, throwError, timer } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
-let isRefreshing = false;
-const refreshQueue$ = new BehaviorSubject<{ accessToken: string | null } | null>(null);
+const REFRESH_COOLDOWN = 30_000;
+
+function createRefreshState() {
+  let isRefreshing = false;
+  let lastRefreshAttempt = 0;
+  const refreshQueue$ = new BehaviorSubject<{ accessToken: string | null } | null>(null);
+  return { isRefreshing, lastRefreshAttempt, refreshQueue$ };
+}
+
+const refreshState = createRefreshState();
 
 export const authInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -12,12 +20,6 @@ export const authInterceptor: HttpInterceptorFn = (
 ): Observable<any> => {
   const authService = inject(AuthService);
   const token = authService.getAccessToken();
-
-  const protectedPaths = ['/admin', '/auth/me', '/auth/logout'];
-  const needsAuth = protectedPaths.some(p => req.url.includes(p));
-  if (!needsAuth) {
-    return next(req);
-  }
 
   const skipPaths = ['/auth/refresh', '/auth/login'];
   const isAuthRequest = skipPaths.some(p => req.url.endsWith(p));
@@ -40,16 +42,20 @@ export const authInterceptor: HttpInterceptorFn = (
     }),
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && token) {
-        if (!isRefreshing) {
-          isRefreshing = true;
-          refreshQueue$.next(null);
+        const now = Date.now();
+        if (now - refreshState.lastRefreshAttempt < REFRESH_COOLDOWN) {
+          return throwError(() => error);
+        }
+        if (!refreshState.isRefreshing) {
+          refreshState.isRefreshing = true;
+          refreshState.lastRefreshAttempt = now;
+          refreshState.refreshQueue$.next(null);
 
           return authService.refreshToken().pipe(
             switchMap((res) => {
-              isRefreshing = false;
-              refreshQueue$.next({ accessToken: res?.accessToken ?? null });
+              refreshState.isRefreshing = false;
+              refreshState.refreshQueue$.next({ accessToken: res?.accessToken ?? null });
               if (!res) {
-                authService.logout().subscribe();
                 return throwError(() => error);
               }
               const retryReq = req.clone({
@@ -58,14 +64,13 @@ export const authInterceptor: HttpInterceptorFn = (
               return next(retryReq);
             }),
             catchError((refreshError) => {
-              isRefreshing = false;
-              refreshQueue$.next({ accessToken: null });
-              authService.logout().subscribe();
+              refreshState.isRefreshing = false;
+              refreshState.refreshQueue$.next({ accessToken: null });
               return throwError(() => refreshError);
             }),
           );
         } else {
-          return refreshQueue$.pipe(
+          return refreshState.refreshQueue$.pipe(
             filter((data) => data !== null),
             take(1),
             switchMap((data) => {

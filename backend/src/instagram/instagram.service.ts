@@ -42,7 +42,7 @@ export class InstagramService {
 
     let result: any;
     try {
-      const { instagramGetUrl } = require('instagram-url-direct');
+      const { instagramGetUrl } = await import('instagram-url-direct');
       result = await instagramGetUrl(cleanUrl, { retries: 3, delay: 2000 });
     } catch (err: any) {
       throw new BadRequestException(`No se pudo obtener la publicación: ${err.message}`);

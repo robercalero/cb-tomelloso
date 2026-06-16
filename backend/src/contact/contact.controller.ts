@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Param, ParseIntPipe, Query, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 import { ContactService } from './contact.service';
 import { CreateContactMessageDto } from './dto/create-contact-message.dto';
@@ -24,6 +25,7 @@ export class ContactController {
   }
 
   @Post()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @ApiOperation({ summary: 'Enviar mensaje de contacto' })
   create(@Body() dto: CreateContactMessageDto, @Req() req: Request) {
     const ip = req.ip || req.socket.remoteAddress;

@@ -44,6 +44,8 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "server": "src/main.server.ts",
+            "outputPath": "dist/cb-tomelloso-web",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -61,9 +63,15 @@
                 "input": "src"
               }
             ],
-            "styles": [
-              "src/styles.scss"
-            ]
+            "styles": ["src/styles.scss"],
+            "security": {
+              "allowedHosts": ["localhost", "cb-tomelloso-api.onrender.com"]
+            },
+            "outputMode": "server",
+            "ssr": {
+              "entry": "src/server.ts"
+            },
+            "prerender": false
           },
           "configurations": {
             "production": {
@@ -86,6 +94,17 @@
                   "type": "anyComponentStyle",
                   "maximumWarning": "8kB",
                   "maximumError": "16kB"
+                },
+                {
+                  "type": "bundle",
+                  "name": "main",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "any",
+                  "maximumWarning": "2MB",
+                  "maximumError": "3MB"
                 }
               ],
               "outputHashing": "all"

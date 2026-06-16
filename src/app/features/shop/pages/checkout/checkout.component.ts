@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal, PLATFORM_ID, DestroyRef } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { CurrencyPipe, isPlatformBrowser } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { CartStore } from '../../../../core/services/cart.store';
 import { ShopService } from '../../../../core/services/shop.service';
@@ -233,9 +234,10 @@ import { environment } from '../../../../../environments/environment';
 export class CheckoutComponent {
   readonly cartStore = inject(CartStore);
   private shopService = inject(ShopService);
-  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
   private title = inject(Title);
   private fb = inject(FormBuilder);
+  private platformId = inject(PLATFORM_ID);
 
   readonly checkoutForm = this.fb.group({
     shippingName: ['', Validators.required],
@@ -267,13 +269,18 @@ export class CheckoutComponent {
     this.shopService.createCheckoutSession({
       sessionId: this.cartStore.sessionId(),
       form: this.checkoutForm.value as any,
-    }).pipe(catchError((err) => {
-      this.isProcessing.set(false);
-      this.errorMessage.set(err.error?.message || err.error?.error || 'Error al procesar el pago. Inténtalo de nuevo.');
-      return of(null);
-    })).subscribe(result => {
+    }).pipe(
+      catchError((err) => {
+        this.isProcessing.set(false);
+        this.errorMessage.set(err.error?.message || err.error?.error || 'Error al procesar el pago. Inténtalo de nuevo.');
+        return of(null);
+      }),
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe(result => {
       if (result?.url) {
-        window.location.href = result.url;
+        if (isPlatformBrowser(this.platformId)) {
+          window.location.href = result.url;
+        }
       } else if (result) {
         this.isProcessing.set(false);
         this.errorMessage.set((result as any).error || 'Error al crear la sesión de pago.');

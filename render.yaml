@@ -65,14 +65,14 @@ services:
       - key: ADMIN_EMAIL
         value: admin@cbtomelloso.es
 
-  # ─── FRONTEND Angular ─────────────────────────────────────────────
-  - type: static
+  # ─── FRONTEND Angular (SSR) ───────────────────────────────────────
+  - type: web
     name: cb-tomelloso-web
-    runtime: static
+    runtime: node
     plan: free
     rootDir: .
     buildCommand: npm install && npm run build
-    staticPublishPath: ./dist/cb-tomelloso-web/browser
+    startCommand: node dist/cb-tomelloso-web/server/server.mjs
     headers:
       - path: /assets/*
         name: Cache-Control

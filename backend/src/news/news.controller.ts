@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseIntPipe, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, ParseIntPipe, UseGuards, HttpCode, HttpStatus, Logger } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
@@ -40,6 +40,13 @@ export class NewsController {
   @ApiOperation({ summary: 'Obtener noticia por slug' })
   findBySlug(@Param('slug') slug: string) {
     return this.newsService.findBySlug(slug);
+  }
+
+  @Post(':slug/view')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Registrar una visita a la noticia' })
+  async registerView(@Param('slug') slug: string): Promise<void> {
+    await this.newsService.registerView(slug);
   }
 
   @Post()

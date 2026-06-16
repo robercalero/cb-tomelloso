@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
-import { Repository, In, DataSource } from 'typeorm';
+import { Repository, In, DataSource, LessThan } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { Order, OrderStatus } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
@@ -11,6 +11,8 @@ import { MailService } from '../../mail/mail.service';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
+
   constructor(
     @InjectRepository(Order)
     private readonly orderRepo: Repository<Order>,
@@ -105,7 +107,7 @@ export class OrdersService {
     }
   }
 
-  async confirmPayment(orderId: number): Promise<void> {
+  async confirmPayment(orderId: number, stripeSessionId?: string, stripePaymentIntent?: string): Promise<void> {
     const order = await this.orderRepo.findOne({
       where: { id: orderId },
       relations: { items: true },
@@ -137,17 +139,30 @@ export class OrdersService {
         await queryRunner.manager.save(product);
       }
 
+      order.status = 'paid';
+      order.paidAt = new Date();
+      if (stripeSessionId) order.stripeSessionId = stripeSessionId;
+      if (stripePaymentIntent) order.stripePaymentIntent = stripePaymentIntent;
+      await queryRunner.manager.save(order);
+
       if (order.sessionId) {
         await queryRunner.manager.delete(CartItem, { sessionId: order.sessionId });
       }
 
       await queryRunner.commitTransaction();
+      this.logger.log(`Pedido #${order.id} (${order.orderNumber}) confirmado — stock deducido, estado: paid`);
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      this.logger.error(`Error confirmando pago del pedido #${order.orderNumber}: ${(e as Error).message}`);
       throw e;
     } finally {
       await queryRunner.release();
     }
+
+    const emailData = this.toEmailData(order);
+    await this.mailService.sendOrderConfirmation(emailData).catch(() => {});
+    const adminEmail = this.config.get<string>('ADMIN_EMAIL', 'admin@cbtomelloso.es');
+    await this.mailService.notifyAdminNewOrder(emailData, adminEmail).catch(() => {});
   }
 
   async findByOrderNumber(orderNumber: string): Promise<Order> {
@@ -164,14 +179,21 @@ export class OrdersService {
     return this.orderRepo.findOne({ where: { stripeSessionId }, relations: { items: true } });
   }
 
-  async findAll(page = 1, limit = 20): Promise<{ orders: Order[]; total: number }> {
-    const [orders, total] = await this.orderRepo.findAndCount({
+  async findAll(cursor?: string, limit = 20): Promise<{ orders: Order[]; nextCursor: string | null }> {
+    const where: any = {};
+    if (cursor) {
+      where.createdAt = LessThan(new Date(cursor));
+    }
+    const orders = await this.orderRepo.find({
+      where,
       relations: { items: true },
       order: { createdAt: 'DESC' },
-      skip: (page - 1) * limit,
-      take: limit,
+      take: limit + 1,
     });
-    return { orders, total };
+    const hasMore = orders.length > limit;
+    if (hasMore) orders.pop();
+    const nextCursor = hasMore ? orders[orders.length - 1].createdAt.toISOString() : null;
+    return { orders, nextCursor };
   }
 
   private readonly validTransitions: Record<OrderStatus, OrderStatus[]> = {
@@ -203,13 +225,13 @@ export class OrdersService {
 
     if (status === 'paid' && prevStatus !== 'paid') {
       const emailData = this.toEmailData(saved);
-      await this.mailService.sendOrderConfirmation(emailData);
+      this.mailService.sendOrderConfirmation(emailData).catch(() => {});
       const adminEmail = this.config.get<string>('ADMIN_EMAIL', 'admin@cbtomelloso.es');
-      await this.mailService.notifyAdminNewOrder(emailData, adminEmail);
+      this.mailService.notifyAdminNewOrder(emailData, adminEmail).catch(() => {});
     }
     if (status === 'shipped' && prevStatus !== 'shipped') {
       const emailData = this.toEmailData(saved);
-      await this.mailService.sendOrderShipped(emailData);
+      this.mailService.sendOrderShipped(emailData).catch(() => {});
     }
 
     return saved;
@@ -228,9 +250,9 @@ export class OrdersService {
 
     if (data.status === 'paid') {
       const emailData = this.toEmailData(saved);
-      await this.mailService.sendOrderConfirmation(emailData);
+      this.mailService.sendOrderConfirmation(emailData).catch(() => {});
       const adminEmail = this.config.get<string>('ADMIN_EMAIL', 'admin@cbtomelloso.es');
-      await this.mailService.notifyAdminNewOrder(emailData, adminEmail);
+      this.mailService.notifyAdminNewOrder(emailData, adminEmail).catch(() => {});
     }
 
     return saved;
@@ -255,27 +277,29 @@ export class OrdersService {
 
   private async generateOrderNumber(existingRunner?: import('typeorm').QueryRunner): Promise<string> {
     const year = new Date().getFullYear();
-    if (existingRunner) {
-      const count = await existingRunner.manager
+    const startOfYear = new Date(year, 0, 1);
+    const startOfNextYear = new Date(year + 1, 0, 1);
+
+    const runQuery = async (runner: import('typeorm').QueryRunner) => {
+      return runner.manager
         .createQueryBuilder(Order, 'order')
         .setLock('pessimistic_write')
-        .where('YEAR(order.createdAt) = :year', { year })
+        .where('order.createdAt >= :start', { start: startOfYear })
+        .andWhere('order.createdAt < :end', { end: startOfNextYear })
         .getCount();
-      const next = count + 1;
-      return `CBT-${year}-${String(next).padStart(4, '0')}`;
+    };
+
+    if (existingRunner) {
+      const count = await runQuery(existingRunner);
+      return `CBT-${year}-${String(count + 1).padStart(4, '0')}`;
     }
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const count = await queryRunner.manager
-        .createQueryBuilder(Order, 'order')
-        .setLock('pessimistic_write')
-        .where('YEAR(order.createdAt) = :year', { year })
-        .getCount();
-      const next = count + 1;
+      const count = await runQuery(queryRunner);
       await queryRunner.commitTransaction();
-      return `CBT-${year}-${String(next).padStart(4, '0')}`;
+      return `CBT-${year}-${String(count + 1).padStart(4, '0')}`;
     } catch (e) {
       await queryRunner.rollbackTransaction();
       throw e;

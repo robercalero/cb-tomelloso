@@ -65,7 +65,16 @@
           <div class="list-view">
             <mat-tab-group class="agenda-tabs">
               <mat-tab label="Próximos">
-                @if (upcomingMatches().length > 0) {
+                @if (loadingUpcoming()) {
+                  <div class="matches-list">
+                    @for (_ of [1,2,3]; track _) {
+                      <div class="match-skeleton">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                      </div>
+                    }
+                  </div>
+                } @else if (upcomingMatches().length > 0) {
                   <div class="matches-list">
                     @for (match of upcomingMatches(); track match.id) {
                       <app-match-card [match]="match" />
@@ -79,7 +88,16 @@
                 }
               </mat-tab>
               <mat-tab label="Resultados">
-                @if (recentResults().length > 0) {
+                @if (loadingResults()) {
+                  <div class="matches-list">
+                    @for (_ of [1,2,3]; track _) {
+                      <div class="match-skeleton">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                      </div>
+                    }
+                  </div>
+                } @else if (recentResults().length > 0) {
                   <div class="matches-list">
                     @for (match of recentResults(); track match.id) {
                       <app-match-card [match]="match" />
@@ -93,7 +111,16 @@
                 }
               </mat-tab>
               <mat-tab label="Todos">
-                @if (matches().length > 0) {
+                @if (loadingAll()) {
+                  <div class="matches-list">
+                    @for (_ of [1,2,3]; track _) {
+                      <div class="match-skeleton">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                      </div>
+                    }
+                  </div>
+                } @else if (matches().length > 0) {
                   <div class="matches-list">
                     @for (match of matches(); track match.id) {
                       <app-match-card [match]="match" />

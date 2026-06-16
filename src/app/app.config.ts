@@ -1,7 +1,9 @@
-import { ApplicationConfig, provideZonelessChangeDetection, APP_INITIALIZER, LOCALE_ID, ErrorHandler, isDevMode } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection, APP_INITIALIZER, LOCALE_ID, ErrorHandler, isDevMode, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser, isPlatformServer } from '@angular/common';
 import { provideRouter, withInMemoryScrolling, withViewTransitions } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideServiceWorker } from '@angular/service-worker';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
@@ -14,8 +16,9 @@ import { getApiBaseUrl } from './core/utils/api-url.utils';
 
 registerLocaleData(localeEs);
 
-function initAuth(authService: AuthService, http: HttpClient) {
+function initAuth(authService: AuthService, http: HttpClient, platformId: Object) {
   return async () => {
+    if (isPlatformServer(platformId)) return;
     const token = authService.getAccessToken();
     if (!token) return;
     if (authService.isTokenExpired()) {
@@ -24,7 +27,7 @@ function initAuth(authService: AuthService, http: HttpClient) {
     }
     const user = await firstValueFrom(
       http.get<AuthUser>(`${getApiBaseUrl()}/auth/me`).pipe(
-        timeout(10_000),
+        timeout(5_000),
         catchError(() => of(null))
       )
     );
@@ -37,7 +40,7 @@ class ViewTransitionErrorHandler implements ErrorHandler {
     if (error instanceof DOMException && error.name === 'InvalidStateError') {
       return;
     }
-    void error;
+    console.error(error);
   }
 }
 
@@ -45,7 +48,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
     provideRouter(routes, withViewTransitions(), withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    provideClientHydration(withEventReplay()),
     provideAnimations(),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
@@ -54,9 +58,9 @@ export const appConfig: ApplicationConfig = {
     { provide: LOCALE_ID, useValue: 'es' },
     {
       provide: APP_INITIALIZER,
-      useFactory: (authService: AuthService, http: HttpClient) =>
-        initAuth(authService, http),
-      deps: [AuthService, HttpClient],
+      useFactory: (authService: AuthService, http: HttpClient, platformId: Object) =>
+        initAuth(authService, http, platformId),
+      deps: [AuthService, HttpClient, PLATFORM_ID],
       multi: true,
     },
     { provide: ErrorHandler, useClass: ViewTransitionErrorHandler }

@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Patch, Param, Body, Query, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -21,8 +22,8 @@ export class OrdersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'editor')
   @ApiBearerAuth()
-  findAll(@Query('page') page?: number, @Query('limit') limit?: number): Promise<{ orders: Order[]; total: number }> {
-    return this.service.findAll(page || 1, limit || 20);
+  findAll(@Query('cursor') cursor?: string, @Query('limit') limit?: number): Promise<{ orders: Order[]; nextCursor: string | null }> {
+    return this.service.findAll(cursor, limit || 20);
   }
 
   @Get('by-stripe-session/:stripeSessionId')
@@ -31,8 +32,11 @@ export class OrdersController {
   }
 
   @Get(':orderNumber')
-  findByOrderNumber(@Param('orderNumber') orderNumber: string): Promise<Order> {
-    return this.service.findByOrderNumber(orderNumber);
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  async findByOrderNumber(@Param('orderNumber') orderNumber: string) {
+    const order = await this.service.findByOrderNumber(orderNumber);
+    const { shippingPhone, notes, userId, ...publicOrder } = order;
+    return publicOrder;
   }
 
   @Patch(':id/status')

@@ -1,12 +1,14 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal, DestroyRef } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiService } from './api.service';
 import { Product, ProductCategory, CartItem, Order, CheckoutForm } from '../../models/shop.model';
 
 @Injectable({ providedIn: 'root' })
 export class ShopService {
   private api = inject(ApiService);
+  private destroyRef = inject(DestroyRef);
 
   private _featuredProducts = signal<Product[]>([]);
   private _categories = signal<ProductCategory[]>([]);
@@ -16,13 +18,15 @@ export class ShopService {
 
   loadFeaturedProducts(): void {
     this.api.get<Product[]>('shop/products/featured').pipe(
-      catchError(() => of(this._featuredProducts()))
+      catchError(() => of([] as Product[])),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe(p => this._featuredProducts.set(p));
   }
 
   loadCategories(): void {
     this.api.get<ProductCategory[]>('shop/categories').pipe(
-      catchError(() => of(this._categories()))
+      catchError(() => of([] as ProductCategory[])),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe(c => this._categories.set(c));
   }
 
@@ -58,34 +62,46 @@ export class ShopService {
     quantity: number;
     size?: string;
     color?: string;
-  }): Observable<CartItem> {
-    return this.api.post<CartItem>(`shop/cart/${sessionId}`, item);
+  }): Observable<CartItem | null> {
+    return this.api.post<CartItem>(`shop/cart/${sessionId}`, item).pipe(
+      catchError(() => of(null))
+    );
   }
 
   updateCartItem(sessionId: string, itemId: number, quantity: number): Observable<CartItem | null> {
-    return this.api.patch<CartItem | null>(`shop/cart/${sessionId}/${itemId}`, { quantity });
+    return this.api.patch<CartItem | null>(`shop/cart/${sessionId}/${itemId}`, { quantity }).pipe(
+      catchError(() => of(null))
+    );
   }
 
   removeCartItem(sessionId: string, itemId: number): Observable<void> {
-    return this.api.delete<void>(`shop/cart/${sessionId}/${itemId}`);
+    return this.api.delete<void>(`shop/cart/${sessionId}/${itemId}`).pipe(
+      catchError(() => of(undefined as unknown as void))
+    );
   }
 
   clearCart(sessionId: string): Observable<void> {
-    return this.api.delete<void>(`shop/cart/${sessionId}`);
+    return this.api.delete<void>(`shop/cart/${sessionId}`).pipe(
+      catchError(() => of(undefined as unknown as void))
+    );
   }
 
-  createOrder(sessionId: string, form: CheckoutForm): Observable<Order> {
-    return this.api.post<Order>('shop/orders', { ...form, sessionId });
+  createOrder(sessionId: string, form: CheckoutForm): Observable<Order | null> {
+    return this.api.post<Order>('shop/orders', { ...form, sessionId }).pipe(
+      catchError(() => of(null))
+    );
   }
 
   createCheckoutSession(data: {
     sessionId: string;
     form: CheckoutForm;
-  }): Observable<{ url: string; sessionId: string }> {
+  }): Observable<{ url: string; sessionId: string } | null> {
     return this.api.post<{ url: string; sessionId: string }>('shop/payments/checkout', {
       ...data.form,
       sessionId: data.sessionId,
-    });
+    }).pipe(
+      catchError(() => of(null))
+    );
   }
 
   getOrderByNumber(orderNumber: string): Observable<Order | null> {

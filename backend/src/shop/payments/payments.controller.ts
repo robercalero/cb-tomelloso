@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Req, Headers, Logger } from '@nestjs/common';
+import { Controller, Post, Get, Body, Req, Headers, Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
@@ -72,8 +72,8 @@ export class PaymentsController {
     @Headers('stripe-signature') signature: string,
   ) {
     const payload = req.rawBody;
-    if (!payload) {
-      return { received: true };
+    if (!payload || !signature) {
+      throw new BadRequestException('Missing webhook payload or signature');
     }
 
     const event = this.paymentsService.constructEvent(payload, signature);
@@ -87,12 +87,11 @@ export class PaymentsController {
         if (existing && existing.status !== 'pending') {
           return { received: true, duplicate: true };
         }
-        await this.ordersService.confirmPayment(Number(orderId));
-        await this.ordersService.updateStripeInfo(Number(orderId), {
-          stripeSessionId: session.id as string,
-          stripePaymentIntent: session.payment_intent as string,
-          status: 'paid',
-        });
+        await this.ordersService.confirmPayment(
+          Number(orderId),
+          session.id as string,
+          session.payment_intent as string,
+        );
       }
     }
 

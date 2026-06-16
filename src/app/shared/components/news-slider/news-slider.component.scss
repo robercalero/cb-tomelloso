@@ -96,7 +96,7 @@
   width: 100%;
   max-width: 900px;
   padding: 0 clamp(1.5rem, 5vw, 4rem) clamp(4rem, 8vh, 7rem);
-  color: #fff;
+  color: var(--color-white);
   transform: translateY(20px);
   opacity: 0;
   transition: transform 700ms ease 210ms, opacity 700ms ease 210ms;
@@ -131,12 +131,12 @@
 .slide__source-badge {
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
+  color: var(--color-white);
 }
 
 .slide__category-badge {
   background: var(--color-accent);
-  color: #1a1a1a;
+  color: var(--color-dark);
 }
 
 .slide__title {
@@ -145,7 +145,7 @@
   font-weight: 800;
   line-height: 1.15;
   margin: 0 0 0.75rem;
-  color: #fff;
+  color: var(--color-white);
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -192,7 +192,7 @@
 
   &--primary {
     background: var(--color-accent);
-    color: #1a1a1a;
+    color: var(--color-dark);
 
     &:hover {
       background: var(--color-accent-hover, #e67e22);
@@ -202,7 +202,7 @@
 
   &--secondary {
     background: rgba(255, 255, 255, 0.15);
-    color: #fff;
+    color: var(--color-white);
     border: 1px solid rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(8px);
 
@@ -226,7 +226,7 @@
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.5);
   background: rgba(0, 0, 0, 0.35);
-  color: #fff;
+  color: var(--color-white);
   cursor: pointer;
   backdrop-filter: blur(8px);
   transition: all 200ms ease;

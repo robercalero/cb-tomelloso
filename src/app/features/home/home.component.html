@@ -17,8 +17,16 @@
       <h2 class="section-title">Tienda Oficial</h2>
       <a routerLink="/tienda" class="section-link" aria-label="Ver todos los productos de la tienda">Ver todos &rarr;</a>
     </div>
-    <div class="products-grid" [class.products-grid--empty]="featuredProducts().length === 0">
-      @if (featuredProducts().length > 0) {
+    <div class="products-grid" [class.products-grid--empty]="featuredProducts().length === 0 && !loadingProducts()">
+      @if (loadingProducts()) {
+        @for (_ of [1,2,3,4]; track _) {
+          <div class="product-skeleton">
+            <div class="skeleton skeleton-image"></div>
+            <div class="skeleton skeleton-title"></div>
+            <div class="skeleton skeleton-text-short"></div>
+          </div>
+        }
+      } @else if (featuredProducts().length > 0) {
         @for (product of featuredProducts(); track product.id; let first = $first) {
           <app-product-card
             [product]="product"
@@ -38,26 +46,16 @@
       <h2 class="section-title">Próximos Partidos</h2>
       <a routerLink="/agenda" class="section-link" aria-label="Ver todos los partidos">Ver todos &rarr;</a>
     </div>
-    @defer (on viewport) {
-      @if (upcomingMatches().length > 0) {
-        <div class="matches-grid">
-          @for (match of upcomingMatches(); track match.id) {
-            <app-match-card [match]="match" />
-          }
-        </div>
-      } @else {
-        <div class="empty-state">
-          <mat-icon>calendar_month</mat-icon>
-          <p>No hay partidos programados próximamente.</p>
-        </div>
-      }
-    } @loading (minimum 300ms) {
+    @if (upcomingMatches().length > 0) {
       <div class="matches-grid">
-        <app-skeleton-loader type="card" [count]="3" />
+        @for (match of upcomingMatches(); track match.id) {
+          <app-match-card [match]="match" />
+        }
       </div>
-    } @placeholder {
-      <div class="matches-grid">
-        <app-skeleton-loader type="card" [count]="3" />
+    } @else {
+      <div class="empty-state">
+        <mat-icon>calendar_month</mat-icon>
+        <p>No hay partidos programados próximamente.</p>
       </div>
     }
   </div>
@@ -70,26 +68,16 @@
       <h2 class="section-title">Últimos Resultados</h2>
       <a routerLink="/agenda" class="section-link" aria-label="Ver todos los resultados">Ver todos &rarr;</a>
     </div>
-    @defer (on viewport) {
-      @if (recentResults().length > 0) {
-        <div class="matches-grid">
-          @for (match of recentResults().slice(0, 3); track match.id) {
-            <app-match-card [match]="match" />
-          }
-        </div>
-      } @else {
-        <div class="empty-state">
-          <mat-icon>sports_score</mat-icon>
-          <p>No hay resultados disponibles.</p>
-        </div>
-      }
-    } @loading (minimum 300ms) {
+    @if (recentResults().length > 0) {
       <div class="matches-grid">
-        <app-skeleton-loader type="card" [count]="3" />
+        @for (match of recentResults().slice(0, 3); track match.id) {
+          <app-match-card [match]="match" />
+        }
       </div>
-    } @placeholder {
-      <div class="matches-grid">
-        <app-skeleton-loader type="card" [count]="3" />
+    } @else {
+      <div class="empty-state">
+        <mat-icon>sports_score</mat-icon>
+        <p>No hay resultados disponibles.</p>
       </div>
     }
   </div>

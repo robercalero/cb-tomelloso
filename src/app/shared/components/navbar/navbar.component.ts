@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, HostListener, signal, inject, DestroyRef, NgZone } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { ChangeDetectionStrategy, Component, HostListener, signal, inject, DestroyRef, NgZone, PLATFORM_ID } from '@angular/core';
+import { NgOptimizedImage, isPlatformBrowser } from '@angular/common';
 import { RouterLink, RouterLinkActive, NavigationEnd, Router } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,18 +37,21 @@ export class NavbarComponent {
   readonly isMobileMenuOpen = signal(false);
 
   private ngZone = inject(NgZone);
+  private platformId = inject(PLATFORM_ID);
 
   constructor() {
-    this.ngZone.runOutsideAngular(() => {
-      const onScroll = () => {
-        const scrolled = window.scrollY > 50;
-        if (scrolled !== this.isScrolled()) {
-          this.isScrolled.set(scrolled);
-        }
-      };
-      window.addEventListener('scroll', onScroll, { passive: true });
-      this.destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));
-    });
+    if (isPlatformBrowser(this.platformId)) {
+      this.ngZone.runOutsideAngular(() => {
+        const onScroll = () => {
+          const scrolled = window.scrollY > 50;
+          if (scrolled !== this.isScrolled()) {
+            this.isScrolled.set(scrolled);
+          }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        this.destroyRef.onDestroy(() => window.removeEventListener('scroll', onScroll));
+      });
+    }
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),

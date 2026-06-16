@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, inject, effect, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, effect, OnInit, signal, DestroyRef, PLATFORM_ID, HostListener } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { Title, Meta } from '@angular/platform-browser';
+import { DatePipe, isPlatformBrowser } from '@angular/common';
+import { Title, Meta, DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, switchMap, catchError, of } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { News, MediaItem } from '../../models/news.model';
@@ -24,6 +24,9 @@ export class NewsDetailComponent implements OnInit {
   private api = inject(ApiService);
   private title = inject(Title);
   private meta = inject(Meta);
+  private destroyRef = inject(DestroyRef);
+  private platformId = inject(PLATFORM_ID);
+  private sanitizer = inject(DomSanitizer);
 
   readonly loading = signal(true);
   readonly notFound = signal(false);
@@ -58,8 +61,14 @@ export class NewsDetailComponent implements OnInit {
     };
   });
 
+  readonly safeContent = computed(() => {
+    const n = this.news();
+    return n ? this.sanitizer.bypassSecurityTrustHtml(n.content) : '';
+  });
+
   readonly lightboxIndex = signal<number | null>(null);
   readonly lightboxMedia = signal<MediaItem[]>([]);
+  private previousActiveElement: HTMLElement | null = null;
 
   constructor() {
     effect(() => {
@@ -71,6 +80,13 @@ export class NewsDetailComponent implements OnInit {
         this.notFound.set(false);
         if (n.media && n.media.length > 0) {
           this.lightboxMedia.set(n.media);
+        }
+        const slug = this.route.snapshot.paramMap.get('slug');
+        if (slug && isPlatformBrowser(this.platformId)) {
+          this.api.post(`news/${slug}/view`, {}).pipe(
+            catchError(() => of(null)),
+            takeUntilDestroyed(this.destroyRef),
+          ).subscribe();
         }
       }
     });
@@ -84,14 +100,27 @@ export class NewsDetailComponent implements OnInit {
     }
   }
 
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.lightboxIndex() !== null) {
+      this.closeLightbox();
+    }
+  }
+
   openLightbox(index: number): void {
+    this.previousActiveElement = isPlatformBrowser(this.platformId) ? document.activeElement as HTMLElement : null;
     this.lightboxIndex.set(index);
-    document.body.style.overflow = 'hidden';
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.style.overflow = 'hidden';
+    }
   }
 
   closeLightbox(): void {
     this.lightboxIndex.set(null);
-    document.body.style.overflow = '';
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.style.overflow = '';
+    }
+    setTimeout(() => this.previousActiveElement?.focus());
   }
 
   prevImage(): void {

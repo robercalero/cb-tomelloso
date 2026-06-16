@@ -87,14 +87,20 @@ export class AdminController {
 
   @Post('migrate-instagram-images')
   @ApiOperation({ summary: '[Admin] Migrar imágenes de Instagram a almacenamiento persistente' })
-  async migrateInstagramImages() {
+  migrateInstagramImages() {
+    this.runInstagramMigration().catch(err => this.logger.error(`Migración Instagram falló: ${err.message}`));
+    return { message: 'Migración iniciada en segundo plano. Revisa los logs para ver el resultado.' };
+  }
+
+  private async runInstagramMigration() {
     const newsList = await this.newsRepo.find({
       where: { source: 'instagram' as any },
       order: { publishedAt: 'DESC' },
     });
 
     if (newsList.length === 0) {
-      return { message: 'No hay publicaciones de Instagram para migrar', migrated: 0 };
+      this.logger.log('No hay publicaciones de Instagram para migrar');
+      return;
     }
 
     let migrated = 0;
@@ -107,7 +113,7 @@ export class AdminController {
       }
 
       try {
-        const { instagramGetUrl } = require('instagram-url-direct');
+        const { instagramGetUrl } = await import('instagram-url-direct');
         const result = await instagramGetUrl(news.sourceUrl, { retries: 2, delay: 1000 });
 
         if (!result?.url_list?.length) {
@@ -171,11 +177,6 @@ export class AdminController {
       }
     }
 
-    return {
-      message: `Migración completada: ${migrated} migradas, ${errors} errores`,
-      total: newsList.length,
-      migrated,
-      errors,
-    };
+    this.logger.log(`Migración completada: ${migrated} migradas, ${errors} errores (total: ${newsList.length})`);
   }
 }

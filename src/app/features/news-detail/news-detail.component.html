@@ -32,7 +32,7 @@
         </div>
       }
       <div class="news-content">
-        <div class="news-body" [innerHTML]="n.content"></div>
+        <div class="news-body" [innerHTML]="safeContent()"></div>
       </div>
 
       @if (n.source === 'instagram' && n.media && n.media.length > 1) {
@@ -83,8 +83,8 @@
 </div>
 
 @let idx = lightboxIndex(); @if (idx !== null) {
-  <div class="lightbox-overlay" (click)="closeLightbox()" role="dialog" aria-label="Visor de imágenes">
-    <button class="lightbox-close" (click)="closeLightbox()" aria-label="Cerrar visor de imágenes">
+  <div class="lightbox-overlay" (click)="closeLightbox()" (keydown.escape)="closeLightbox()" role="dialog" aria-label="Visor de imágenes">
+    <button class="lightbox-close" (click)="closeLightbox()" tabindex="0" aria-label="Cerrar visor de imágenes">
       <mat-icon>close</mat-icon>
     </button>
     <div class="lightbox-content" (click)="$event.stopPropagation()">

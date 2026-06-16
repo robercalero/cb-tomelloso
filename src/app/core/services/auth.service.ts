@@ -1,4 +1,5 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, tap, catchError, of, throwError } from 'rxjs';
 import { getApiBaseUrl } from '../utils/api-url.utils';
@@ -20,17 +21,19 @@ export interface AuthTokens {
 export class AuthService {
   private http = inject(HttpClient);
   private baseUrl = `${getApiBaseUrl()}/auth`;
+  private platformId = inject(PLATFORM_ID);
 
   readonly sessionCleared$ = new Subject<void>();
 
   private _currentUser = signal<AuthUser | null>(null);
   private _isLoading = signal(false);
   private _isRetrying = signal(false);
+  private _token = signal<string | null>(this.getAccessToken());
 
   readonly currentUser = this._currentUser.asReadonly();
   readonly isLoading = this._isLoading.asReadonly();
   readonly isRetrying = this._isRetrying.asReadonly();
-  readonly isLoggedIn = computed(() => this._currentUser() !== null || !!this.getAccessToken());
+  readonly isLoggedIn = computed(() => this._currentUser() !== null || this._token() !== null);
   readonly isAdmin = computed(() => this._currentUser()?.role === 'admin');
   readonly isEditor = computed(() => ['admin', 'editor'].includes(this._currentUser()?.role ?? ''));
 
@@ -47,6 +50,7 @@ export class AuthService {
       tap(tokens => {
         this.storeTokens(tokens.accessToken, tokens.refreshToken);
         this._currentUser.set(tokens.user);
+        this._token.set(tokens.accessToken);
         this._isLoading.set(false);
       }),
       catchError((err) => {
@@ -63,11 +67,19 @@ export class AuthService {
     );
   }
 
+  private isBrowser(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
+
   refreshToken(): Observable<{ accessToken: string } | null> {
+    if (!this.isBrowser()) return of(null);
     const refresh_token = localStorage.getItem(this.REFRESH_KEY);
     if (!refresh_token) return of(null);
     return this.http.post<{ accessToken: string }>(`${this.baseUrl}/refresh`, { refreshToken: refresh_token }).pipe(
-      tap(res => localStorage.setItem(this.TOKEN_KEY, res.accessToken)),
+      tap(res => {
+        localStorage.setItem(this.TOKEN_KEY, res.accessToken);
+        this._token.set(res.accessToken);
+      }),
       catchError(() => {
         this.clearSession();
         return of(null);
@@ -76,6 +88,7 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
+    if (!this.isBrowser()) return null;
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
@@ -91,14 +104,19 @@ export class AuthService {
   }
 
   private storeTokens(access: string, refresh: string) {
+    if (!this.isBrowser()) return;
     localStorage.setItem(this.TOKEN_KEY, access);
     localStorage.setItem(this.REFRESH_KEY, refresh);
+    this._token.set(access);
   }
 
   private clearSession() {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_KEY);
+    if (this.isBrowser()) {
+      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.removeItem(this.REFRESH_KEY);
+    }
     this._currentUser.set(null);
+    this._token.set(null);
     this.sessionCleared$.next();
   }
 }

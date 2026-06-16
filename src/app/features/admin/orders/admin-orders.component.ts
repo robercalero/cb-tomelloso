@@ -81,6 +81,13 @@ const ORDER_TRANSITIONS: Record<string, string[]> = {
           </tbody>
         </table>
       </div>
+      @if (hasMore()) {
+        <div class="load-more">
+          <button class="btn btn--load" [disabled]="loading()" (click)="loadOrders(true)">
+            {{ loading() ? 'Cargando…' : 'Cargar más pedidos' }}
+          </button>
+        </div>
+      }
     </div>
   `,
   styles: [`
@@ -96,6 +103,9 @@ const ORDER_TRANSITIONS: Record<string, string[]> = {
     .actions { display: flex; gap: 0.25rem; }
     .btn { border: none; cursor: pointer; padding: 0.35rem 0.6rem; border-radius: 6px; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; }
     .btn--sm { padding: 0.25rem 0.5rem; font-size: 0.85rem; }
+    .btn--load { background: #1a5276; color: white; padding: 0.6rem 1.5rem; font-weight: 600; }
+    .btn--load:disabled { opacity: 0.5; cursor: not-allowed; }
+    .load-more { display: flex; justify-content: center; padding: 1.5rem; }
     .status-select { padding: 0.3rem 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.8rem; background: white; cursor: pointer; }
     .status-select:disabled { opacity: 0.5; }
   `],
@@ -107,6 +117,9 @@ export class AdminOrdersComponent {
 
   readonly orders = signal<Order[]>([]);
   readonly updating = signal<number | null>(null);
+  readonly cursor = signal<string | null>(null);
+  readonly hasMore = signal(false);
+  readonly loading = signal(false);
 
   protected readonly STATUS_OPTIONS = STATUS_OPTIONS;
 
@@ -119,11 +132,25 @@ export class AdminOrdersComponent {
     this.loadOrders();
   }
 
-  private loadOrders(): void {
-    this.api.get<{ orders: Order[]; total: number }>('shop/orders').pipe(
-      catchError(() => of({ orders: [], total: 0 })),
+  protected loadOrders(append = false): void {
+    this.loading.set(true);
+    const params: Record<string, string> = {};
+    if (append && this.cursor()) {
+      params['cursor'] = this.cursor()!;
+    }
+    this.api.get<{ orders: Order[]; nextCursor: string | null }>('shop/orders', params).pipe(
+      catchError(() => of({ orders: [], nextCursor: null })),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(data => this.orders.set(data.orders));
+    ).subscribe(data => {
+      if (append) {
+        this.orders.update(o => [...o, ...data.orders]);
+      } else {
+        this.orders.set(data.orders);
+      }
+      this.cursor.set(data.nextCursor);
+      this.hasMore.set(data.nextCursor !== null);
+      this.loading.set(false);
+    });
   }
 
   updateStatus(id: number, status: string): void {

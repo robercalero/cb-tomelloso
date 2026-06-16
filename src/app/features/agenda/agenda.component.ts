@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal, PLATFORM_ID } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { isPlatformBrowser } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +28,7 @@ export class AgendaComponent implements OnInit {
   private matchesService = inject(MatchesService);
   private title = inject(Title);
   private meta = inject(Meta);
+  private platformId = inject(PLATFORM_ID);
 
   readonly matches = this.matchesService.matches;
   readonly upcomingMatches = this.matchesService.upcomingMatches;
@@ -34,6 +36,12 @@ export class AgendaComponent implements OnInit {
 
   readonly viewMode = signal<ViewMode>('list');
   readonly filterTeam = signal<string | null>(null);
+  readonly loadingUpcoming = signal(true);
+  readonly loadingResults = signal(true);
+  readonly loadingAll = signal(true);
+  private upcomingResolved = false;
+  private resultsResolved = false;
+  private allResolved = false;
 
   readonly competitionTypes = ['Todas', '1ª Autonómica CLM', 'Copa CLM'];
 
@@ -51,7 +59,7 @@ export class AgendaComponent implements OnInit {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  readonly calendarDays = signal(this.generateCalendarDays());
+  readonly calendarDays = signal<number[]>([]);
 
   private generateCalendarDays(): number[] {
     const now = new Date();
@@ -60,16 +68,47 @@ export class AgendaComponent implements OnInit {
   }
 
   get currentMonthYear(): string {
-    const now = new Date();
+    const now = isPlatformBrowser(this.platformId) ? new Date() : new Date(2024, 0, 1);
     return `${this.monthNames[now.getMonth()]} ${now.getFullYear()}`;
   }
 
   getMatchesForDay(day: number): Match[] {
     return this.matches().filter(m => {
       const date = new Date(m.matchDate);
+      const ref = isPlatformBrowser(this.platformId) ? new Date() : new Date(2024, 0, 1);
       return date.getDate() === day &&
-        date.getMonth() === new Date().getMonth() &&
-        date.getFullYear() === new Date().getFullYear();
+        date.getMonth() === ref.getMonth() &&
+        date.getFullYear() === ref.getFullYear();
+    });
+  }
+
+  constructor() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.calendarDays.set(this.generateCalendarDays());
+    }
+    effect(() => {
+      this.upcomingMatches();
+      if (!this.upcomingResolved) {
+        this.upcomingResolved = true;
+        return;
+      }
+      this.loadingUpcoming.set(false);
+    });
+    effect(() => {
+      this.recentResults();
+      if (!this.resultsResolved) {
+        this.resultsResolved = true;
+        return;
+      }
+      this.loadingResults.set(false);
+    });
+    effect(() => {
+      this.matches();
+      if (!this.allResolved) {
+        this.allResolved = true;
+        return;
+      }
+      this.loadingAll.set(false);
     });
   }
 }

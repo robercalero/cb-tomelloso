@@ -1,5 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
 
 @Injectable()
 export class PaymentsService {
@@ -11,9 +12,7 @@ export class PaymentsService {
     if (!secretKey || secretKey === 'sk_test_placeholder') {
       this.logger.warn('STRIPE_SECRET_KEY no configurada — los pagos no funcionarán');
     }
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
-    const Stripe = require('stripe');
-    this.stripe = new Stripe(secretKey || 'sk_test_placeholder');
+    this.stripe = new Stripe(secretKey || 'sk_test_placeholder', { apiVersion: '2025-02-24.acacia' as any });
   }
 
   async createCheckoutSession(dto: {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, effect, afterNextRender, DestroyRef, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, effect, afterNextRender, DestroyRef, PLATFORM_ID, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
@@ -50,6 +50,15 @@ export class HomeComponent implements OnInit {
 
   constructor() {
     effect(() => {
+      this.featuredProducts();
+      if (!this.productsResolved) {
+        this.productsResolved = true;
+        return;
+      }
+      this.loadingProducts.set(false);
+    });
+
+    effect((onCleanup) => {
       if (!this.isBrowser) return;
       const slides = this.heroSlides();
       const first = slides?.[0];
@@ -61,6 +70,7 @@ export class HomeComponent implements OnInit {
       const sep = first.imageUrl.includes('?') ? '&' : '?';
       link.href = `${first.imageUrl}${sep}w=640`;
       document.head.appendChild(link);
+      onCleanup(() => link.remove());
     });
   }
 
@@ -69,6 +79,8 @@ export class HomeComponent implements OnInit {
   readonly heroSlides = this.newsService.heroSlides;
   readonly sponsors = this.sponsorsService.sponsors;
   readonly featuredProducts = this.shopService.featuredProducts;
+  readonly loadingProducts = signal(true);
+  private productsResolved = false;
 
   readonly stats = [
     { value: 40, label: 'Años de historia', icon: 'history' },
@@ -96,16 +108,16 @@ export class HomeComponent implements OnInit {
     this.newsService.loadHeroSlides();
     this.shopService.loadFeaturedProducts();
 
-    // Deferred: visible content just below hero
-    this.deferredTimeouts.push(setTimeout(() => {
-      this.matchesService.loadUpcomingMatches();
-      this.matchesService.loadRecentResults();
-    }, 500));
+    // Load immediately: renders server-side, client reuses via TransferState
+    this.matchesService.loadUpcomingMatches();
+    this.matchesService.loadRecentResults();
 
-    // Deferred: below the fold
-    this.deferredTimeouts.push(setTimeout(() => {
-      this.sponsorsService.loadSponsors();
-    }, 1500));
+    // Deferred (below the fold): only on client
+    if (isPlatformBrowser(this.platformId)) {
+      this.deferredTimeouts.push(setTimeout(() => {
+        this.sponsorsService.loadSponsors();
+      }, 1500));
+    }
 
     this.destroyRef.onDestroy(() => {
       for (const t of this.deferredTimeouts) clearTimeout(t);

@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 
-import { PlayersService } from '../../core/services/players.service';
+import { PlayersService, TEAM_CATEGORIES } from '../../core/services/players.service';
 import { PlayerCardComponent } from '../../shared/components/player-card/player-card.component';
 import { MatchCardComponent } from '../../shared/components/match-card/match-card.component';
 import { MatchesService } from '../../core/services/matches.service';
@@ -31,17 +31,19 @@ export class TeamsComponent implements OnInit {
   readonly teams = this.playersService.teams;
   readonly recentResults = this.matchesService.recentResults;
   readonly activeTab = signal(0);
+  readonly loadingTeams = signal(true);
+  private loadingResolved = false;
 
   readonly teamTabs = ['Senior Autonómica', 'Júnior', 'Categorías Base'];
 
   readonly seniorTeams = computed(() =>
-    this.teams().filter(t => t.category === 'Senior Autonómica')
+    this.teams().filter(t => t.category === TEAM_CATEGORIES.SENIOR)
   );
   readonly juniorTeams = computed(() =>
-    this.teams().filter(t => t.category === 'Junior U19')
+    this.teams().filter(t => t.category === TEAM_CATEGORIES.JUNIOR)
   );
   readonly baseTeams = computed(() =>
-    this.teams().filter(t => t.category === 'Minibasket')
+    this.teams().filter(t => t.category === TEAM_CATEGORIES.BASE)
   );
 
   readonly tabTeams = computed(() => [
@@ -57,6 +59,17 @@ export class TeamsComponent implements OnInit {
 
   readonly classificationUrl = 'https://fbclm.net/pagina-de-grupo/?id=952';
   readonly ascensoUrl = 'https://fbclm.net/pagina-de-grupo/?id=1019';
+
+  constructor() {
+    effect(() => {
+      this.teams();
+      if (!this.loadingResolved) {
+        this.loadingResolved = true;
+        return;
+      }
+      this.loadingTeams.set(false);
+    });
+  }
 
   ngOnInit(): void {
     this.title.setTitle(`Equipos - ${environment.titleSuffix}`);

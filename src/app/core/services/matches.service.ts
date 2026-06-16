@@ -1,12 +1,14 @@
-import { Injectable, inject, computed, signal } from '@angular/core';
+import { Injectable, inject, computed, signal, DestroyRef } from '@angular/core';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ApiService } from './api.service';
 import { Match } from '../../models/match.model';
 
 @Injectable({ providedIn: 'root' })
 export class MatchesService {
   private api = inject(ApiService);
+  private destroyRef = inject(DestroyRef);
 
   private _matches = signal<Match[]>([]);
   private _upcomingMatches = signal<Match[]>([]);
@@ -26,19 +28,22 @@ export class MatchesService {
 
   loadMatches(): void {
     this.api.get<Match[]>('matches').pipe(
-      catchError(() => of(this._matches()))
+      catchError(() => of([] as Match[])),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe(m => this._matches.set(m));
   }
 
   loadUpcomingMatches(): void {
     this.api.get<Match[]>('matches/upcoming').pipe(
-      catchError(() => of(this._upcomingMatches()))
+      catchError(() => of([] as Match[])),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe(m => this._upcomingMatches.set(m));
   }
 
   loadRecentResults(): void {
     this.api.get<Match[]>('matches/results').pipe(
-      catchError(() => of(this._recentResults()))
+      catchError(() => of([] as Match[])),
+      takeUntilDestroyed(this.destroyRef),
     ).subscribe(m => this._recentResults.set(m));
   }
 }

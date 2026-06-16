@@ -148,7 +148,7 @@
   justify-content: center;
 
   &.border-gold { border: 2px solid var(--color-accent); }
-  &.border-silver { border: 2px solid #bdc3c7; }
+  &.border-silver { border: 2px solid var(--color-border); }
 }
 
 .sponsor-card-initial {
@@ -198,7 +198,7 @@
 
   &.plan-highlighted {
     border-color: var(--color-accent);
-    box-shadow: 0 8px 30px rgba(243, 156, 18, 0.15);
+    box-shadow: 0 8px 30px rgba(212, 160, 23, 0.15);
   }
 }
 

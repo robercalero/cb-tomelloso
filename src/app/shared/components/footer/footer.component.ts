@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, inject, PLATFORM_ID } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage, isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-footer',
@@ -11,7 +11,8 @@ import { NgOptimizedImage } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent {
-  readonly year = signal(new Date().getFullYear());
+  private platformId = inject(PLATFORM_ID);
+  readonly year = signal(isPlatformBrowser(this.platformId) ? new Date().getFullYear() : 2024);
 
   readonly socialLinks = [
     { icon: 'instagram', url: 'https://www.instagram.com/cbtomelloso', label: 'Instagram' },

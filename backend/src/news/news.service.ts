@@ -42,8 +42,11 @@ export class NewsService {
   async findBySlug(slug: string): Promise<News> {
     const news = await this.newsRepo.findOne({ where: { slug }, relations: { author: true } });
     if (!news) throw new NotFoundException(`Noticia con slug "${slug}" no encontrada`);
-    await this.newsRepo.increment({ id: news.id }, 'views', 1);
     return news;
+  }
+
+  async registerView(slug: string): Promise<void> {
+    await this.newsRepo.increment({ slug }, 'views', 1);
   }
 
   async findOne(id: number): Promise<News> {

@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, signal, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
-import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { AdminStatsService } from '../admin-stats.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -92,25 +91,13 @@ import { ApiService } from '../../../core/services/api.service';
 export class AdminLayoutComponent {
   readonly authService = inject(AuthService);
   private router = inject(Router);
-  private api = inject(ApiService);
-  private destroyRef = inject(DestroyRef);
+  private statsService = inject(AdminStatsService);
 
-  readonly pendingOrdersCount = signal(0);
-  readonly unreadMessagesCount = signal(0);
+  readonly pendingOrdersCount = computed(() => this.statsService.stats().pendingOrders);
+  readonly unreadMessagesCount = computed(() => this.statsService.stats().unreadMessages);
 
   constructor() {
-    this.api.get<{ orders: { status: string }[]; total: number }>('shop/orders').pipe(
-      catchError(() => of({ orders: [], total: 0 })),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe(r => {
-      const pending = r.orders.filter(o => o.status === 'pending').length;
-      this.pendingOrdersCount.set(pending);
-    });
-
-    this.api.get<{ id: number; isRead: boolean }[]>('contact', { isRead: 'false' }).pipe(
-      catchError(() => of([])),
-      takeUntilDestroyed(this.destroyRef),
-    ).subscribe(messages => this.unreadMessagesCount.set(messages.length));
+    this.statsService.load();
   }
 
   logout(): void {

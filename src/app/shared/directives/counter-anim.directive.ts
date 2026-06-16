@@ -1,4 +1,5 @@
-import { Directive, ElementRef, Input, effect, inject, signal } from '@angular/core';
+import { Directive, ElementRef, Renderer2, effect, inject, input, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Directive({
   selector: '[appCounterAnim]',
@@ -6,18 +7,21 @@ import { Directive, ElementRef, Input, effect, inject, signal } from '@angular/c
 })
 export class CounterAnimDirective {
   private el = inject(ElementRef);
+  private renderer = inject(Renderer2);
+  private platformId = inject(PLATFORM_ID);
 
-  @Input({ required: true }) targetValue = signal(0);
-  @Input() duration = 2000;
+  readonly targetValue = input(0);
+  readonly duration = input(2000);
 
-  private animated = false;
+  private previousTarget = 0;
 
   constructor() {
     effect(() => {
       const target = this.targetValue();
-      if (target === 0 || this.animated) return;
+      if (target === 0 || !isPlatformBrowser(this.platformId)) return;
+      if (target === this.previousTarget) return;
+      this.previousTarget = target;
       this.animateCount(target);
-      this.animated = true;
     });
   }
 
@@ -27,16 +31,16 @@ export class CounterAnimDirective {
 
     const update = (currentTime: number) => {
       const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / this.duration, 1);
+      const progress = Math.min(elapsed / this.duration(), 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = Math.floor(startValue + (target - startValue) * eased);
 
-      this.el.nativeElement.textContent = current;
+      this.renderer.setProperty(this.el.nativeElement, 'textContent', current);
 
       if (progress < 1) {
         requestAnimationFrame(update);
       } else {
-        this.el.nativeElement.textContent = target;
+        this.renderer.setProperty(this.el.nativeElement, 'textContent', target);
       }
     };
 

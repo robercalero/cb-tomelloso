@@ -14,8 +14,8 @@ import { ConfigService } from '@nestjs/config';
         password: config.get<string>('DB_PASSWORD'),
         database: config.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: config.get<string>('NODE_ENV') !== 'production',
-        logging: config.get<string>('NODE_ENV') !== 'production',
+        synchronize: config.get<string>('NODE_ENV')?.toLowerCase() !== 'production',
+        logging: config.get<string>('NODE_ENV')?.toLowerCase() !== 'production',
         charset: 'utf8mb4',
         ssl: config.get<string>('DB_SSL') === 'DISABLED'
           ? false

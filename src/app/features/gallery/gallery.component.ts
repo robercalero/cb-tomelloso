@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, HostListener, inject, OnInit, signal, PLATFORM_ID } from '@angular/core';
 import { DomSanitizer, Title, Meta } from '@angular/platform-browser';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DatePipe } from '@angular/common';
+import { DatePipe, isPlatformBrowser } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { GalleryService, GalleryItem } from '../../core/services/gallery.service';
@@ -33,6 +33,7 @@ interface GalleryImage {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GalleryComponent implements OnInit {
+  private platformId = inject(PLATFORM_ID);
   private title = inject(Title);
   private meta = inject(Meta);
   private sanitizer = inject(DomSanitizer);
@@ -104,6 +105,8 @@ export class GalleryComponent implements OnInit {
     }))
   );
 
+  private previousActiveElement: HTMLElement | null = null;
+
   readonly gradientColors = [
     'linear-gradient(135deg, #D4A017, #E8B830)',
     'linear-gradient(135deg, #1B8A3D, #27AE60)',
@@ -124,10 +127,12 @@ export class GalleryComponent implements OnInit {
   }
 
   openLightbox(image: GalleryImage): void {
+    this.previousActiveElement = isPlatformBrowser(this.platformId) ? document.activeElement as HTMLElement : null;
     this.selectedImage.set(image);
   }
 
   closeLightbox(): void {
     this.selectedImage.set(null);
+    setTimeout(() => this.previousActiveElement?.focus(), 100);
   }
 }

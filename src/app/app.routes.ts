@@ -202,5 +202,5 @@ export const routes: Routes = [
     loadComponent: () => import('./features/not-found/not-found.component').then(m => m.NotFoundComponent),
     title: 'Página no encontrada — CB Tomelloso',
   },
-  { path: '**', redirectTo: '/404' },
+  { path: '**', redirectTo: '404' },
 ];

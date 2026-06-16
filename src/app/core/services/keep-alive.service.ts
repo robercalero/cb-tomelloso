@@ -4,13 +4,16 @@ import { switchMap, catchError, retryWhen, delayWhen } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class KeepAliveService {
   private http = inject(HttpClient);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
 
   start() {
+    if (!this.authService.getAccessToken()) return;
     interval(300_000).pipe(
       takeUntilDestroyed(this.destroyRef),
       switchMap(() =>
