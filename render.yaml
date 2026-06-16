@@ -76,17 +76,4 @@ services:
     envVars:
       - key: NODE_VERSION
         value: "20"
-    headers:
-      - path: /assets/*
-        name: Cache-Control
-        value: public, max-age=31536000, immutable
-      - path: /*.js
-        name: Cache-Control
-        value: public, max-age=31536000, immutable
-      - path: /*.css
-        name: Cache-Control
-        value: public, max-age=31536000, immutable
-      - path: /*
-        name: Cache-Control
-        value: public, max-age=0, s-maxage=3600
 
