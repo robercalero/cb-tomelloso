@@ -35,9 +35,9 @@ services:
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
       - key: CORS_ORIGIN
-        value: https://cb-tomelloso-web.onrender.com,http://localhost:4200
+        value: https://cb-tomelloso-web.onrender.com,https://cb-tomelloso.onrender.com,http://localhost:4200
       - key: FRONTEND_URL
-        value: https://cb-tomelloso-web.onrender.com
+        value: https://cb-tomelloso.onrender.com
       - key: THROTTLE_TTL
         value: "60000"
       - key: THROTTLE_LIMIT
