@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, ParseIntPipe, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { ProductCategoriesService } from './product-categories.service';
 import { ProductCategory } from './entities/product-category.entity';
@@ -33,15 +33,16 @@ export class ProductCategoriesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'editor')
   @ApiBearerAuth()
-  update(@Param('id') id: number, @Body() data: Partial<ProductCategory>): Promise<ProductCategory> {
+  update(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<ProductCategory>): Promise<ProductCategory> {
     return this.service.update(id, data);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @ApiBearerAuth()
-  remove(@Param('id') id: number): Promise<void> {
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.service.remove(id);
   }
 }

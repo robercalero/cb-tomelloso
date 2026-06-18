@@ -20,6 +20,15 @@ import { ConfigService } from '@nestjs/config';
         ssl: config.get<string>('DB_SSL') === 'DISABLED'
           ? false
           : { rejectUnauthorized: false },
+        // ── Connection resilience for Render free-tier cold starts ──
+        retryAttempts: 5,
+        retryDelay: 3000,
+        extra: {
+          connectTimeout: 30000,       // 30s to establish connection
+          acquireTimeout: 30000,       // 30s to acquire from pool
+          waitForConnections: true,
+          connectionLimit: 5,          // keep pool small for free tier
+        },
       }),
     }),
   ],

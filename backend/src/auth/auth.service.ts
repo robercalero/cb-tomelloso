@@ -48,9 +48,14 @@ export class AuthService {
       if (!user || !user.isActive || !user.refreshToken || !(await bcrypt.compare(refreshToken, user.refreshToken))) {
         throw new UnauthorizedException('Refresh token inválido');
       }
-      const tokens = await this.generateTokens(user.id, user.email, user.role);
-      await this.usersService.updateRefreshToken(user.id, tokens.refreshToken);
-      return { accessToken: tokens.accessToken };
+      const accessToken = await this.jwtService.signAsync(
+        { sub: user.id, email: user.email, role: user.role },
+        {
+          secret: this.configService.get<string>('JWT_SECRET'),
+          expiresIn: (this.configService.get<string>('JWT_EXPIRES_IN') || '15m') as any,
+        },
+      );
+      return { accessToken };
     } catch {
       throw new UnauthorizedException('Refresh token inválido o expirado');
     }

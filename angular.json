@@ -65,7 +65,7 @@
             ],
             "styles": ["src/styles.scss"],
             "security": {
-              "allowedHosts": ["localhost", "cb-tomelloso-api.onrender.com", "cb-tomelloso.onrender.com", "cb-tomelloso-web.onrender.com"]
+              "allowedHosts": ["localhost", "cb-tomelloso-api.onrender.com", "cb-tomelloso.onrender.com"]
             },
             "outputMode": "server",
             "ssr": {

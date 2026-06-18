@@ -1,7 +1,7 @@
 # CB Tomelloso — Web Oficial
 
 ## URLs de producción
-- Frontend: https://cb-tomelloso-web.onrender.com
+- Frontend: https://cb-tomelloso.onrender.com
 - API:      https://cb-tomelloso-api.onrender.com/api/v1
 
 ## Stack técnico

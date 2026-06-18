@@ -4,16 +4,7 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
-
-interface Order {
-  id: number;
-  orderNumber: string;
-  shippingName: string;
-  shippingEmail: string;
-  totalAmount: number;
-  status: string;
-  createdAt: string;
-}
+import { Order } from '../../../models/shop.model';
 
 const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
 const ORDER_TRANSITIONS: Record<string, string[]> = {
@@ -160,7 +151,7 @@ export class AdminOrdersComponent {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(() => {
       this.updating.set(null);
-      this.orders.set(this.orders().map(o => o.id === id ? { ...o, status } : o));
+      this.orders.set(this.orders().map(o => o.id === id ? { ...o, status: status as Order['status'] } : o));
     });
   }
 }

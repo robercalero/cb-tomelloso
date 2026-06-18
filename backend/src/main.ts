@@ -9,26 +9,53 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { rawBody: true });
   const logger = new Logger('Bootstrap');
 
-  app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
-  }));
-  app.use(compression());
-
   const apiPrefix = process.env.API_PREFIX ?? 'api/v1';
   app.setGlobalPrefix(apiPrefix);
 
+  // ── 1. CORS — must be FIRST, before helmet and any other middleware ──
   const corsOrigins = process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
     : ['http://localhost:4200'];
   const allowedOrigins = process.env.NODE_ENV === 'production'
     ? corsOrigins.filter(o => !o.includes('localhost'))
     : corsOrigins;
+  logger.log(`CORS allowed origins: ${JSON.stringify(allowedOrigins)}`);
   app.enableCors({
     origin: allowedOrigins,
-    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
+  });
+
+  // ── 2. Helmet — after CORS so preflight OPTIONS aren't blocked ──
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+  }));
+  app.use(compression());
+
+  // ── 3. Request logging + timeout (with CORS headers in 504 response) ──
+  app.use((req, res, next) => {
+    const start = Date.now();
+    logger.log(`→ ${req.method} ${req.originalUrl}`);
+    res.setTimeout(55000, () => {
+      logger.error(`Timeout: ${req.method} ${req.originalUrl} — no respondió en 55s`);
+      // Include CORS header so the browser shows the real error, not "CORS blocked"
+      const origin = req.headers.origin;
+      if (origin && allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+      }
+      res.status(504).json({
+        statusCode: 504,
+        message: 'Gateway Timeout — el servidor no respondió a tiempo',
+        error: 'Gateway Timeout',
+      });
+    });
+    res.on('finish', () => {
+      logger.log(`← ${req.method} ${req.originalUrl} ${res.statusCode} — ${Date.now() - start}ms`);
+    });
+    next();
   });
 
   app.useGlobalPipes(new ValidationPipe({

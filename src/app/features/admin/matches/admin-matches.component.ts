@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Match {
   id: number;
@@ -69,7 +70,9 @@ interface Match {
                 </td>
                 <td class="actions">
                   <a [routerLink]="['/admin/partidos', match.id]" class="btn btn--sm" title="Editar">✏️</a>
-                  <button class="btn btn--sm btn--danger" (click)="deleteMatch(match.id)" title="Eliminar">🗑️</button>
+                  @if (isAdmin()) {
+                    <button class="btn btn--sm btn--danger" (click)="deleteMatch(match.id)" title="Eliminar">🗑️</button>
+                  }
                 </td>
               </tr>
             } @empty {
@@ -109,7 +112,10 @@ interface Match {
 })
 export class AdminMatchesComponent {
   private api = inject(ApiService);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
+
+  readonly isAdmin = this.authService.isAdmin;
 
   readonly matches = signal<Match[]>([]);
 

@@ -31,9 +31,10 @@ export class CreateMemberDto {
   @IsString()
   memberNumber?: string;
 
-  @ApiProperty({ example: '2025-09-01' })
+  @ApiPropertyOptional({ example: '2025-09-01' })
+  @IsOptional()
   @IsDateString()
-  joinedAt: string;
+  joinedAt?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

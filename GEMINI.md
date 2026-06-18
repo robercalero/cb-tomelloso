@@ -10,7 +10,7 @@ Eres el agente de desarrollo de la **web oficial del Club Baloncesto Tomelloso**
 - **Base de datos:** MySQL (Aiven Cloud)
 - **Despliegue:** GitHub → Render (auto-deploy en push a `main`)
 - **URLs producción:**
-  - Frontend: https://cb-tomelloso-web.onrender.com
+  - Frontend: https://cb-tomelloso.onrender.com
   - API: https://cb-tomelloso-api.onrender.com/api/v1
 
 ## Estructura del monorepo
@@ -44,18 +44,18 @@ cb-tomelloso/
 - Siempre importar en el array `imports[]` del componente lo que se usa en el template
 
 ### Backend (NestJS)
-- PostgreSQL con SSL en producción: `ssl: { rejectUnauthorized: false }`
+- MySQL con SSL en producción: `ssl: { rejectUnauthorized: false }`
 - `synchronize: false` en producción (NODE_ENV=production)
 - Puerto dinámico: `process.env.PORT || 3000`
 - Escuchar en `'0.0.0.0'` no en `'localhost'`
-- CORS incluye siempre `https://cb-tomelloso-web.onrender.com`
+- CORS incluye siempre `https://cb-tomelloso.onrender.com`
 - Swagger deshabilitado en producción
 - Soft delete (isActive: false) en lugar de delete físico
 
 ### Base de datos
-- PostgreSQL — NO MySQL ni MariaDB
-- Tipos PostgreSQL: `SERIAL`, `BOOLEAN`, `SMALLINT`, `TIMESTAMPTZ`, `TEXT`
-- No usar tipos MySQL: `TINYINT(1)`, `AUTO_INCREMENT`, `YEAR`, `LONGTEXT`
+- MySQL (Aiven Cloud)
+- Tipos MySQL: `INT AUTO_INCREMENT`, `TINYINT(1)`, `SMALLINT`, `TIMESTAMP`, `TEXT`
+- No usar tipos PostgreSQL: `SERIAL`, `BOOLEAN DEFAULT`, `TIMESTAMPTZ`
 
 ### Git y despliegue
 - Nunca committear `.env` con credenciales reales

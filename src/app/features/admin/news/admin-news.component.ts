@@ -5,6 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { News, NewsListResponse } from '../../../models/news.model';
 
 @Component({
@@ -56,7 +57,9 @@ import { News, NewsListResponse } from '../../../models/news.model';
                   <button class="btn btn--sm" (click)="togglePublish(item)">
                     {{ item.isPublished ? 'Despublicar' : 'Publicar' }}
                   </button>
-                  <button class="btn btn--sm btn--danger" (click)="deleteNews(item)">Eliminar</button>
+                  @if (isAdmin()) {
+                    <button class="btn btn--sm btn--danger" (click)="deleteNews(item)">Eliminar</button>
+                  }
                 </td>
               </tr>
             } @empty {
@@ -103,8 +106,11 @@ import { News, NewsListResponse } from '../../../models/news.model';
 })
 export class AdminNewsComponent {
   private api = inject(ApiService);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
   private titleService = inject(Title);
+
+  readonly isAdmin = this.authService.isAdmin;
 
   readonly news = signal<News[]>([]);
   readonly total = signal(0);

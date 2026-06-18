@@ -1,11 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, DestroyRef } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of, finalize } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
 import { environment } from '../../../../environments/environment';
 import { Title } from '@angular/platform-browser';
-import { AdminStatsService } from '../admin-stats.service';
 
 interface DashboardStats {
   totalNews: number;
@@ -18,9 +17,9 @@ interface DashboardStats {
 
 interface MigrateResult {
   message: string;
-  total: number;
-  migrated: number;
-  errors: number;
+  total?: number;
+  migrated?: number;
+  errors?: number;
 }
 
 @Component({
@@ -87,9 +86,11 @@ interface MigrateResult {
             {{ migrating() ? 'Migrando…' : 'Migrar imágenes' }}
           </button>
           @if (migrateResult(); as r) {
-            <div class="migrate-result" [class.migrate-result--ok]="r.errors === 0">
+            <div class="migrate-result" [class.migrate-result--ok]="r.errors === 0 || r.errors === undefined">
               <p>{{ r.message }}</p>
-              <small>Migradas: {{ r.migrated }} / Errores: {{ r.errors }} / Total: {{ r.total }}</small>
+              @if (r.total !== undefined) {
+                <small>Migradas: {{ r.migrated }} / Errores: {{ r.errors }} / Total: {{ r.total }}</small>
+              }
             </div>
           }
         </div>
@@ -142,10 +143,6 @@ export class AdminDashboardComponent {
   private api = inject(ApiService);
   private destroyRef = inject(DestroyRef);
   private title = inject(Title);
-  private statsService = inject(AdminStatsService);
-
-  readonly pendingOrders = computed(() => this.statsService.stats().pendingOrders);
-  readonly unreadMessages = computed(() => this.statsService.stats().unreadMessages);
 
   readonly stats = signal<DashboardStats>({
     totalNews: 0, pendingOrders: 0, revenueThisMonth: 0, unreadMessages: 0,

@@ -31,14 +31,21 @@ export class CartService {
       throw new BadRequestException(`Solo quedan ${product.stock} unidades disponibles`);
     }
 
-    const existing = await this.cartRepo.findOne({
-      where: {
-        sessionId,
-        productId: dto.productId,
-        size: dto.size != null ? dto.size : IsNull(),
-        color: dto.color != null ? dto.color : IsNull(),
-      } as any,
-    });
+    const where: Record<string, unknown> = {
+      sessionId,
+      productId: dto.productId,
+    };
+    if (dto.size != null) {
+      where.size = dto.size;
+    } else {
+      where.size = IsNull();
+    }
+    if (dto.color != null) {
+      where.color = dto.color;
+    } else {
+      where.color = IsNull();
+    }
+    const existing = await this.cartRepo.findOne({ where });
 
     if (existing) {
       existing.quantity += dto.quantity;

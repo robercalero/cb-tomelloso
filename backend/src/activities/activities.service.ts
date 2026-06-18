@@ -38,6 +38,6 @@ export class ActivitiesService {
 
   async remove(id: number): Promise<void> {
     await this.findOne(id);
-    await this.activityRepo.update(id, { isPublished: false });
+    await this.activityRepo.delete(id);
   }
 }

@@ -3,6 +3,7 @@ import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
+import type { OrderStatus } from './entities/order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
@@ -45,9 +46,9 @@ export class OrdersController {
   @ApiBearerAuth()
   updateStatus(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status') status: string,
+    @Body('status') status: OrderStatus,
     @Body('trackingNumber') trackingNumber?: string,
   ): Promise<Order> {
-    return this.service.updateStatus(id, status as any, trackingNumber);
+    return this.service.updateStatus(id, status, trackingNumber);
   }
 }

@@ -31,7 +31,9 @@ import { AdminStatsService } from '../admin-stats.service';
               Mensajes @if (unreadMessagesCount() > 0) { <span class="badge">{{ unreadMessagesCount() }}</span> }
             </a>
           </li>
-          <li><a routerLink="/admin/socios" routerLinkActive="active">Socios</a></li>
+          @if (authService.isAdmin()) {
+            <li><a routerLink="/admin/socios" routerLinkActive="active">Socios</a></li>
+          }
           <li><a routerLink="/" routerLinkActive="active">Volver a la web</a></li>
         </ul>
         <div class="admin-sidebar__user">

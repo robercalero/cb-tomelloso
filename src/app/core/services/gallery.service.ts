@@ -14,6 +14,8 @@ export interface GalleryItem {
   season?: string;
   eventName?: string;
   takenAt?: string;
+  isPublished: boolean;
+  sortOrder: number;
 }
 
 @Injectable({ providedIn: 'root' })

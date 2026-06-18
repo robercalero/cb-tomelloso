@@ -30,6 +30,7 @@ export class User {
   isActive: boolean;
 
   @Column({ name: 'refresh_token', type: 'varchar', length: 500, nullable: true })
+  @Exclude()
   refreshToken: string | null;
 
   @OneToMany(() => News, (news) => news.author)

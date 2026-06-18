@@ -21,7 +21,7 @@
 - `synchronize: false` en producción (NODE_ENV=production)
 - Puerto dinámico: `process.env.PORT || 3000`
 - Escuchar en `'0.0.0.0'` no en `'localhost'`
-- CORS incluye siempre `https://cb-tomelloso-web.onrender.com`
+- CORS incluye siempre `https://cb-tomelloso.onrender.com`
 - Swagger deshabilitado en producción
 - Soft delete (isActive: false) en lugar de delete físico
 

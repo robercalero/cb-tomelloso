@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Activity {
   id: number;
@@ -49,7 +50,9 @@ interface Activity {
                 <td>{{ a.isPublished ? 'Sí' : 'No' }}</td>
                 <td class="actions">
                   <a [routerLink]="['/admin/actividades', a.id]" class="btn btn--sm" title="Editar">✏️</a>
-                  <button class="btn btn--sm btn--danger" (click)="deleteActivity(a.id)" title="Eliminar">🗑️</button>
+                  @if (isAdmin()) {
+                    <button class="btn btn--sm btn--danger" (click)="deleteActivity(a.id)" title="Eliminar">🗑️</button>
+                  }
                 </td>
               </tr>
             } @empty {
@@ -81,7 +84,10 @@ interface Activity {
 })
 export class AdminActivitiesComponent {
   private api = inject(ApiService);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
+
+  readonly isAdmin = this.authService.isAdmin;
 
   readonly activities = signal<Activity[]>([]);
 

@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, of } from 'rxjs';
 import { ApiService } from '../../../core/services/api.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Team {
   id: number;
@@ -52,7 +53,9 @@ interface Team {
                 </td>
                 <td class="actions">
                   <a [routerLink]="['/admin/equipos', team.id]" class="btn btn--sm" title="Editar">✏️</a>
-                  <button class="btn btn--sm btn--danger" (click)="deleteTeam(team.id)" title="Eliminar">🗑️</button>
+                  @if (isAdmin()) {
+                    <button class="btn btn--sm btn--danger" (click)="deleteTeam(team.id)" title="Eliminar">🗑️</button>
+                  }
                 </td>
               </tr>
             } @empty {
@@ -89,7 +92,10 @@ interface Team {
 })
 export class AdminTeamsComponent {
   private api = inject(ApiService);
+  private authService = inject(AuthService);
   private destroyRef = inject(DestroyRef);
+
+  readonly isAdmin = this.authService.isAdmin;
 
   readonly teams = signal<Team[]>([]);
 

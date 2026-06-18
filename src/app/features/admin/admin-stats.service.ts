@@ -14,11 +14,8 @@ export class AdminStatsService {
   private destroyRef = inject(DestroyRef);
 
   readonly stats = signal<AdminStats>({ pendingOrders: 0, unreadMessages: 0 });
-  private loaded = false;
 
   load(): void {
-    if (this.loaded) return;
-    this.loaded = true;
     this.api.get<AdminStats>('admin/stats').pipe(
       catchError(() => of({ pendingOrders: 0, unreadMessages: 0 })),
       takeUntilDestroyed(this.destroyRef),

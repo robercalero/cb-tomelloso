@@ -10,6 +10,8 @@ services:
     startCommand: node dist/main
     healthCheckPath: /api/v1/health
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: NODE_ENV
         value: production
       - key: API_PREFIX
@@ -35,7 +37,7 @@ services:
       - key: JWT_REFRESH_EXPIRES_IN
         value: 7d
       - key: CORS_ORIGIN
-        value: https://cb-tomelloso-web.onrender.com,https://cb-tomelloso.onrender.com,http://localhost:4200
+        value: https://cb-tomelloso.onrender.com,http://localhost:4200
       - key: FRONTEND_URL
         value: https://cb-tomelloso.onrender.com
       - key: THROTTLE_TTL
