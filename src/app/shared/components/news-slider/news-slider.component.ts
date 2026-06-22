@@ -44,7 +44,8 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
   private isBrowser = isPlatformBrowser(this.platformId);
 
   private autoplayTimer: ReturnType<typeof setInterval> | null = null;
-  private progressTimer: ReturnType<typeof setInterval> | null = null;
+  private rafId: number | null = null;
+  private progressStart = 0;
   private touchStartX = 0;
   private touchEndX = 0;
 
@@ -86,17 +87,17 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
     if (!this.isBrowser || !this.canNavigate()) return;
     this.stopAutoplay();
     this.progressPercent.set(0);
-    const total = this.interval();
-    const step = 50;
-    const increment = 100 / (total / step);
-    this.progressTimer = setInterval(() => {
-      if (!this.isPaused()) {
-        this.progressPercent.update(v => Math.min(v + increment, 100));
-      }
-    }, step);
+    this.progressStart = Date.now();
+    const interval = this.interval();
+    const tick = () => {
+      const elapsed = Date.now() - this.progressStart;
+      this.progressPercent.set(Math.min(elapsed / interval * 100, 100));
+      this.rafId = requestAnimationFrame(tick);
+    };
+    this.rafId = requestAnimationFrame(tick);
     this.autoplayTimer = setInterval(() => {
-      if (!this.isPaused()) this.goTo(this.activeIndex() + 1);
-    }, total);
+      this.goTo(this.activeIndex() + 1);
+    }, interval);
   }
 
   stopAutoplay(): void {
@@ -104,9 +105,9 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
       clearInterval(this.autoplayTimer);
       this.autoplayTimer = null;
     }
-    if (this.progressTimer !== null) {
-      clearInterval(this.progressTimer);
-      this.progressTimer = null;
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
     }
   }
 
