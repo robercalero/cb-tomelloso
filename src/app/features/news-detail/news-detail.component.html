@@ -100,12 +100,12 @@
       }
     </div>
     @if (idx !== null && idx > 0) {
-      <button class="lightbox-nav lightbox-prev" (click)="prevImage()" aria-label="Imagen anterior">
+      <button class="lightbox-nav lightbox-prev" (click)="prevImage(); $event.stopPropagation()" aria-label="Imagen anterior">
         <mat-icon>chevron_left</mat-icon>
       </button>
     }
     @if (idx !== null && idx < lightboxMedia().length - 1) {
-      <button class="lightbox-nav lightbox-next" (click)="nextImage()" aria-label="Siguiente imagen">
+      <button class="lightbox-nav lightbox-next" (click)="nextImage(); $event.stopPropagation()" aria-label="Siguiente imagen">
         <mat-icon>chevron_right</mat-icon>
       </button>
     }

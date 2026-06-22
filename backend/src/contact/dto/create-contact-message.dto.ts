@@ -19,5 +19,6 @@ export class CreateContactMessageDto {
 
   @ApiProperty({ example: 'Me gustaría obtener información sobre...' })
   @IsString()
+  @Length(1, 5000)
   message: string;
 }

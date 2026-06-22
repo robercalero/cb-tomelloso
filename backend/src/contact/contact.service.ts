@@ -51,4 +51,9 @@ export class ContactService {
   async markAsRead(id: number): Promise<void> {
     await this.contactRepo.update(id, { isRead: true });
   }
+
+  async remove(id: number): Promise<void> {
+    await this.findOne(id);
+    await this.contactRepo.delete(id);
+  }
 }

@@ -23,6 +23,14 @@ interface Match {
   team?: { id: number; name: string; category: string };
 }
 
+const MATCH_STATUS_LABELS: Record<string, string> = {
+  scheduled: 'Programado',
+  live: 'En directo',
+  finished: 'Finalizado',
+  postponed: 'Aplazado',
+  cancelled: 'Cancelado',
+};
+
 @Component({
   selector: 'app-admin-matches',
   standalone: true,
@@ -65,7 +73,7 @@ interface Match {
                 </td>
                 <td>
                   <span class="status-badge" [class]="'status-badge--' + match.status">
-                    {{ match.status }}
+                    {{ MATCH_STATUS_LABELS[match.status] }}
                   </span>
                 </td>
                 <td class="actions">
@@ -118,6 +126,7 @@ export class AdminMatchesComponent {
   readonly isAdmin = this.authService.isAdmin;
 
   readonly matches = signal<Match[]>([]);
+  protected readonly MATCH_STATUS_LABELS = MATCH_STATUS_LABELS;
 
   constructor() {
     this.loadMatches();
@@ -135,10 +144,7 @@ export class AdminMatchesComponent {
   deleteMatch(id: number): void {
     if (!confirm('¿Eliminar este partido?')) return;
     this.api.delete<void>(`matches/${id}`).pipe(
-      catchError(() => of(undefined)),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => {
-      this.matches.set(this.matches().filter(m => m.id !== id));
-    });
+    ).subscribe({ next: () => this.matches.set(this.matches().filter(m => m.id !== id)) });
   }
 }

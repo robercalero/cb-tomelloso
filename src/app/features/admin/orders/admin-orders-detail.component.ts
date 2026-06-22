@@ -7,6 +7,15 @@ import { ApiService } from '../../../core/services/api.service';
 import { Order } from '../../../models/shop.model';
 
 const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  pending: 'Pendiente',
+  paid: 'Pagado',
+  processing: 'Procesando',
+  shipped: 'Enviado',
+  delivered: 'Entregado',
+  cancelled: 'Cancelado',
+  refunded: 'Reembolsado',
+};
 const VALID_TRANSITIONS: Record<string, string[]> = {
   pending: ['paid', 'cancelled'],
   paid: ['pending', 'processing', 'refunded'],
@@ -43,7 +52,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
               <dd>
                 <select class="status-select" [value]="o.status" (change)="updateStatus($any($event.target).value)">
                   @for (opt of allowedOptions(o.status); track opt) {
-                    <option [value]="opt">{{ opt }}</option>
+                    <option [value]="opt">{{ ORDER_STATUS_LABELS[opt] || opt }}</option>
                   }
                 </select>
               </dd>
@@ -178,6 +187,7 @@ export class AdminOrdersDetailComponent {
   readonly error = signal('');
 
   protected readonly STATUS_OPTIONS = STATUS_OPTIONS;
+  protected readonly ORDER_STATUS_LABELS = ORDER_STATUS_LABELS;
 
   allowedOptions(current: string): string[] {
     const transitions = VALID_TRANSITIONS[current];
@@ -191,7 +201,7 @@ export class AdminOrdersDetailComponent {
 
   private loadOrder(orderNumber: string): void {
     this.loading.set(true);
-    this.api.get<Order>(`shop/orders/${orderNumber}`).pipe(
+    this.api.get<Order>(`shop/orders/admin/${orderNumber}`).pipe(
       catchError(() => {
         this.loading.set(false);
         this.error.set('Pedido no encontrado');

@@ -99,8 +99,7 @@ export class AdminGalleryComponent {
   deleteItem(id: number): void {
     if (!confirm('¿Eliminar este elemento?')) return;
     this.api.delete<void>(`gallery/${id}`).pipe(
-      catchError(() => of(undefined)),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => this.items.set(this.items().filter(i => i.id !== id)));
+    ).subscribe({ next: () => this.items.set(this.items().filter(i => i.id !== id)) });
   }
 }

@@ -224,8 +224,7 @@ export class AdminMembersComponent {
   deactivate(member: Member): void {
     if (!confirm(`Desactivar socio "${member.name}"?`)) return;
     this.api.delete<void>(`members/${member.id}`).pipe(
-      catchError(() => of(null)),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => this.loadMembers());
+    ).subscribe({ next: () => this.loadMembers() });
   }
 }

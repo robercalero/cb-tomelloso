@@ -1,6 +1,6 @@
 import {
   Component, OnInit, OnDestroy, ChangeDetectionStrategy, input, output,
-  signal, computed, inject, DestroyRef, afterNextRender, PLATFORM_ID
+  signal, computed, inject, effect, DestroyRef, afterNextRender, PLATFORM_ID
 } from '@angular/core';
 import { isPlatformBrowser, NgClass, DatePipe, TitleCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -49,7 +49,10 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
   constructor() {
     afterNextRender(() => {
       this.isLoaded.set(true);
-      if (this.autoplay()) this.startAutoplay();
+    });
+    effect(() => {
+      this.slides();
+      if (this.isBrowser) this.startAutoplay();
     });
     this.destroyRef.onDestroy(() => this.stopAutoplay());
   }

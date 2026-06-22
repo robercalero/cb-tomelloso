@@ -40,6 +40,7 @@ export class ProductCategoriesService {
   }
 
   async remove(id: number): Promise<void> {
-    await this.repo.delete(id);
+    await this.findOne(id);
+    await this.repo.update(id, { isActive: false });
   }
 }

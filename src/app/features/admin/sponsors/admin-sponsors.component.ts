@@ -104,8 +104,7 @@ export class AdminSponsorsComponent {
   deleteSponsor(id: number): void {
     if (!confirm('¿Eliminar este patrocinador?')) return;
     this.api.delete<void>(`sponsors/${id}`).pipe(
-      catchError(() => of(undefined)),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => this.sponsors.set(this.sponsors().filter(s => s.id !== id)));
+    ).subscribe({ next: () => this.sponsors.set(this.sponsors().filter(s => s.id !== id)) });
   }
 }

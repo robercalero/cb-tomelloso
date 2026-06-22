@@ -32,6 +32,14 @@ export class OrdersController {
     return this.service.findByStripeSessionId(stripeSessionId);
   }
 
+  @Get('admin/:orderNumber')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin', 'editor')
+  @ApiBearerAuth()
+  async findForAdmin(@Param('orderNumber') orderNumber: string): Promise<Order> {
+    return this.service.findByOrderNumber(orderNumber);
+  }
+
   @Get(':orderNumber')
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   async findByOrderNumber(@Param('orderNumber') orderNumber: string) {

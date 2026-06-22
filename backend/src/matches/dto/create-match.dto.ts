@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsEnum, IsOptional, IsBoolean, IsDateString, Length, Matches } from 'class-validator';
+import { IsString, IsNumber, IsEnum, IsOptional, IsBoolean, Length, Matches } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import type { MatchStatus } from '../entities/match.entity';
 
@@ -28,7 +28,7 @@ export class CreateMatchDto {
   awayTeamLogo?: string;
 
   @ApiProperty({ example: '2025-09-20' })
-  @IsDateString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/, { message: 'matchDate debe tener formato YYYY-MM-DD' })
   matchDate: string;
 
   @ApiProperty({ example: '19:00' })

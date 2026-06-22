@@ -30,6 +30,14 @@ interface Team {
 
 const MATCH_STATUSES = ['scheduled', 'live', 'finished', 'postponed', 'cancelled'] as const;
 
+const MATCH_STATUS_LABELS: Record<string, string> = {
+  scheduled: 'Programado',
+  live: 'En directo',
+  finished: 'Finalizado',
+  postponed: 'Aplazado',
+  cancelled: 'Cancelado',
+};
+
 @Component({
   selector: 'app-admin-matches-form',
   standalone: true,
@@ -105,7 +113,7 @@ const MATCH_STATUSES = ['scheduled', 'live', 'finished', 'postponed', 'cancelled
               <label for="status">Estado</label>
               <select id="status" [ngModel]="status()" (ngModelChange)="status.set($event)" name="status">
                 @for (s of MATCH_STATUSES; track s) {
-                  <option [value]="s">{{ s }}</option>
+                  <option [value]="s">{{ MATCH_STATUS_LABELS[s] }}</option>
                 }
               </select>
             </div>
@@ -191,6 +199,7 @@ export class AdminMatchesFormComponent {
   readonly teams = signal<Team[]>([]);
 
   protected readonly MATCH_STATUSES = MATCH_STATUSES;
+  protected readonly MATCH_STATUS_LABELS = MATCH_STATUS_LABELS;
 
   private matchId: number | null = null;
 

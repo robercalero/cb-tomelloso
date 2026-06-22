@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, ParseIntPipe, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, ParseIntPipe, Query, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
@@ -39,5 +39,15 @@ export class ContactController {
   @ApiOperation({ summary: '[Admin] Ver detalle de mensaje' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.contactService.markAsRead(id).then(() => this.contactService.findOne(id));
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: '[Admin] Eliminar mensaje' })
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.contactService.remove(id);
   }
 }

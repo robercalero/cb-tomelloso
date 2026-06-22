@@ -34,6 +34,7 @@ export class ContactComponent implements OnInit {
   readonly isSubmitted = signal(false);
   readonly isMemberSubmitted = signal(false);
   readonly isSending = signal(false);
+  readonly errorMessage = signal('');
 
   readonly contactForm = new FormGroup({
     name: new FormControl('', [Validators.required, Validators.minLength(2)]),
@@ -111,6 +112,7 @@ export class ContactComponent implements OnInit {
     if (this.isSending()) return;
     if (this.contactForm.valid) {
       this.isSending.set(true);
+      this.errorMessage.set('');
       const { name, email, subject, message } = this.contactForm.value;
       this.contactService.sendMessage({ name: name!, email: email!, subject: subject!, message: message! })
         .pipe(finalize(() => this.isSending.set(false)))
@@ -118,6 +120,9 @@ export class ContactComponent implements OnInit {
           next: () => {
             this.isSubmitted.set(true);
             this.contactForm.reset({ subject: 'general' });
+          },
+          error: () => {
+            this.errorMessage.set('Error al enviar el mensaje. Inténtalo de nuevo más tarde.');
           },
         });
     } else {
@@ -129,6 +134,7 @@ export class ContactComponent implements OnInit {
     if (this.isSending()) return;
     if (this.memberForm.valid) {
       this.isSending.set(true);
+      this.errorMessage.set('');
       const { name, email, phone, category } = this.memberForm.value;
       this.api.post<{ id: number }>('members', {
         name: name!,
@@ -141,6 +147,9 @@ export class ContactComponent implements OnInit {
           next: () => {
             this.isMemberSubmitted.set(true);
             this.memberForm.reset({ category: 'adulto' });
+          },
+          error: () => {
+            this.errorMessage.set('Error al enviar la solicitud. Inténtalo de nuevo más tarde.');
           },
         });
     } else {

@@ -152,8 +152,7 @@ export class AdminNewsComponent {
   deleteNews(item: News): void {
     if (!confirm(`¿Eliminar "${item.title}"?`)) return;
     this.api.delete<void>(`news/${item.id}`).pipe(
-      catchError(() => of(undefined)),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => this.loadNews());
+    ).subscribe({ next: () => this.loadNews() });
   }
 }

@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { Member } from './entities/member.entity';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
@@ -11,6 +11,8 @@ export class MembersService {
   constructor(
     @InjectRepository(Member)
     private readonly memberRepo: Repository<Member>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
     private readonly mailService: MailService,
   ) {}
 
@@ -30,24 +32,26 @@ export class MembersService {
   }
 
   async create(dto: CreateMemberDto): Promise<Member> {
-    const memberNumber = await this.generateMemberNumber();
-    const member = this.memberRepo.create({
-      name: dto.name,
-      email: dto.email,
-      phone: dto.phone || null,
-      memberType: dto.memberType,
-      memberNumber,
-      joinedAt: new Date().toISOString().split('T')[0],
-      userId: dto.userId ?? null,
+    const saved = await this.dataSource.transaction(async (manager) => {
+      const memberNumber = await this.generateMemberNumber(manager);
+      const member = manager.create(Member, {
+        name: dto.name,
+        email: dto.email,
+        phone: dto.phone || null,
+        memberType: dto.memberType,
+        memberNumber,
+        joinedAt: new Date().toISOString().split('T')[0],
+        userId: dto.userId ?? null,
+      });
+      return manager.save(Member, member);
     });
-    const saved = await this.memberRepo.save(member);
 
-    await this.mailService.sendMemberWelcome({
+    this.mailService.sendMemberWelcome({
       name: dto.name,
       email: dto.email,
       memberType: dto.memberType || 'adulto',
       memberNumber: saved.memberNumber ?? undefined,
-    });
+    }).catch(() => {});
 
     return saved;
   }
@@ -63,9 +67,10 @@ export class MembersService {
     await this.memberRepo.update(id, { isActive: false });
   }
 
-  private async generateMemberNumber(): Promise<string> {
+  private async generateMemberNumber(manager?: any): Promise<string> {
     const year = new Date().getFullYear();
-    const last = await this.memberRepo.findOne({ order: { id: 'DESC' } });
+    const repo = manager ? manager.getRepository(Member) : this.memberRepo;
+    const last = await repo.findOne({ order: { id: 'DESC' } });
     const next = (last?.id || 0) + 1;
     return `CBT-${year}-${String(next).padStart(4, '0')}`;
   }

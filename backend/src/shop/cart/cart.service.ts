@@ -49,7 +49,11 @@ export class CartService {
 
     if (existing) {
       existing.quantity += dto.quantity;
-      return this.cartRepo.save(existing);
+      const saved = await this.cartRepo.save(existing);
+      return this.cartRepo.findOneOrFail({
+        where: { id: saved.id },
+        relations: { product: { category: true } },
+      });
     }
 
     const item = this.cartRepo.create({
@@ -59,7 +63,11 @@ export class CartService {
       size: dto.size || null,
       color: dto.color || null,
     });
-    return this.cartRepo.save(item);
+    const saved = await this.cartRepo.save(item);
+    return this.cartRepo.findOneOrFail({
+      where: { id: saved.id },
+      relations: { product: { category: true } },
+    });
   }
 
   async updateItem(sessionId: string, itemId: number, quantity: number): Promise<CartItem | null> {

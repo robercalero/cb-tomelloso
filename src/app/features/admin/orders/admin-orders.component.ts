@@ -7,6 +7,15 @@ import { ApiService } from '../../../core/services/api.service';
 import { Order } from '../../../models/shop.model';
 
 const STATUS_OPTIONS = ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded'];
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  pending: 'Pendiente',
+  paid: 'Pagado',
+  processing: 'Procesando',
+  shipped: 'Enviado',
+  delivered: 'Entregado',
+  cancelled: 'Cancelado',
+  refunded: 'Reembolsado',
+};
 const ORDER_TRANSITIONS: Record<string, string[]> = {
   pending: ['paid', 'cancelled'],
   paid: ['pending', 'processing', 'refunded'],
@@ -55,7 +64,7 @@ const ORDER_TRANSITIONS: Record<string, string[]> = {
                     (change)="updateStatus(order.id, $any($event.target).value)"
                   >
                     @for (opt of allowedOptions(order.status); track opt) {
-                      <option [value]="opt">{{ opt }}</option>
+                      <option [value]="opt">{{ ORDER_STATUS_LABELS[opt] || opt }}</option>
                     }
                   </select>
                 </td>
@@ -113,6 +122,7 @@ export class AdminOrdersComponent {
   readonly loading = signal(false);
 
   protected readonly STATUS_OPTIONS = STATUS_OPTIONS;
+  protected readonly ORDER_STATUS_LABELS = ORDER_STATUS_LABELS;
 
   allowedOptions(current: string): string[] {
     const t = ORDER_TRANSITIONS[current];

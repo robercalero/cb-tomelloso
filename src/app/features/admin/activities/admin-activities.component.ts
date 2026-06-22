@@ -105,8 +105,7 @@ export class AdminActivitiesComponent {
   deleteActivity(id: number): void {
     if (!confirm('¿Eliminar esta actividad?')) return;
     this.api.delete<void>(`activities/${id}`).pipe(
-      catchError(() => of(undefined)),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => this.activities.set(this.activities().filter(a => a.id !== id)));
+    ).subscribe({ next: () => this.activities.set(this.activities().filter(a => a.id !== id)) });
   }
 }

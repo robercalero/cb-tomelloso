@@ -19,7 +19,7 @@ INSERT INTO `teams` (`name`, `category`, `season`, `coach`, `is_active`) VALUES
 -- PATROCINADORES
 -- -----------------------------------------------------------
 INSERT INTO `sponsors` (`name`, `logo_url`, `website_url`, `tier`, `description`, `contact_name`, `sort_order`, `is_active`) VALUES
-('Val Brokers · Jiménez Valentín Seguros', '/assets/sponsors/valbrokers.png', '#', 'principal',
+('Val Brokers · Jiménez Valentín Seguros', '/assets/sponsors/valbrokers.png', 'https://valbrokers.com/', 'principal',
  'Patrocinador principal del Club Baloncesto Tomelloso. Dionisio Jiménez Valentín.', 'Dionisio Jiménez Valentín', 1, 1),
 ('Ayuntamiento de Tomelloso', '/assets/sponsors/ayuntamiento.png', 'https://www.tomelloso.es', 'oro',
  'Colaborador institucional del club.', NULL, 2, 1),

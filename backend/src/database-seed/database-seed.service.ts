@@ -373,11 +373,11 @@ export class DatabaseSeedService implements OnModuleInit {
       {
         name: 'Val Brokers',
         logoUrl: 'https://placehold.co/300x150/1a5276/f39c12?text=Val+Brokers',
-        websiteUrl: 'https://valbrokers.es',
+        websiteUrl: 'https://valbrokers.com/',
         tier: 'principal' as const,
         description: 'Correduría de seguros de confianza, patrocinador oficial del CB Tomelloso desde 2018.',
         contactName: 'Javier Valbuena',
-        contactEmail: 'info@valbrokers.es',
+        contactEmail: 'info@valbrokers.com',
         isActive: true,
         sortOrder: 1,
       },

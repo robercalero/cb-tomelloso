@@ -42,7 +42,10 @@ import { ContactMessage } from '../../../models/contact-message.model';
           <div class="message-detail">
             <div class="message-detail__header">
               <h2>{{ msg.subject }}</h2>
-              <button class="btn btn--sm" (click)="closeMessage()">✕</button>
+              <div class="message-detail__actions">
+                <button class="btn btn--sm btn--danger" (click)="deleteMessage(msg.id)" title="Eliminar mensaje">🗑️</button>
+                <button class="btn btn--sm" (click)="closeMessage()">✕</button>
+              </div>
             </div>
             <div class="message-detail__meta">
               <span><strong>De:</strong> {{ msg.name }} ({{ msg.email }})</span>
@@ -76,12 +79,15 @@ import { ContactMessage } from '../../../models/contact-message.model';
     .empty { text-align: center; color: var(--color-text-muted); padding: 2rem !important; }
     .message-detail { background: white; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 1.5rem; }
     .message-detail--empty { display: flex; align-items: center; justify-content: center; min-height: 200px; color: var(--color-text-muted); }
-    .message-detail__header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .message-detail__header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 1rem; }
     .message-detail__header h2 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+    .message-detail__actions { display: flex; gap: 0.25rem; flex-shrink: 0; }
     .message-detail__meta { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
     .message-detail__body { white-space: pre-wrap; line-height: 1.6; font-size: 0.9rem; }
     .btn { border: none; cursor: pointer; padding: 0.35rem 0.6rem; border-radius: 6px; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; background: #f0f0f0; }
     .btn--sm { padding: 0.25rem 0.5rem; font-size: 0.85rem; }
+    .btn--danger { background: #fce4e4; color: #c0392b; }
+    .btn--danger:hover { background: #f5c6c6; }
     @media (max-width: 768px) { .messages-layout { grid-template-columns: 1fr; } }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -122,5 +128,19 @@ export class AdminMessagesComponent {
 
   closeMessage(): void {
     this.selectedMessage.set(null);
+  }
+
+  deleteMessage(id: number): void {
+    if (!confirm('¿Eliminar este mensaje?')) return;
+    this.api.delete(`contact/${id}`).pipe(
+      takeUntilDestroyed(this.destroyRef),
+    ).subscribe({
+      next: () => {
+        this.messages.set(this.messages().filter(m => m.id !== id));
+        if (this.selectedMessage()?.id === id) {
+          this.selectedMessage.set(null);
+        }
+      },
+    });
   }
 }

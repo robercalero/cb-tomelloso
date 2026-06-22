@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, signal, computed, PLATFORM_ID } from '@angular/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { isPlatformBrowser } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -36,6 +36,24 @@ export class AgendaComponent implements OnInit {
 
   readonly viewMode = signal<ViewMode>('list');
   readonly filterTeam = signal<string | null>(null);
+
+  readonly filteredUpcomingMatches = computed(() => {
+    const filter = this.filterTeam();
+    if (!filter) return this.upcomingMatches();
+    return this.upcomingMatches().filter(m => m.competition === filter);
+  });
+
+  readonly filteredRecentResults = computed(() => {
+    const filter = this.filterTeam();
+    if (!filter) return this.recentResults();
+    return this.recentResults().filter(m => m.competition === filter);
+  });
+
+  readonly filteredMatches = computed(() => {
+    const filter = this.filterTeam();
+    if (!filter) return this.matches();
+    return this.matches().filter(m => m.competition === filter);
+  });
   readonly loadingUpcoming = signal(true);
   readonly loadingResults = signal(true);
   readonly loadingAll = signal(true);

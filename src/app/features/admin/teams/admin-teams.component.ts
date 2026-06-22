@@ -113,10 +113,9 @@ export class AdminTeamsComponent {
   deleteTeam(id: number): void {
     if (!confirm('¿Eliminar este equipo?')) return;
     this.api.delete<void>(`teams/${id}`).pipe(
-      catchError(() => of(undefined)),
       takeUntilDestroyed(this.destroyRef),
-    ).subscribe(() => {
-      this.teams.set(this.teams().filter(t => t.id !== id));
+    ).subscribe({
+      next: () => this.teams.set(this.teams().filter(t => t.id !== id)),
     });
   }
 }

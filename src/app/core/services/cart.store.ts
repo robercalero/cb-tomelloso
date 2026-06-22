@@ -73,7 +73,6 @@ export class CartStore {
         } else {
           this.reloadCartSilently();
         }
-        this.openCart();
       });
   }
 
