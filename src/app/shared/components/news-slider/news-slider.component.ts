@@ -68,6 +68,7 @@ export class NewsSliderComponent implements OnInit, OnDestroy {
     this.isTransitioning.set(true);
     this.activeIndex.set((index + this.totalSlides()) % this.totalSlides());
     this.progressPercent.set(0);
+    this.progressStart = Date.now();
     const slide = this.activeSlide();
     if (slide) this.slideChanged.emit(slide);
     setTimeout(() => this.isTransitioning.set(false), this.transition());
