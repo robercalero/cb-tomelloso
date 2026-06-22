@@ -130,7 +130,7 @@
     </div>
   }
 
-  @if (autoplay() && canNavigate() && !isPaused()) {
-    <div class="slider__progress" [style.animation-duration]="interval() + 'ms'" aria-hidden="true"></div>
+  @if (autoplay() && canNavigate()) {
+    <div class="slider__progress" [style.transform]="'scaleX(' + (progressPercent() / 100) + ')'" aria-hidden="true"></div>
   }
 </section>
